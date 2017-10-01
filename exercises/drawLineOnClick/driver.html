@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>[TITLE]</title>
+        <style>
+            body {
+                height: 100%;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            #navbar {
+                width: 100%;
+                height: 40px;
+                background: gray;
+                text-align: center;
+                vertical-align: middle;
+                line-height: 40px;
+            }
+            #content {
+                margin-top: 15px;
+            }
+            #webgl {
+                border: 1px solid black;
+                padding: 0;
+                margin: auto;
+                display: block;
+            }
+            #footer {
+                width: 100%;
+                text-align: center;
+                vertical-align: middle;
+            }
+            #options {
+                width: 800px;
+                padding: 0;
+                margin: auto;
+                margin-top: 15px;
+            }
+            #options button{
+                float: right;
+            }
+        </style>
+    </head>
+
+    <body onload="main()">
+        <div id="page-container">
+            <div id="navbar">
+                <span>[TITLE]</span>
+            </div>
+            <div id="footer">
+                <a href="features.html">Go to features</a>
+            </div>   
+            <div id="content">
+                <canvas id="webgl" height="800" width="800">
+                    Please use a browser that supports "canvas".
+                </canvas>
+            </div>
+            <form action="" id="options">
+                <button onclick="clear()">Clear</button>
+            </form>
+        </div>        
+
+        <script src="../lib/webgl-utils.js"></script>
+        <script src="../lib/webgl-debug.js"></script>
+        <script src="../lib/cuon-utils.js"></script>
+        <script src="main.js"></script>
+    </body>
+</html>
