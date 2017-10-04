@@ -28,7 +28,7 @@ let canvas,
 		x: 0.0,
 		y: 0.0
 	},
-	active_random;
+	active_random = false;
 
 function main() {
 	if (!setup()) {
@@ -45,7 +45,9 @@ function main() {
 	// Mouse move event
 	canvas.onmousemove = function(event) {
 		event.preventDefault();
-		move(event);
+		if (!active_random) {
+			move(event);
+		}
 	};
 
 	// Disable context menu
@@ -278,24 +280,29 @@ function draw() {
 function startRandom() {
 	console.log("Starting random points.")
 
-	mouse_point.x = (Math.random() * 2) - 1;
-	mouse_point.y = (Math.random() * 2) - 1;
+	// Set first point to start
+	mouse_point.x = (Math.random().toFixed(2) * 2) - 1;
+	mouse_point.y = (Math.random().toFixed(2) * 2) - 1;
 
+	// Start loop
 	active_random = setInterval( function() {
+		// Right click or left click
 		let right = !(Math.random() < 0.7); // true if random number >= 0.7
-
+		// Log it
 		if (right) {
 			console.log("Right click detected at [", mouse_point.x, ", ", mouse_point.y, "].");
 		} else {
 			console.log("Left click detected at [", mouse_point.x, ", ", mouse_point.y, "].");
 		}
 
-		let e = newPoint({
+		// Add the point. Does it finish a polyline?
+		let ends = newPoint({
 			x: mouse_point.x,
 			y: mouse_point.y
 		}, right);
 
-		if (e) {
+		// If it ends print it.
+		if (ends) {
 			let str = 'Polyline ended. Points are: ',
 					i = 0;
 			for (i; i < polylines[polylines.length - 1].points.length - 1; i++) {
@@ -306,27 +313,57 @@ function startRandom() {
 			console.log(str);
 		}
 
-		draw()
+		// Always draw
+		draw();
 
-		mouse_point.x = (Math.random() * 2) - 1;
-		mouse_point.y = (Math.random() * 2) - 1;
+		// Save the point
+		let previous_mouse_point = {
+			x: mouse_point.x,
+			y: mouse_point.y
+		};
+		//console.log("Previous mouse point: ", previous_mouse_point);
 
-		setTimeout(function() {
-			draw();
-		}, 800);
+		// Set a new point
+		let next_mouse_point = {
+			x: (Math.random().toFixed(2) * 2) - 1,
+			y: (Math.random().toFixed(2) * 2) - 1
+		};
+		//console.log("Next mouse point: ", next_mouse_point);
 
-	}, 1600);
+		// Calculate the difference
+		let diff = {
+			x: next_mouse_point.x - mouse_point.x,
+			y: next_mouse_point.y - mouse_point.y
+		};
+		//console.log("diff: ", diff);
+		
+		// We will move the mouse 1000 points between them
+		for (let j = 1; j < 500; j++) {
+			setTimeout(function() {
+				// Move the mouse
+				mouse_point.x = previous_mouse_point.x + (diff.x / 500) * j;
+				mouse_point.y = previous_mouse_point.y + (diff.y / 500) * j;
+
+				// Draw it
+				draw();
+			}, 100);
+		}
+
+		// Update mouse to real point
+		mouse_point.x = next_mouse_point.x;
+		mouse_point.y = next_mouse_point.y;
+
+	}, 500);
 
 	document.getElementById('rdstart').disabled = true;
 	document.getElementById('rdstop').disabled = false;
-
-
 }
 
 function stopRandom() {
 	console.log("Stoping random points.")
 
 	clearInterval(active_random);
+	active_random = false;
 
 	document.getElementById('rdstart').disabled = false;
 	document.getElementById('rdstop').disabled = true;
