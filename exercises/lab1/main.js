@@ -19,16 +19,16 @@ let FSHADER_SOURCE =
 
 // Program vars
 let canvas,
-	gl,
-	a_Position,
-	a_Color,
-	polylines = [],
-	active_polyline = -1,
-	mouse_point = {
-		x: 0.0,
-		y: 0.0
-	},
-	active_random = false;
+		gl,
+		a_Position,
+		a_Color,
+		polylines = [],
+		active_polyline = -1,
+		mouse_point = {
+			x: 0.0,
+			y: 0.0
+		},
+		active_random = false;
 
 function main() {
 	if (!setup()) {
@@ -39,7 +39,9 @@ function main() {
 	// Mouse press event
 	canvas.onmousedown = function(event) {
 		event.preventDefault();
-		click(event);
+		if (!active_random) {
+			click(event);
+		}
 	};
 
 	// Mouse move event
@@ -131,6 +133,7 @@ function click(event) {
 	coords.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width  / 2);
 	coords.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2);
 
+	// Which button was pressed?
 	switch (event.button) {
 		case 0:
 			// Left click, red point
@@ -145,6 +148,8 @@ function click(event) {
 		default:
 			break;
 	}
+
+	// If the point ends a polyline print it
 	if (coords.e) {
 		let str = 'Polyline ended. Points are: ',
 				i = 0;
@@ -156,6 +161,7 @@ function click(event) {
 		console.log(str);
 	}
 
+	// Draw
 	draw();
 }
 
@@ -214,6 +220,7 @@ function newPoint(coords, ends) {
 		active_polyline = -1;
 	}
 
+	// Return true if it was an ending point
 	return (ends && !first);
 }
 
@@ -225,12 +232,14 @@ function drawPolyline(lineObj) {
 	let lines_count;
 
 	for (vertex_count = 0; vertex_count < lineObj.points.length; vertex_count++) {
+		// Vertex and color
 		vertex_set.push(lineObj.points[vertex_count].x);
 		vertex_set.push(lineObj.points[vertex_count].y);
 		vertex_set.push(lineObj.points[vertex_count].c.R);
 		vertex_set.push(lineObj.points[vertex_count].c.G);
 		vertex_set.push(lineObj.points[vertex_count].c.B);
 
+		// Lines and grey
 		lines_set.push(lineObj.points[vertex_count].x);
 		lines_set.push(lineObj.points[vertex_count].y);
 		lines_set.push(0.8);
@@ -249,8 +258,6 @@ function drawPolyline(lineObj) {
 			lines_set.push(1.0);
 			lines_set.push(0.0);
 			lines_count++;
-		} else {
-
 		}
 
 		// Write vertex into buffer
@@ -270,6 +277,7 @@ function drawPolyline(lineObj) {
 }
 
 function draw() {
+	// Draw each polyline
 	for (let i = 0; i < polylines.length; i++) {
 		drawPolyline(polylines[i]);
 	}
