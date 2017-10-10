@@ -24,36 +24,38 @@ const FLOAT_BYTES = 4,
 let canvas,
 		gl,
 		a_Position,
-		a_Color,
-		segments = [],
-		active_segment_set = -1,
+		a_Color;
+
+let objects = [],
+		active_object = -1,
 		mouse_point = {
 			x: 0.0,
 			y: 0.0,
 			z: 0.0
-		},
-		active_random = false;
+		};
 
+// Main function
 function main() {
 	if (!setup()) {
 		console.log('There was an error in the setup. Exiting now.');
 		return;
 	}
 
+	document.getElementById('bRotate').onclick = function(event) {
+		event.preventDefault();
+		rotate();
+	};
+
 	// Mouse press event
 	canvas.onmousedown = function(event) {
 		event.preventDefault();
-		if (!active_random) {
-			click(event);
-		}
+		click(event);
 	};
 
 	// Mouse move event
 	canvas.onmousemove = function(event) {
 		event.preventDefault();
-		if (!active_random) {
-			move(event);
-		}
+		move(event);
 	};
 
 	// Disable context menu
@@ -62,6 +64,7 @@ function main() {
 	}
 }
 
+// Setup WebGL function
 function setup() {
 	// Retrieve <canvas> element
 	canvas = document.getElementById('webgl');
@@ -123,6 +126,99 @@ function setup() {
 	return true;
 }
 
+// Main draw function
+function draw() {
+	clearCanvas();
+
+	// Draw each polyline
+	for (let i = 0; i < objects.length; i++) {
+		drawObject(objects[i]);
+	}
+
+	return objects.length;
+}
+
+function rotate() {
+	let M = new Matrix4();
+	M.setRotate(45, 1, 1, 1);
+
+	for (let i = 0; i < objects.length; i++) {
+		for (let j = 0; j < objects[i].nodes.length; j++) {
+			// Transform point
+			objects[i].nodes[j].point.x = 
+				objects[i].nodes[j].point.x * M.elements[0] + 
+				objects[i].nodes[j].point.y * M.elements[4] + 
+				objects[i].nodes[j].point.z * M.elements[8] + 
+				1 * M.elements[12];
+
+			objects[i].nodes[j].point.y = 
+				objects[i].nodes[j].point.x * M.elements[1] + 
+				objects[i].nodes[j].point.y * M.elements[5] + 
+				objects[i].nodes[j].point.z * M.elements[9] + 
+				1 * M.elements[13];
+
+			objects[i].nodes[j].point.z = 
+				objects[i].nodes[j].point.x * M.elements[2] + 
+				objects[i].nodes[j].point.y * M.elements[6] + 
+				objects[i].nodes[j].point.z * M.elements[10] + 
+				1 * M.elements[15];
+
+			if (objects[i].nodes[j].prevCircle) {
+				for (let k = 0; k < objects[i].nodes[j].prevCircle.length; k++) {
+					// Transform point
+					objects[i].nodes[j].prevCircle[k].x = 
+						objects[i].nodes[j].prevCircle[k].x * M.elements[0] + 
+						objects[i].nodes[j].prevCircle[k].y * M.elements[4] + 
+						objects[i].nodes[j].prevCircle[k].z * M.elements[8] + 
+						1 * M.elements[12];
+
+					objects[i].nodes[j].prevCircle[k].y = 
+						objects[i].nodes[j].prevCircle[k].x * M.elements[1] + 
+						objects[i].nodes[j].prevCircle[k].y * M.elements[5] + 
+						objects[i].nodes[j].prevCircle[k].z * M.elements[9] + 
+						1 * M.elements[13];
+
+					objects[i].nodes[j].prevCircle[k].z = 
+						objects[i].nodes[j].prevCircle[k].x * M.elements[2] + 
+						objects[i].nodes[j].prevCircle[k].y * M.elements[6] + 
+						objects[i].nodes[j].prevCircle[k].z * M.elements[10] + 
+						1 * M.elements[15];
+				}
+			}
+
+			if (objects[i].nodes[j].nextCircle) {
+				for (let k = 0; k < objects[i].nodes[j].nextCircle.length; k++) {
+					// Transform point
+					objects[i].nodes[j].nextCircle[k].x = 
+						objects[i].nodes[j].nextCircle[k].x * M.elements[0] + 
+						objects[i].nodes[j].nextCircle[k].y * M.elements[4] + 
+						objects[i].nodes[j].nextCircle[k].z * M.elements[8] + 
+						1 * M.elements[12];
+
+					objects[i].nodes[j].nextCircle[k].y = 
+						objects[i].nodes[j].nextCircle[k].x * M.elements[1] + 
+						objects[i].nodes[j].nextCircle[k].y * M.elements[5] + 
+						objects[i].nodes[j].nextCircle[k].z * M.elements[9] + 
+						1 * M.elements[13];
+
+					objects[i].nodes[j].nextCircle[k].z = 
+						objects[i].nodes[j].nextCircle[k].x * M.elements[2] + 
+						objects[i].nodes[j].nextCircle[k].y * M.elements[6] + 
+						objects[i].nodes[j].nextCircle[k].z * M.elements[10] + 
+						1 * M.elements[15];
+				}
+			}
+		}
+	}
+
+	draw();
+
+	// setInterval(function() {
+
+	// }, 500);
+}
+
+// Event handler for mouse click
 function click(event) {
 	let coords = {};
 
@@ -142,12 +238,12 @@ function click(event) {
 	switch (event.button) {
 		case 0:
 			// Left click, red point
-			coords.e = newPoint(coords, false);
+			coords.e = newNode(coords, false);
 			console.log("Left click detected at [", coords.x, ", ", coords.y, "].");
 			break;
 		case 2:
 			// Right click, blue point
-			coords.e = newPoint(coords, true);
+			coords.e = newNode(coords, true);
 			console.log("Right click detected at [", coords.x, ", ", coords.y, "].");
 			break;
 		default:
@@ -156,12 +252,12 @@ function click(event) {
 
 	// If the point ends a polyline print it
 	if (coords.e) {
-		let str = 'Polyline ended. Points are: ',
+		let str = 'Object ended. Points are: ',
 				i = 0;
-		for (i; i < segments[segments.length - 1].points.length - 1; i++) {
-			str += '[' + segments[segments.length - 1].points[i].x + ', ' + segments[segments.length - 1].points[i].y + '], ';
+		for (i; i < objects[objects.length - 1].nodes.length - 1; i++) {
+			str += '[' + objects[objects.length - 1].nodes[i].point.x + ', ' + objects[objects.length - 1].nodes[i].point.y + '], ';
 		}
-		str += '[' + segments[segments.length - 1].points[i].x + ', ' + segments[segments.length - 1].points[i].y + '].';
+		str += '[' + objects[objects.length - 1].nodes[i].point.x + ', ' + objects[objects.length - 1].nodes[i].point.y + '].';
 
 		console.log(str);
 	}
@@ -170,6 +266,7 @@ function click(event) {
 	draw();
 }
 
+// Event handler for mouse move
 function move(event) {
 	// Mouse coordinates
 	let x_mouse = event.clientX;
@@ -186,349 +283,253 @@ function move(event) {
 	draw();
 }
 
-function newPoint(coords, ends) {
+// Insert new node into active object or create new object
+function newNode(coords, ends) {
 	let first = false;
-	// If no active polyline
-	if (active_segment_set === -1) {
-		// Add new polyline and set active
-		segments.push({
+
+	// Check if there's an active object
+	if (active_object === -1) {
+		objects.push({
 			ended: false,
-			points: []
+			nodes: []
 		});
-		active_segment_set = segments.length - 1;
+
+		active_object = objects.length - 1;
 		first = true;
 	}
 
-	// Red by default
-	let color = {
-		R: 1.0,
-		G: 0.0,
-		B: 0.0
-	}
-	// If first or last change to blue
-	if (ends || first) {
-		color.R = 0.0,
-		color.B = 1.0
+	// Create point
+	let point = new Coord(coords.x, coords.y, coords.z, 1.0, 0.0, 0.0);
+	// Push to object
+	objects[active_object].nodes.push(new Node(point));
+
+	// If is not first, calculate the previous node nextCircle and the current node prevCircle
+	if (!first) {
+		let index = objects[active_object].nodes.length - 1;
+		let prev = objects[active_object].nodes[index - 1];
+		let curr = objects[active_object].nodes[index];
+
+		let circles = generateCircles(prev, curr);
+
+		objects[active_object].nodes[index - 1].nextCircle = circles.circle1;
+		objects[active_object].nodes[index].prevCircle = circles.circle2;
 	}
 
-	// Add point to polyline
-	segments[active_segment_set].points.push({
-		x: coords.x,
-		y: coords.y,
-		z: coords.z,
-		c: color
-	});
-
-	// If last point of polyline
+	// If last point of object
 	if (ends && !first) {
-		// Finish polyline and set no active one
-		segments[active_segment_set].ended = true;
-		active_segment_set = -1;
+		objects[active_object].ended = true;
+		active_object = -1;
 	}
 
-	// Return true if it was an ending point
 	return (ends && !first);
 }
 
-function drawPolyline(segment_set) {
-	// Retrieve vertex set, color set and count
-	let vertex_set = [];
-	let lines_set = [];
-	let vertex_count;
-	let lines_count;
-
-	for (vertex_count = 0; vertex_count < segment_set.points.length; vertex_count++) {
-		// Vertex and color
-		vertex_set.push(segment_set.points[vertex_count].x);
-		vertex_set.push(segment_set.points[vertex_count].y);
-		vertex_set.push(segment_set.points[vertex_count].z);
-		vertex_set.push(segment_set.points[vertex_count].c.R);
-		vertex_set.push(segment_set.points[vertex_count].c.G);
-		vertex_set.push(segment_set.points[vertex_count].c.B);
-
-		// Lines and grey
-		lines_set.push(segment_set.points[vertex_count].x);
-		lines_set.push(segment_set.points[vertex_count].y);
-		lines_set.push(segment_set.points[vertex_count].z);
-		lines_set.push(0.8);
-		lines_set.push(0.8);
-		lines_set.push(0.8);
-	}
-	lines_count = vertex_count;
-
-	if (vertex_count > 0) {
-		// If polyline is not finished
-		if (!segment_set.ended) {
-			// Add mouse location
-			lines_set.push(mouse_point.x);
-			lines_set.push(mouse_point.y);
-			lines_set.push(mouse_point.z);
-			lines_set.push(0.0);
-			lines_set.push(1.0);
-			lines_set.push(0.0);
-			lines_count++;
-		}
-
-		// Write vertex into buffer
-	  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines_set), gl.STATIC_DRAW);
-
-		// Draw lines
-		gl.drawArrays(gl.LINE_STRIP, 0, lines_count);
-
-		// Write vertex into buffer
-	  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertex_set), gl.STATIC_DRAW);
-	  
-		// Draw points
-		gl.drawArrays(gl.POINTS, 0, vertex_count);
+function drawObject(obj) {
+	// Draw object nodes (points)
+	let node_vertices = [];
+	for (let i = 0; i < obj.nodes.length; i++) {
+		node_vertices.push(obj.nodes[i].point.x);
+		node_vertices.push(obj.nodes[i].point.y);
+		node_vertices.push(obj.nodes[i].point.z);
+		node_vertices.push(obj.nodes[i].point.r);
+		node_vertices.push(obj.nodes[i].point.g);
+		node_vertices.push(obj.nodes[i].point.b);
 	}
 
-	return vertex_count
-}
+	// Write vertices into buffer
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(node_vertices), gl.STATIC_DRAW);
 
-function drawCylinders(segment_set) {
-	let circles = calculateCylinders(segment_set);
+	// Draw points
+	gl.drawArrays(gl.POINTS, 0, node_vertices.length / 6);
 
-	// Circles
-	for (let i = 0; i < circles.length; i++) {
-		let circle_set = [];
-		let circle_set_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+	// Draw object nodes (circles)
+	for (let i = 0; i < obj.nodes.length; i++) {
 
-		for (let j = 0; j < circles[i].length; j++) {
-			circle_set.push(circles[i][circle_set_index[j]].x);
-			circle_set.push(circles[i][circle_set_index[j]].y);
-			circle_set.push(circles[i][circle_set_index[j]].z);
-			circle_set.push(1.0);
-			circle_set.push(0.0);
-			circle_set.push(0.6);
-		}
+		// If has previous node
+		if (obj.nodes[i].prevCircle) {
+			// Draw circle points
+			let prev_vertices = [];
 
-	  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(circle_set), gl.STATIC_DRAW);
-		gl.drawArrays(gl.POINTS, 0, circle_set.length / 6);
-	}
-
-	// Lines between circles
-	for (let i = 0; i < circles.length - 1; i++) {
-		for (let j = 0; j < circles[i].length - 1; j++) {
-			let lines_set = [];
-
-			// First
-			lines_set.push(circles[i][j].x);
-			lines_set.push(circles[i][j].y);
-			lines_set.push(circles[i][j].z);
-			lines_set.push(0.6);
-			lines_set.push(0.0);
-			lines_set.push(1.0);
-
-			// Second
-			lines_set.push(circles[i][j + 1].x);
-			lines_set.push(circles[i][j + 1].y);
-			lines_set.push(circles[i][j + 1].z);
-			lines_set.push(0.6);
-			lines_set.push(0.0);
-			lines_set.push(1.0);
-
-			// Third
-			lines_set.push(circles[i + 1][j + 1].x);
-			lines_set.push(circles[i + 1][j + 1].y);
-			lines_set.push(circles[i + 1][j + 1].z);
-			lines_set.push(0.6);
-			lines_set.push(0.0);
-			lines_set.push(1.0);
-
-			// Forth
-			lines_set.push(circles[i + 1][j].x);
-			lines_set.push(circles[i + 1][j].y);
-			lines_set.push(circles[i + 1][j].z);
-			lines_set.push(0.6);
-			lines_set.push(0.0);
-			lines_set.push(1.0);
-
-			// Draw
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines_set), gl.STATIC_DRAW);
-			gl.drawArrays(gl.LINE_LOOP, 0, lines_set.length / 6);
-		}
-	}
-}
-
-function calculateCylinders(segment_set) {
-	let circles = [];
-
-	for (let i = 0; i < segment_set.points.length - 1; i++) {
-		// Get p1
-		let p1 = {
-			x: segment_set.points[i].x,
-			y: segment_set.points[i].y,
-			z: segment_set.points[i].z
-		};
-
-		// Get p2
-		let p2 = {
-			x: segment_set.points[i + 1].x,
-			y: segment_set.points[i + 1].y,
-			z: segment_set.points[i + 1].z
-		};
-
-		// Get vector from p1 to p2
-		let v = [
-			p2.x - p1.x,
-			p2.y - p1.y,
-			p2.z - p1.z
-		];
-
-		// Calculate normal vector
-		let n = getPerpendicular(v, RADIUS);
-
-		// Calculate cross vector
-		let p = crossProduct(v, n);
-
-		// Get vectors magnitude. Then calculate unit vectors
-		let s1 = vectorMagnitude(n),
-				s2 = vectorMagnitude(p);
-
-		let u1 = [n[0] / s1, n[1] / s1, n[2] / s1],
-				u2 = [p[0] / s2, p[1] / s2, p[2] / s2];
-
-		// Calculate circles
-		let circle1 = [],
-				circle2 = [];
-
-		for (let i = 0; i < 360; i += 30) {
-			let angle = i * Math.PI / 180;
-			// Calculate vector direction
-			let direction = [RADIUS * (Math.cos(angle) * u1[0] + Math.sin(angle) * u2[0]),
-											 RADIUS * (Math.cos(angle) * u1[1] + Math.sin(angle) * u2[1]),
-											 RADIUS * (Math.cos(angle) * u1[2] + Math.sin(angle) * u2[2])]
-			circle1.push({
-				x: p1.x + direction[0],
-				y: p1.y + direction[1],
-				z: p1.z + direction[2]
-			});
-
-			circle2.push({
-				x: p2.x + direction[0],
-				y: p2.y + direction[1],
-				z: p2.z + direction[2]
-			});
-		}
-
-		circles.push(circle1);
-		circles.push(circle2);
-	}
-
-	return circles;
-}
-
-function draw() {
-	// Draw each polyline
-	for (let i = 0; i < segments.length; i++) {
-		drawPolyline(segments[i]);
-		drawCylinders(segments[i]);
-	}
-
-	return segments.length;
-}
-
-function startRandom() {
-	console.log("Starting random points.")
-
-	// Set first point to start
-	mouse_point.x = (Math.random().toFixed(2) * 2) - 1;
-	mouse_point.y = (Math.random().toFixed(2) * 2) - 1;
-
-	// Start loop
-	active_random = setInterval( function() {
-		// Right click or left click
-		let right = !(Math.random() < 0.7); // true if random number >= 0.7
-		// Log it
-		if (right) {
-			console.log("Right click detected at [", mouse_point.x, ", ", mouse_point.y, "].");
-		} else {
-			console.log("Left click detected at [", mouse_point.x, ", ", mouse_point.y, "].");
-		}
-
-		// Add the point. Does it finish a polyline?
-		let ends = newPoint({
-			x: mouse_point.x,
-			y: mouse_point.y,
-			z: 0.0
-		}, right);
-
-		// If it ends print it.
-		if (ends) {
-			let str = 'Polyline ended. Points are: ',
-					i = 0;
-			for (i; i < segments[segments.length - 1].points.length - 1; i++) {
-				str += '[' + segments[segments.length - 1].points[i].x + ', ' + segments[segments.length - 1].points[i].y + '], ';
+			for (let j = 0; j < obj.nodes[i].prevCircle.length; j++) {
+				prev_vertices.push(obj.nodes[i].prevCircle[j].x);
+				prev_vertices.push(obj.nodes[i].prevCircle[j].y);
+				prev_vertices.push(obj.nodes[i].prevCircle[j].z);
+				prev_vertices.push(obj.nodes[i].prevCircle[j].r);
+				prev_vertices.push(obj.nodes[i].prevCircle[j].g);
+				prev_vertices.push(obj.nodes[i].prevCircle[j].b);
 			}
-			str += '[' + segments[segments.length - 1].points[i].x + ', ' + segments[segments.length - 1].points[i].y + '].';
 
-			console.log(str);
+			// Write vertices into buffer
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(prev_vertices), gl.STATIC_DRAW);
+
+			// Draw points
+			gl.drawArrays(gl.POINTS, 0, prev_vertices.length / 6);
+
+			// Draw lines
+			gl.drawArrays(gl.LINE_LOOP, 0, prev_vertices.length / 6);
+
+			// And draw skeleton to previous
+			for (let j = 0; j < obj.nodes[i].prevCircle.length - 1; j++) {
+				let vertices = [];
+
+				// First
+				vertices.push(obj.nodes[i].prevCircle[j].x);
+				vertices.push(obj.nodes[i].prevCircle[j].y);
+				vertices.push(obj.nodes[i].prevCircle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Second
+				vertices.push(obj.nodes[i - 1].nextCircle[j].x);
+				vertices.push(obj.nodes[i - 1].nextCircle[j].y);
+				vertices.push(obj.nodes[i - 1].nextCircle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Third
+				vertices.push(obj.nodes[i - 1].nextCircle[j + 1].x);
+				vertices.push(obj.nodes[i - 1].nextCircle[j + 1].y);
+				vertices.push(obj.nodes[i - 1].nextCircle[j + 1].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Fourth
+				vertices.push(obj.nodes[i].prevCircle[j + 1].x);
+				vertices.push(obj.nodes[i].prevCircle[j + 1].y);
+				vertices.push(obj.nodes[i].prevCircle[j + 1].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Write vertex into buffer
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+			  
+				// Draw points
+				gl.drawArrays(gl.LINE_LOOP, 0, vertices.length / 6);
+			}
 		}
 
-		// Always draw
-		draw();
+		// If has next node
+		if (obj.nodes[i].nextCircle) {
+			let next_vertices = [];
 
-		// Save the point
-		let previous_mouse_point = {
-			x: mouse_point.x,
-			y: mouse_point.y,
-			z: mouse_point.z
-		};
-		//console.log("Previous mouse point: ", previous_mouse_point);
+			for (let j = 0; j < obj.nodes[i].nextCircle.length; j++) {
+				next_vertices.push(obj.nodes[i].nextCircle[j].x);
+				next_vertices.push(obj.nodes[i].nextCircle[j].y);
+				next_vertices.push(obj.nodes[i].nextCircle[j].z);
+				next_vertices.push(obj.nodes[i].nextCircle[j].r);
+				next_vertices.push(obj.nodes[i].nextCircle[j].g);
+				next_vertices.push(obj.nodes[i].nextCircle[j].b);
+			}
 
-		// Set a new point
-		let next_mouse_point = {
-			x: (Math.random().toFixed(2) * 2) - 1,
-			y: (Math.random().toFixed(2) * 2) - 1,
-			z: 0.0
-		};
-		//console.log("Next mouse point: ", next_mouse_point);
+			// Write vertices into buffer
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(next_vertices), gl.STATIC_DRAW);
 
-		// Calculate the difference
-		let diff = {
-			x: next_mouse_point.x - mouse_point.x,
-			y: next_mouse_point.y - mouse_point.y,
-			z: next_mouse_point.z - mouse_point.z
-		};
-		//console.log("diff: ", diff);
-		
-		// We will move the mouse 1000 points between them
-		for (let j = 1; j < 500; j++) {
-			setTimeout(function() {
-				// Move the mouse
-				mouse_point.x = previous_mouse_point.x + (diff.x / 500) * j;
-				mouse_point.y = previous_mouse_point.y + (diff.y / 500) * j;
-
-				// Draw it
-				draw();
-			}, 10);
+			// Draw lines
+			gl.drawArrays(gl.POINTS, 0, next_vertices.length / 6);
+			
+			// Draw lines
+			gl.drawArrays(gl.LINE_LOOP, 0, next_vertices.length / 6);
 		}
 
-		// Update mouse to real point
-		mouse_point.x = next_mouse_point.x;
-		mouse_point.y = next_mouse_point.y;
+		// If has both draw cylinder between both circles 
+		if (obj.nodes[i].prevCircle && obj.nodes[i].nextCircle) {
+			for (let j = 0; j < obj.nodes[i].prevCircle.length - 1; j++) {
+				let vertices = [];
 
-	}, 500);
+				// First
+				vertices.push(obj.nodes[i].prevCircle[j].x);
+				vertices.push(obj.nodes[i].prevCircle[j].y);
+				vertices.push(obj.nodes[i].prevCircle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
 
-	document.getElementById('rdstart').disabled = true;
-	document.getElementById('rdstop').disabled = false;
+				// Second
+				vertices.push(obj.nodes[i].prevCircle[j + 1].x);
+				vertices.push(obj.nodes[i].prevCircle[j + 1].y);
+				vertices.push(obj.nodes[i].prevCircle[j + 1].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Third
+				vertices.push(obj.nodes[i].nextCircle[j + 1].x);
+				vertices.push(obj.nodes[i].nextCircle[j + 1].y);
+				vertices.push(obj.nodes[i].nextCircle[j + 1].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Fourth
+				vertices.push(obj.nodes[i].nextCircle[j].x);
+				vertices.push(obj.nodes[i].nextCircle[j].y);
+				vertices.push(obj.nodes[i].nextCircle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Write vertex into buffer
+			  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+			  
+				// Draw points
+				gl.drawArrays(gl.LINE_LOOP, 0, vertices.length / 6);
+			}
+		}
+	}
 }
 
-function stopRandom() {
-	console.log("Stoping random points.")
+// Generate circle with center in n1 perpendicular to n1->n2
+function generateCircles(n1, n2) {
+	// Get p1
+	let p1 = n1.point;
 
-	clearInterval(active_random);
-	active_random = false;
+	// Get p2
+	let p2 = n2.point;
 
-	document.getElementById('rdstart').disabled = false;
-	document.getElementById('rdstop').disabled = true;
+	// Get vector from p1 to p2
+	let v = [p2.x - p1.x,
+					 p2.y - p1.y,
+					 p2.z - p1.z,
+					 0.0,
+					 0.0,
+					 0.0];
+
+	// Calculate normal vector
+	let n = getPerpendicular(v, RADIUS);
+
+	// Calculate cross vector
+	let p = crossProduct(v, n);
+
+	// Get vectors magnitude. Then calculate unit vectors
+	let s1 = vectorMagnitude(n),
+			s2 = vectorMagnitude(p);
+
+	let u1 = [n[0] / s1, n[1] / s1, n[2] / s1],
+			u2 = [p[0] / s2, p[1] / s2, p[2] / s2];
+
+	// Calculate circles
+	let circle1 = [],
+			circle2 = [];
+
+	for (let i = 0; i < 360; i += 30) {
+		let angle = i * Math.PI / 180;
+		// Calculate vector direction
+		let direction = [RADIUS * (Math.cos(angle) * u1[0] + Math.sin(angle) * u2[0]),
+										 RADIUS * (Math.cos(angle) * u1[1] + Math.sin(angle) * u2[1]),
+										 RADIUS * (Math.cos(angle) * u1[2] + Math.sin(angle) * u2[2])]
+		circle1.push(new Coord(p1.x + direction[0], p1.y + direction[1], p1.z + direction[2], 0.0, 0.0, 1.0));
+		circle2.push(new Coord(p2.x + direction[0], p2.y + direction[1], p2.z + direction[2], 0.0, 0.0, 1.0));
+	}
+
+	return {
+		circle1: circle1,
+		circle2: circle2
+	};
 }
-
-function clearCanvas() {
-	// Clear <canvas>
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-}
-
 
 // Return perpendicular to a vector with length
 function getPerpendicular(vector, length) {
@@ -549,20 +550,19 @@ function getPerpendicular(vector, length) {
 	}
 }
 
-function getAngledAndPerpendicular(angled, angle, perpendicular, length) {
-	let a = angle * Math.PI / 180;
-	let a_length = Math.sqrt( Math.pow(angled[0], 2) + Math.pow([1], 2) + Math.pow([2], 2) );
-
-}
-
+// Calculate dot product of two vectors
 function dotProduct(v1, v2) {
+
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 
+// Calculate cross product of two vectors
 function crossProduct(v1, v2) {
+
 	return [(v1[1] * v2[2] - v2[1] * v1[2]), -(v1[0] * v2[2] - v2[0] * v1[2]), (v1[0] * v2[1] - v2[0] * v1[1])];
 }
 
+// Calculate magnitude of vector
 function vectorMagnitude(v) {
 	let s = 0;
 
@@ -571,4 +571,25 @@ function vectorMagnitude(v) {
 	}
 
 	return Math.sqrt(s);
+}
+
+// Clear canvas
+function clearCanvas() {
+	// Clear <canvas>
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+}
+
+function Coord(x, y, z, r, g, b) {
+	this.x = x;
+	this.y = y;
+	this.z = z;
+	this.r = r;
+	this.g = g;
+	this.b = b;
+}
+
+function Node(coord) {
+	this.point = coord;
+	this.nextCircle = null;
+	this.prevCircle = null;
 }

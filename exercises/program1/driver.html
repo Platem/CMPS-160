@@ -62,8 +62,9 @@
             </div>
             <form action="" id="options">
                 <div>
-                    <button id="rdstop" onclick="stopRandom()" disabled>Stop random</button>
-                    <button id="rdstart" onclick="startRandom()">Start random</button>
+                    <button id="bRotate">Rotate</button>
+                    <button id="fSave" onclick="">Save file</button>
+                    <button id="fOpen" onclick="">Open file</button>
                 </div>
                 <button onclick="clearCanvas()">Clear</button>
             </form>
@@ -72,6 +73,8 @@
         <script src="../lib/webgl-utils.js"></script>
         <script src="../lib/webgl-debug.js"></script>
         <script src="../lib/cuon-utils.js"></script>
+        <script src="../lib/cuon-matrix.js"></script>
+        <script src="../lib/ioSOR.js"></script>
         <script src="main.js"></script>
     </body>
 </html>
