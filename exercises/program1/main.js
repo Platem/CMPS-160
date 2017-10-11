@@ -41,9 +41,14 @@ function main() {
 		return;
 	}
 
-	document.getElementById('bRotate').onclick = function(event) {
+	document.getElementById('bRotateL').onclick = function(event) {
 		event.preventDefault();
-		rotate();
+		// rotate("left");
+	};
+
+	document.getElementById('bRotateR').onclick = function(event) {
+		event.preventDefault();
+		// rotate("right");
 	};
 
 	// Mouse press event
@@ -128,8 +133,6 @@ function setup() {
 
 // Main draw function
 function draw() {
-	clearCanvas();
-
 	// Draw each polyline
 	for (let i = 0; i < objects.length; i++) {
 		drawObject(objects[i]);
@@ -138,9 +141,15 @@ function draw() {
 	return objects.length;
 }
 
-function rotate() {
+// Rotates all points
+function rotate(side) {
 	let M = new Matrix4();
-	M.setRotate(45, 1, 1, 1);
+	if (side == "right")
+		M.setRotate(10, 0, 1, 0);
+	else if (side == "left")
+		M.setRotate(-10, 0, 1, 0);
+	else
+		M.setRotate(0, 0, 1, 0);
 
 	for (let i = 0; i < objects.length; i++) {
 		for (let j = 0; j < objects[i].nodes.length; j++) {
@@ -163,6 +172,7 @@ function rotate() {
 				objects[i].nodes[j].point.z * M.elements[10] + 
 				1 * M.elements[15];
 
+			// Transfrom prevCircle
 			if (objects[i].nodes[j].prevCircle) {
 				for (let k = 0; k < objects[i].nodes[j].prevCircle.length; k++) {
 					// Transform point
@@ -186,6 +196,7 @@ function rotate() {
 				}
 			}
 
+			// Transform nextCircle
 			if (objects[i].nodes[j].nextCircle) {
 				for (let k = 0; k < objects[i].nodes[j].nextCircle.length; k++) {
 					// Transform point
@@ -211,11 +222,8 @@ function rotate() {
 		}
 	}
 
-	draw();
-
-	// setInterval(function() {
-
-	// }, 500);
+	console.log("Rotate " + side);
+	draw();	
 }
 
 // Event handler for mouse click
@@ -324,6 +332,7 @@ function newNode(coords, ends) {
 	return (ends && !first);
 }
 
+// Draws an object
 function drawObject(obj) {
 	// Draw object nodes (points)
 	let node_vertices = [];
@@ -579,6 +588,7 @@ function clearCanvas() {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
+// Coord object
 function Coord(x, y, z, r, g, b) {
 	this.x = x;
 	this.y = y;
@@ -588,6 +598,7 @@ function Coord(x, y, z, r, g, b) {
 	this.b = b;
 }
 
+// Node object
 function Node(coord) {
 	this.point = coord;
 	this.nextCircle = null;
