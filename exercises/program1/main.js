@@ -19,7 +19,8 @@ let FSHADER_SOURCE =
 
 // Program vars
 const FLOAT_BYTES = 4,
-			RADIUS = 0.1;
+			RADIUS = 0.1,
+			ROTATION = 10;
 
 let canvas,
 		gl,
@@ -43,12 +44,12 @@ function main() {
 
 	document.getElementById('bRotateL').onclick = function(event) {
 		event.preventDefault();
-		// rotate("left");
+		rotate("left");
 	};
 
 	document.getElementById('bRotateR').onclick = function(event) {
 		event.preventDefault();
-		// rotate("right");
+		rotate("right");
 	};
 
 	// Mouse press event
@@ -67,6 +68,22 @@ function main() {
 	canvas.oncontextmenu = function(event) {
 		return false;
 	}
+
+	// Setup ioSOR
+	setupIOSOR('fOpen');
+	document.getElementById('fOpen').addEventListener('change', function(e) {
+		document.getElementById('fLoad').disabled = false;
+	});
+
+	document.getElementById('fSave').addEventListener('click', function(e) {
+		e.preventDefault();
+		saveSOR();
+	});
+
+	document.getElementById('fLoad').addEventListener('click', function(e) {
+		e.preventDefault();
+		readSOR();
+	});
 }
 
 // Setup WebGL function
@@ -110,7 +127,7 @@ function setup() {
   gl.enableVertexAttribArray(a_Position);
 
 	// Get the storage location of a_Color
-	a_Color = gl.getUniformLocation(gl.program, 'a_Color');
+	a_Color = gl.getAttribLocation(gl.program, 'a_Color');
 	if (a_Color < 0) {
 		console.log('Failed to get the storage location of a_Color');
 		return false;
@@ -131,11 +148,126 @@ function setup() {
 	return true;
 }
 
+function readSOR() {
+	let objSOR = readFile();
+	let vertices = objSOR.vertices;
+	let indexes = objSOR.indexes;
+	if (vertices.length % (12*3) != 0) {
+		alert('Selected file doesn\'t match vertices (points) format. There should be groups of 12 points, each group forming a circle.');
+	} else if (indexes.length % (4*3) != 0) {
+		alert('Selected file doesn\'t match indexes (faces) format. There should be groups of 4 points, each group forming a face.');
+	} else {
+		objects = [];
+		let v = [],
+				l = [];
+		for (let i = 0; i < vertices.length; i += 3) {
+			v.push(vertices[i]);
+			v.push(vertices[i + 1]);
+			v.push(vertices[i + 2]);
+			v.push(0.0);
+			v.push(0.0);
+			v.push(1.0);
+		}
+		// Write vertices into buffer
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
+
+		// Draw points
+		gl.drawArrays(gl.POINTS, 0, v.length / 6);
+
+		for (let i = 0; i < indexes.length; i+= 12) {
+			// Point 1
+			l.push(indexes[i]);
+			l.push(indexes[i + 1]);
+			l.push(indexes[i + 2]);
+			l.push(0.0);
+			l.push(1.0);
+			l.push(0.0);
+
+			// Point 2
+			l.push(indexes[i + 3]);
+			l.push(indexes[i + 4]);
+			l.push(indexes[i + 5]);
+			l.push(0.0);
+			l.push(1.0);
+			l.push(0.0);
+
+			// Point 2
+			l.push(indexes[i + 6]);
+			l.push(indexes[i + 7]);
+			l.push(indexes[i + 8]);
+			l.push(0.0);
+			l.push(1.0);
+			l.push(0.0);
+
+			// Point 2
+			l.push(indexes[i + 9]);
+			l.push(indexes[i + 10]);
+			l.push(indexes[i + 11]);
+			l.push(0.0);
+			l.push(1.0);
+			l.push(0.0);
+		}
+		// Write vertices into buffer
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(l), gl.STATIC_DRAW);
+
+		// Draw points
+		gl.drawArrays(gl.LINE_LOOP, 0, l.length / 6);
+	}
+}
+
+function saveSOR() {
+	if (objects.length > 0 && objects[0].ended) {
+		var name = prompt("Please enter a name.\n\n[Note that only the first drawn object will be saved]", "object");
+		let pts = [];
+		let ind = []
+		for (let i = 0; i < objects[0].nodes.length; i++) {
+			for (let j = 0; j < objects[0].nodes[i].circle.length; j++) {
+				pts.push(objects[0].nodes[i].circle[j]);
+			}
+		}
+		for (let i = 0; i < objects[0].nodes.length - 1; i++) {
+			for (let j = 0; j < objects[0].nodes[i].circle.length; j++) {
+				if (j == objects[0].nodes[i].circle.length - 1) {
+					ind.push(objects[0].nodes[i].circle[j]);
+					ind.push(objects[0].nodes[i].circle[0]);
+					ind.push(objects[0].nodes[i + 1].circle[0]);
+					ind.push(objects[0].nodes[i + 1].circle[j]);
+				} else {
+					ind.push(objects[0].nodes[i].circle[j]);
+					ind.push(objects[0].nodes[i].circle[j + 1]);
+					ind.push(objects[0].nodes[i + 1].circle[j + 1]);
+					ind.push(objects[0].nodes[i + 1].circle[j]);
+				}
+			}
+		}
+
+		let sor = new SOR(name, [], []);
+		for (let i = 0; i < pts.length; i++) {
+			sor.vertices.push(pts[i].x);
+			sor.vertices.push(pts[i].y);
+			sor.vertices.push(pts[i].z);
+		}
+		for (let i = 0; i < ind.length; i++) {
+			sor.indexes.push(ind[i].x);
+			sor.indexes.push(ind[i].y);
+			sor.indexes.push(ind[i].z);
+		}
+
+		saveFile(sor);
+	} else {
+		alert('There\'s no object to be saved. Be sure you draw something and you complete it (right click).');
+	}
+}
+
 // Main draw function
 function draw() {
 	// Draw each polyline
 	for (let i = 0; i < objects.length; i++) {
-		drawObject(objects[i]);
+		if (objects[i].ended) {
+			drawObject(objects[i]);
+		} else {
+			drawLine(objects[i]);
+		}
 	}
 
 	return objects.length;
@@ -143,11 +275,13 @@ function draw() {
 
 // Rotates all points
 function rotate(side) {
+	let oldObjects = objects.splice();
+
 	let M = new Matrix4();
 	if (side == "right")
-		M.setRotate(10, 0, 1, 0);
+		M.setRotate(ROTATION, 0, 1, 0);
 	else if (side == "left")
-		M.setRotate(-10, 0, 1, 0);
+		M.setRotate(-ROTATION, 0, 1, 0);
 	else
 		M.setRotate(0, 0, 1, 0);
 
@@ -158,71 +292,43 @@ function rotate(side) {
 				objects[i].nodes[j].point.x * M.elements[0] + 
 				objects[i].nodes[j].point.y * M.elements[4] + 
 				objects[i].nodes[j].point.z * M.elements[8] + 
-				1 * M.elements[12];
+																			M.elements[12];
 
 			objects[i].nodes[j].point.y = 
 				objects[i].nodes[j].point.x * M.elements[1] + 
 				objects[i].nodes[j].point.y * M.elements[5] + 
 				objects[i].nodes[j].point.z * M.elements[9] + 
-				1 * M.elements[13];
+																			M.elements[13];
 
 			objects[i].nodes[j].point.z = 
 				objects[i].nodes[j].point.x * M.elements[2] + 
 				objects[i].nodes[j].point.y * M.elements[6] + 
 				objects[i].nodes[j].point.z * M.elements[10] + 
-				1 * M.elements[15];
+																			M.elements[14];
 
-			// Transfrom prevCircle
-			if (objects[i].nodes[j].prevCircle) {
-				for (let k = 0; k < objects[i].nodes[j].prevCircle.length; k++) {
-					// Transform point
-					objects[i].nodes[j].prevCircle[k].x = 
-						objects[i].nodes[j].prevCircle[k].x * M.elements[0] + 
-						objects[i].nodes[j].prevCircle[k].y * M.elements[4] + 
-						objects[i].nodes[j].prevCircle[k].z * M.elements[8] + 
-						1 * M.elements[12];
+			// Transfrom circle
+			for (let k = 0; k < objects[i].nodes[j].circle.length; k++) {
+				objects[i].nodes[j].circle[k].x = 
+					objects[i].nodes[j].circle[k].x * M.elements[0] +
+					objects[i].nodes[j].circle[k].y * M.elements[4] +
+					objects[i].nodes[j].circle[k].z * M.elements[8] +
+																						M.elements[12];
 
-					objects[i].nodes[j].prevCircle[k].y = 
-						objects[i].nodes[j].prevCircle[k].x * M.elements[1] + 
-						objects[i].nodes[j].prevCircle[k].y * M.elements[5] + 
-						objects[i].nodes[j].prevCircle[k].z * M.elements[9] + 
-						1 * M.elements[13];
+				objects[i].nodes[j].circle[k].y = 
+					objects[i].nodes[j].circle[k].x * M.elements[1] +
+					objects[i].nodes[j].circle[k].y * M.elements[5] +
+					objects[i].nodes[j].circle[k].z * M.elements[9] +
+																						M.elements[13];
 
-					objects[i].nodes[j].prevCircle[k].z = 
-						objects[i].nodes[j].prevCircle[k].x * M.elements[2] + 
-						objects[i].nodes[j].prevCircle[k].y * M.elements[6] + 
-						objects[i].nodes[j].prevCircle[k].z * M.elements[10] + 
-						1 * M.elements[15];
-				}
-			}
-
-			// Transform nextCircle
-			if (objects[i].nodes[j].nextCircle) {
-				for (let k = 0; k < objects[i].nodes[j].nextCircle.length; k++) {
-					// Transform point
-					objects[i].nodes[j].nextCircle[k].x = 
-						objects[i].nodes[j].nextCircle[k].x * M.elements[0] + 
-						objects[i].nodes[j].nextCircle[k].y * M.elements[4] + 
-						objects[i].nodes[j].nextCircle[k].z * M.elements[8] + 
-						1 * M.elements[12];
-
-					objects[i].nodes[j].nextCircle[k].y = 
-						objects[i].nodes[j].nextCircle[k].x * M.elements[1] + 
-						objects[i].nodes[j].nextCircle[k].y * M.elements[5] + 
-						objects[i].nodes[j].nextCircle[k].z * M.elements[9] + 
-						1 * M.elements[13];
-
-					objects[i].nodes[j].nextCircle[k].z = 
-						objects[i].nodes[j].nextCircle[k].x * M.elements[2] + 
-						objects[i].nodes[j].nextCircle[k].y * M.elements[6] + 
-						objects[i].nodes[j].nextCircle[k].z * M.elements[10] + 
-						1 * M.elements[15];
-				}
+				objects[i].nodes[j].circle[k].z = 
+					objects[i].nodes[j].circle[k].x * M.elements[2] +
+					objects[i].nodes[j].circle[k].y * M.elements[6] +
+					objects[i].nodes[j].circle[k].z * M.elements[10] +
+																						M.elements[14];
 			}
 		}
 	}
 
-	console.log("Rotate " + side);
 	draw();	
 }
 
@@ -247,28 +353,28 @@ function click(event) {
 		case 0:
 			// Left click, red point
 			coords.e = newNode(coords, false);
-			console.log("Left click detected at [", coords.x, ", ", coords.y, "].");
+			// console.log("Left click detected at [", coords.x, ", ", coords.y, "].");
 			break;
 		case 2:
 			// Right click, blue point
 			coords.e = newNode(coords, true);
-			console.log("Right click detected at [", coords.x, ", ", coords.y, "].");
+			// console.log("Right click detected at [", coords.x, ", ", coords.y, "].");
 			break;
 		default:
 			break;
 	}
 
 	// If the point ends a polyline print it
-	if (coords.e) {
-		let str = 'Object ended. Points are: ',
-				i = 0;
-		for (i; i < objects[objects.length - 1].nodes.length - 1; i++) {
-			str += '[' + objects[objects.length - 1].nodes[i].point.x + ', ' + objects[objects.length - 1].nodes[i].point.y + '], ';
-		}
-		str += '[' + objects[objects.length - 1].nodes[i].point.x + ', ' + objects[objects.length - 1].nodes[i].point.y + '].';
+	// if (coords.e) {
+	// 	let str = 'Object ended. Points are: ',
+	// 			i = 0;
+	// 	for (i; i < objects[objects.length - 1].nodes.length - 1; i++) {
+	// 		str += '[' + objects[objects.length - 1].nodes[i].point.x + ', ' + objects[objects.length - 1].nodes[i].point.y + '], ';
+	// 	}
+	// 	str += '[' + objects[objects.length - 1].nodes[i].point.x + ', ' + objects[objects.length - 1].nodes[i].point.y + '].';
 
-		console.log(str);
-	}
+	// 	console.log(str);
+	// }
 
 	// Draw
 	draw();
@@ -299,7 +405,9 @@ function newNode(coords, ends) {
 	if (active_object === -1) {
 		objects.push({
 			ended: false,
-			nodes: []
+			nodes: [],
+			g_points: [],
+			g_indexes: []
 		});
 
 		active_object = objects.length - 1;
@@ -311,29 +419,22 @@ function newNode(coords, ends) {
 	// Push to object
 	objects[active_object].nodes.push(new Node(point));
 
-	// If is not first, calculate the previous node nextCircle and the current node prevCircle
-	if (!first) {
-		let index = objects[active_object].nodes.length - 1;
-		let prev = objects[active_object].nodes[index - 1];
-		let curr = objects[active_object].nodes[index];
-
-		let circles = generateCircles(prev, curr);
-
-		objects[active_object].nodes[index - 1].nextCircle = circles.circle1;
-		objects[active_object].nodes[index].prevCircle = circles.circle2;
-	}
-
 	// If last point of object
 	if (ends && !first) {
+		// Set as finished
 		objects[active_object].ended = true;
+
+		// Generate GC
+		generateCylinder(objects[active_object]);
+
 		active_object = -1;
 	}
 
 	return (ends && !first);
 }
 
-// Draws an object
-function drawObject(obj) {
+// Draws a line
+function drawLine(obj) {
 	// Draw object nodes (points)
 	let node_vertices = [];
 	for (let i = 0; i < obj.nodes.length; i++) {
@@ -351,144 +452,216 @@ function drawObject(obj) {
 	// Draw points
 	gl.drawArrays(gl.POINTS, 0, node_vertices.length / 6);
 
+	// Draw lines and rubberband
+	node_vertices = [];
+	for (let i = 0; i < obj.nodes.length; i++) {
+		node_vertices.push(obj.nodes[i].point.x);
+		node_vertices.push(obj.nodes[i].point.y);
+		node_vertices.push(obj.nodes[i].point.z);
+		node_vertices.push(0.6);
+		node_vertices.push(0.6);
+		node_vertices.push(0.6);
+	}
+	node_vertices.push(mouse_point.x);
+	node_vertices.push(mouse_point.y);
+	node_vertices.push(mouse_point.z);
+	node_vertices.push(0.0);
+	node_vertices.push(1.0);
+	node_vertices.push(0.0);
+
+	// Write vertices into buffer
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(node_vertices), gl.STATIC_DRAW);
+
+	// Draw lines
+	gl.drawArrays(gl.LINE_STRIP, 0, node_vertices.length / 6);
+}
+
+// Draws an object
+function drawObject(obj) {
 	// Draw object nodes (circles)
 	for (let i = 0; i < obj.nodes.length; i++) {
-
-		// If has previous node
-		if (obj.nodes[i].prevCircle) {
-			// Draw circle points
-			let prev_vertices = [];
-
-			for (let j = 0; j < obj.nodes[i].prevCircle.length; j++) {
-				prev_vertices.push(obj.nodes[i].prevCircle[j].x);
-				prev_vertices.push(obj.nodes[i].prevCircle[j].y);
-				prev_vertices.push(obj.nodes[i].prevCircle[j].z);
-				prev_vertices.push(obj.nodes[i].prevCircle[j].r);
-				prev_vertices.push(obj.nodes[i].prevCircle[j].g);
-				prev_vertices.push(obj.nodes[i].prevCircle[j].b);
+		let mid_vertices = [];
+			// Draw mid circle
+			for (let j = 0; j < obj.nodes[i].circle.length; j++) {
+				mid_vertices.push(obj.nodes[i].circle[j].x);
+				mid_vertices.push(obj.nodes[i].circle[j].y);
+				mid_vertices.push(obj.nodes[i].circle[j].z);
+				mid_vertices.push(obj.nodes[i].circle[j].r);
+				mid_vertices.push(obj.nodes[i].circle[j].g);
+				mid_vertices.push(obj.nodes[i].circle[j].b);
 			}
 
 			// Write vertices into buffer
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(prev_vertices), gl.STATIC_DRAW);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mid_vertices), gl.STATIC_DRAW);
 
 			// Draw points
-			gl.drawArrays(gl.POINTS, 0, prev_vertices.length / 6);
+			gl.drawArrays(gl.POINTS, 0, mid_vertices.length / 6);
 
 			// Draw lines
-			gl.drawArrays(gl.LINE_LOOP, 0, prev_vertices.length / 6);
+			gl.drawArrays(gl.LINE_LOOP, 0, mid_vertices.length / 6);
+	}
 
-			// And draw skeleton to previous
-			for (let j = 0; j < obj.nodes[i].prevCircle.length - 1; j++) {
-				let vertices = [];
-
+	for (let i = 1; i < obj.nodes.length; i++) {
+		for (let j = 0; j < obj.nodes[i].circle.length; j++) {
+			let vertices = [];
+			if (j == obj.nodes[i].circle.length - 1) {
 				// First
-				vertices.push(obj.nodes[i].prevCircle[j].x);
-				vertices.push(obj.nodes[i].prevCircle[j].y);
-				vertices.push(obj.nodes[i].prevCircle[j].z);
+				vertices.push(obj.nodes[i].circle[j].x);
+				vertices.push(obj.nodes[i].circle[j].y);
+				vertices.push(obj.nodes[i].circle[j].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
 
 				// Second
-				vertices.push(obj.nodes[i - 1].nextCircle[j].x);
-				vertices.push(obj.nodes[i - 1].nextCircle[j].y);
-				vertices.push(obj.nodes[i - 1].nextCircle[j].z);
+				vertices.push(obj.nodes[i - 1].circle[j].x);
+				vertices.push(obj.nodes[i - 1].circle[j].y);
+				vertices.push(obj.nodes[i - 1].circle[j].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
 
 				// Third
-				vertices.push(obj.nodes[i - 1].nextCircle[j + 1].x);
-				vertices.push(obj.nodes[i - 1].nextCircle[j + 1].y);
-				vertices.push(obj.nodes[i - 1].nextCircle[j + 1].z);
+				vertices.push(obj.nodes[i - 1].circle[0].x);
+				vertices.push(obj.nodes[i - 1].circle[0].y);
+				vertices.push(obj.nodes[i - 1].circle[0].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
 
 				// Fourth
-				vertices.push(obj.nodes[i].prevCircle[j + 1].x);
-				vertices.push(obj.nodes[i].prevCircle[j + 1].y);
-				vertices.push(obj.nodes[i].prevCircle[j + 1].z);
+				vertices.push(obj.nodes[i].circle[0].x);
+				vertices.push(obj.nodes[i].circle[0].y);
+				vertices.push(obj.nodes[i].circle[0].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
-
-				// Write vertex into buffer
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-			  
-				// Draw points
-				gl.drawArrays(gl.LINE_LOOP, 0, vertices.length / 6);
-			}
-		}
-
-		// If has next node
-		if (obj.nodes[i].nextCircle) {
-			let next_vertices = [];
-
-			for (let j = 0; j < obj.nodes[i].nextCircle.length; j++) {
-				next_vertices.push(obj.nodes[i].nextCircle[j].x);
-				next_vertices.push(obj.nodes[i].nextCircle[j].y);
-				next_vertices.push(obj.nodes[i].nextCircle[j].z);
-				next_vertices.push(obj.nodes[i].nextCircle[j].r);
-				next_vertices.push(obj.nodes[i].nextCircle[j].g);
-				next_vertices.push(obj.nodes[i].nextCircle[j].b);
-			}
-
-			// Write vertices into buffer
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(next_vertices), gl.STATIC_DRAW);
-
-			// Draw lines
-			gl.drawArrays(gl.POINTS, 0, next_vertices.length / 6);
-			
-			// Draw lines
-			gl.drawArrays(gl.LINE_LOOP, 0, next_vertices.length / 6);
-		}
-
-		// If has both draw cylinder between both circles 
-		if (obj.nodes[i].prevCircle && obj.nodes[i].nextCircle) {
-			for (let j = 0; j < obj.nodes[i].prevCircle.length - 1; j++) {
-				let vertices = [];
-
+			} else {
 				// First
-				vertices.push(obj.nodes[i].prevCircle[j].x);
-				vertices.push(obj.nodes[i].prevCircle[j].y);
-				vertices.push(obj.nodes[i].prevCircle[j].z);
+				vertices.push(obj.nodes[i].circle[j].x);
+				vertices.push(obj.nodes[i].circle[j].y);
+				vertices.push(obj.nodes[i].circle[j].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
 
 				// Second
-				vertices.push(obj.nodes[i].prevCircle[j + 1].x);
-				vertices.push(obj.nodes[i].prevCircle[j + 1].y);
-				vertices.push(obj.nodes[i].prevCircle[j + 1].z);
+				vertices.push(obj.nodes[i - 1].circle[j].x);
+				vertices.push(obj.nodes[i - 1].circle[j].y);
+				vertices.push(obj.nodes[i - 1].circle[j].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
 
 				// Third
-				vertices.push(obj.nodes[i].nextCircle[j + 1].x);
-				vertices.push(obj.nodes[i].nextCircle[j + 1].y);
-				vertices.push(obj.nodes[i].nextCircle[j + 1].z);
+				vertices.push(obj.nodes[i - 1].circle[j + 1].x);
+				vertices.push(obj.nodes[i - 1].circle[j + 1].y);
+				vertices.push(obj.nodes[i - 1].circle[j + 1].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
 
 				// Fourth
-				vertices.push(obj.nodes[i].nextCircle[j].x);
-				vertices.push(obj.nodes[i].nextCircle[j].y);
-				vertices.push(obj.nodes[i].nextCircle[j].z);
+				vertices.push(obj.nodes[i].circle[j + 1].x);
+				vertices.push(obj.nodes[i].circle[j + 1].y);
+				vertices.push(obj.nodes[i].circle[j + 1].z);
 				vertices.push(0.0);
 				vertices.push(1.0);
 				vertices.push(0.0);
-
-				// Write vertex into buffer
-			  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-			  
-				// Draw points
-				gl.drawArrays(gl.LINE_LOOP, 0, vertices.length / 6);
 			}
+
+			// Write vertex into buffer
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+		  
+			// Draw points
+			gl.drawArrays(gl.LINE_LOOP, 0, vertices.length / 6);
 		}
 	}
+}
+
+// Generate Cylinder
+function generateCylinder(obj) {
+	// Each node (starting from the second one)
+	for (let i = 1; i < obj.nodes.length; i++) {
+		if (i == 1) {
+			// It's the second one, just generate the first one circle
+			obj.nodes[i-1].circle = generateCircles(obj.nodes[i-1], obj.nodes[i]).circle1;
+		} else {
+			// It's third or more, generate previous circle having in mind current circle and 2 previous
+			let A = obj.nodes[i - 2],
+					B = obj.nodes[i - 1],
+					C = obj.nodes[i];
+
+			// Get cylinder (circles) related to each line
+			let circleAB = generateCircles(A, B).circle1;
+			let circleBC = generateCircles(B, C).circle1;
+
+			// Get directions
+			let dirAB = [B.point.x - A.point.x,
+									 B.point.y - A.point.y,
+									 B.point.z - A.point.z];
+
+			let dirBC = [C.point.x - B.point.x,
+									 C.point.y - B.point.y,
+									 C.point.z - B.point.z];
+
+			let mid = [];
+
+			// For each point
+			for (let j = 0; j < circleAB.length; j++) {
+				// Get points in edges
+				let pA = circleAB[j];
+				let pC = circleBC[j];
+
+				let dirCA = [pA.x - pC.x,
+										 pA.y - pC.y,
+										 pA.z - pC.z];
+
+				console.log('pA[' + j + ']: ', pA);
+				console.log('pC[' + j + ']: ', pC);
+
+				/* 			pB = pA + dirAB * h1
+				 * 			pB = pC + dirBC * h2 			(h2 < 0)
+				 *
+				 * 			--					      --   --  --   --       --
+				 * 			|-dirAB.x 	dirBC.x| · | h1 | = | dirCA.x |
+				 * 			|-dirAB.y 	dirBC.y|	 | h2 |   | dirCA.y |
+				 * 			--					      --   --  --   --       --
+				 *
+				 *      |dirCA.x 		dirBC.x|						 |-dirAB.x 		dirCA.x|
+				 *      |dirCA.y 		dirBC.y|						 |-dirAB.y 		dirCA.y|
+				 * x = ----------------------, 			y = ----------------------
+				 *      |-dirAB.x 	dirBC.x|						 |-dirAB.x 		dirBC.x|
+				 *      |-dirAB.y 	dirBC.y|						 |-dirAB.y 		dirBC.y|
+				 *
+				 * x = det1 / detA , y = det2 / detA
+				 */
+				 let det1 = (dirCA[0] * dirBC[1]) - (dirCA[1] * dirBC[0]);
+				 let det2 = (-dirAB[0] * dirCA[1]) - (-dirAB[1] * dirCA[0]);
+				 let detA = (-dirAB[0] * dirBC[1]) - (-dirAB[1] * dirBC[0]);
+
+				 let h1 = det1 / detA;
+				 let h2 = det2 / detA;
+
+				 console.log('h1[' + j + ']: ', h1);
+				 console.log('h2[' + j + ']: ', h2);
+
+				 let pB = [pA.x + dirAB[0] * h1,
+				 					 pA.y + dirAB[1] * h1,
+				 					 pA.z + dirAB[2] * h1];
+
+				 mid.push(new Coord(pB[0], pB[1], pB[2], 0.0, 0.0, 1.0));
+			}
+
+			console.log('mid: ', mid);
+			// Now we have mid circle
+			obj.nodes[i - 1].circle = mid;
+		}
+	}
+
+	// Generate last circle
+	let circle = generateCircles(obj.nodes[obj.nodes.length - 2], obj.nodes[obj.nodes.length - 1]).circle2;
+	obj.nodes[obj.nodes.length - 1].circle = circle;
 }
 
 // Generate circle with center in n1 perpendicular to n1->n2
@@ -601,6 +774,5 @@ function Coord(x, y, z, r, g, b) {
 // Node object
 function Node(coord) {
 	this.point = coord;
-	this.nextCircle = null;
-	this.prevCircle = null;
+	this.circle = null;
 }

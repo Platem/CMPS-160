@@ -44,6 +44,9 @@
             #options div{
                 float: left;
             }
+            #options div button{
+                float: left;
+            }
         </style>
     </head>
 
@@ -62,12 +65,13 @@
             </div>
             <form action="" id="options">
                 <div>
-                    <button id="bRotateR">Rotate Right</button>
-                    <button id="bRotateL">Rotate Left</button>
-                    <button id="fSave" onclick="">Save file</button>
-                    <button id="fOpen" onclick="">Open file</button>
+                    <button id="fSave">Save file</button>
+                    <button id="fLoad" disabled>Extract data</button>
+                    <input type="file" id="fOpen">
                 </div>
                 <button onclick="clearCanvas()">Clear</button>
+                <button id="bRotateR">Rotate Right</button>
+                <button id="bRotateL">Rotate Left</button>
             </form>
         </div>        
 

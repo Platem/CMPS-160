@@ -1,8 +1,8 @@
 // Vertex shader program
-let VSHADER_SOURCE =
+var VSHADER_SOURCE =
 	'attribute vec4 a_Position;\n' +
 	'attribute vec4 a_Color;\n' +
-  'varying vec4 v_Color;\n' +
+	'varying vec4 v_Color;\n' +
 	'void main() {\n' +
 	'  gl_Position = a_Position;\n' +
 	'  v_Color = a_Color;\n' +
@@ -10,25 +10,25 @@ let VSHADER_SOURCE =
 	'}\n';
 
 // Fragment shader program
-let FSHADER_SOURCE =
+var FSHADER_SOURCE =
 	'precision mediump float;\n' +
-  'varying vec4 v_Color;\n' +
+	'varying vec4 v_Color;\n' +
 	'void main() {\n' +
-  '  gl_FragColor = v_Color;\n' +
+	'  gl_FragColor = v_Color;\n' +
 	'}\n';
 
 // Program vars
-let canvas,
-		gl,
-		a_Position,
-		a_Color,
-		polylines = [],
-		active_polyline = -1,
-		mouse_point = {
-			x: 0.0,
-			y: 0.0
-		},
-		active_random = false;
+var canvas,
+	gl,
+	a_Position,
+	a_Color,
+	polylines = [],
+	active_polyline = -1,
+	mouse_point = {
+		x: 0.0,
+		y: 0.0
+	},
+	active_random = false;
 
 function main() {
 	if (!setup()) {
@@ -75,39 +75,39 @@ function setup() {
 		return false;
 	}
 
-  // Init vertex Buffer
-  let vertexBuffer = gl.createBuffer();
-  if (!vertexBuffer) {
-    console.log('Failed to create the vertex buffer object');
-    return false;
-  }
+	// Init vertex Buffer
+	var vertexBuffer = gl.createBuffer();
+	if (!vertexBuffer) {
+		console.log('Failed to create the vertex buffer object');
+		return false;
+	}
 
-  // Bind the buffer object to target
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+	// Bind the buffer object to target
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
 	// Get the storage location of a_Position
-  a_Position = gl.getAttribLocation(gl.program, 'a_Position');
-  if (a_Position < 0) {
-    console.log('Failed to get the storage location of a_Position');
-    return false;
-  }
-  
-  // Assign buffer to a_Position variable
-  gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 4 * 5, 0);
-  // Enable the assignment to a_Position variable
-  gl.enableVertexAttribArray(a_Position);
+	a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+	if (a_Position < 0) {
+		console.log('Failed to get the storage location of a_Position');
+		return false;
+	}
+
+	// Assign buffer to a_Position variable
+	gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 4 * 5, 0);
+	// Enable the assignment to a_Position variable
+	gl.enableVertexAttribArray(a_Position);
 
 	// Get the storage location of a_Color
-	a_Color = gl.getUniformLocation(gl.program, 'a_Color');
+	a_Color = gl.getAttribLocation(gl.program, 'a_Color');
 	if (a_Color < 0) {
 		console.log('Failed to get the storage location of a_Color');
 		return false;
 	}
 
 	// Assign buffer to a_Color variable
-  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, 4 * 5, 4 * 2);
-  // Enable the assignment to a_Color variable
-  gl.enableVertexAttribArray(a_Color);
+	gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, 4 * 5, 4 * 2);
+	// Enable the assignment to a_Color variable
+	gl.enableVertexAttribArray(a_Color);
 
 	// Specify the color for clearing <canvas>
 	gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -120,17 +120,17 @@ function setup() {
 }
 
 function click(event) {
-	let coords = {};
+	var coords = {};
 
 	// Mouse coordinates
-	let x_mouse = event.clientX;
-	let y_mouse = event.clientY;
+	var x_mouse = event.clientX;
+	var y_mouse = event.clientY;
 
 	// Canvas positioning
-	let rect = event.target.getBoundingClientRect();
+	var rect = event.target.getBoundingClientRect();
 
 	// Draw coordinates
-	coords.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width  / 2);
+	coords.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width / 2);
 	coords.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2);
 
 	// Which button was pressed?
@@ -151,8 +151,8 @@ function click(event) {
 
 	// If the point ends a polyline print it
 	if (coords.e) {
-		let str = 'Polyline ended. Points are: ',
-				i = 0;
+		var str = 'Polyline ended. Points are: ',
+			i = 0;
 		for (i; i < polylines[polylines.length - 1].points.length - 1; i++) {
 			str += '[' + polylines[polylines.length - 1].points[i].x + ', ' + polylines[polylines.length - 1].points[i].y + '], ';
 		}
@@ -167,14 +167,14 @@ function click(event) {
 
 function move(event) {
 	// Mouse coordinates
-	let x_mouse = event.clientX;
-	let y_mouse = event.clientY;
+	var x_mouse = event.clientX;
+	var y_mouse = event.clientY;
 
 	// Canvas positioning
-	let rect = event.target.getBoundingClientRect();
+	var rect = event.target.getBoundingClientRect();
 
 	// Draw coordinates
-	mouse_point.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width  / 2);
+	mouse_point.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width / 2);
 	mouse_point.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2);
 
 	// Draw
@@ -182,7 +182,7 @@ function move(event) {
 }
 
 function newPoint(coords, ends) {
-	let first = false;
+	var first = false;
 	// If no active polyline
 	if (active_polyline === -1) {
 		// Add new polyline and set active
@@ -195,15 +195,15 @@ function newPoint(coords, ends) {
 	}
 
 	// Red by default
-	let color = {
-		R: 1.0,
-		G: 0.0,
-		B: 0.0
-	}
-	// If first or last change to blue
+	var color = {
+			R: 1.0,
+			G: 0.0,
+			B: 0.0
+		}
+		// If first or last change to blue
 	if (ends || first) {
 		color.R = 0.0,
-		color.B = 1.0
+			color.B = 1.0
 	}
 
 	// Add point to polyline
@@ -226,10 +226,10 @@ function newPoint(coords, ends) {
 
 function drawPolyline(lineObj) {
 	// Retrieve vertex set, color set and count
-	let vertex_set = [];
-	let lines_set = [];
-	let vertex_count;
-	let lines_count;
+	var vertex_set = [];
+	var lines_set = [];
+	var vertex_count;
+	var lines_count;
 
 	for (vertex_count = 0; vertex_count < lineObj.points.length; vertex_count++) {
 		// Vertex and color
@@ -261,14 +261,14 @@ function drawPolyline(lineObj) {
 		}
 
 		// Write vertex into buffer
-	  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines_set), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines_set), gl.STATIC_DRAW);
 
 		// Draw lines
 		gl.drawArrays(gl.LINE_STRIP, 0, lines_count);
 
 		// Write vertex into buffer
-	  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertex_set), gl.STATIC_DRAW);
-	  
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertex_set), gl.STATIC_DRAW);
+
 		// Draw points
 		gl.drawArrays(gl.POINTS, 0, vertex_count);
 	}
@@ -278,7 +278,7 @@ function drawPolyline(lineObj) {
 
 function draw() {
 	// Draw each polyline
-	for (let i = 0; i < polylines.length; i++) {
+	for (var i = 0; i < polylines.length; i++) {
 		drawPolyline(polylines[i]);
 	}
 
@@ -293,9 +293,9 @@ function startRandom() {
 	mouse_point.y = (Math.random().toFixed(2) * 2) - 1;
 
 	// Start loop
-	active_random = setInterval( function() {
+	active_random = setInterval(function() {
 		// Right click or left click
-		let right = !(Math.random() < 0.7); // true if random number >= 0.7
+		var right = !(Math.random() < 0.7); // true if random number >= 0.7
 		// Log it
 		if (right) {
 			console.log("Right click detected at [", mouse_point.x, ", ", mouse_point.y, "].");
@@ -304,15 +304,15 @@ function startRandom() {
 		}
 
 		// Add the point. Does it finish a polyline?
-		let ends = newPoint({
+		var ends = newPoint({
 			x: mouse_point.x,
 			y: mouse_point.y
 		}, right);
 
 		// If it ends print it.
 		if (ends) {
-			let str = 'Polyline ended. Points are: ',
-					i = 0;
+			var str = 'Polyline ended. Points are: ',
+				i = 0;
 			for (i; i < polylines[polylines.length - 1].points.length - 1; i++) {
 				str += '[' + polylines[polylines.length - 1].points[i].x + ', ' + polylines[polylines.length - 1].points[i].y + '], ';
 			}
@@ -325,28 +325,28 @@ function startRandom() {
 		draw();
 
 		// Save the point
-		let previous_mouse_point = {
+		var previous_mouse_point = {
 			x: mouse_point.x,
 			y: mouse_point.y
 		};
 		//console.log("Previous mouse point: ", previous_mouse_point);
 
 		// Set a new point
-		let next_mouse_point = {
+		var next_mouse_point = {
 			x: (Math.random().toFixed(2) * 2) - 1,
 			y: (Math.random().toFixed(2) * 2) - 1
 		};
 		//console.log("Next mouse point: ", next_mouse_point);
 
 		// Calculate the difference
-		let diff = {
+		var diff = {
 			x: next_mouse_point.x - mouse_point.x,
 			y: next_mouse_point.y - mouse_point.y
 		};
 		//console.log("diff: ", diff);
-		
+
 		// We will move the mouse 1000 points between them
-		for (let j = 1; j < 500; j++) {
+		for (var j = 1; j < 500; j++) {
 			setTimeout(function() {
 				// Move the mouse
 				mouse_point.x = previous_mouse_point.x + (diff.x / 500) * j;
