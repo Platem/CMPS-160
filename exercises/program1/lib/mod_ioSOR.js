@@ -265,7 +265,6 @@ function saveFile2(SORCollection, name) {
 			text = text + "f " + SOR.indexes[i] + " " + SOR.indexes[i + 1] + " " + SOR.indexes[i + 2] + "\n";
 		}
 	}
-	console.log(text);
 
 	// Create Blob out of plain text
 	let myBlob = new Blob([text], {
