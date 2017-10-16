@@ -47,6 +47,17 @@
             #options div button{
                 float: left;
             }
+            #circle {
+                float: right !important;
+                height: 10px;
+                width: 10px;
+                margin-top: 5px;
+                border-radius: 5px;
+                background: red;
+            }
+            #circle.active {
+                background: green;
+            }
         </style>
     </head>
 
@@ -73,6 +84,7 @@
                 <button id="bRotateR">Rotate Right</button>
                 <button id="bRotateL">Rotate Left</button>
                 <button id="bNormals">Toggle Normals</button>
+                <div id="circle"></div>
             </form>
         </div>        
 

@@ -33,7 +33,8 @@ let objects = [],
 		x: 0.0,
 		y: 0.0,
 		z: 0.0
-	};
+	},
+	draw_normals = false;
 
 // Main function
 function main() {
@@ -68,6 +69,14 @@ function main() {
 	canvas.oncontextmenu = function(event) {
 		return false;
 	}
+
+	// Draw normals toggler
+	document.getElementById('bNormals').addEventListener('click', function(e) {
+		e.preventDefault();
+		draw_normals ? draw_normals = false : draw_normals = true;
+		document.getElementById('circle').classList.toggle('active');
+		draw();
+	});
 
 	// Setup ioSOR
 	setupIOSOR('fOpen');
@@ -150,7 +159,7 @@ function setup() {
 
 function readSOR2() {
 	let SORCollection = readFile2();
-	console.log(SORCollection[0]);
+
 	for (let i = 0; i < SORCollection.length; i++) {
 		let vertices = SORCollection[i].vertices;
 		let indexes = SORCollection[i].indexes;
@@ -412,7 +421,7 @@ function rotate(side) {
 	if (side == "right")
 		M.setRotate(ROTATION, 0, 1, 0);
 	else if (side == "left")
-		M.setRotate(-ROTATION, 0, 1, 0);
+		M.setRotate(-(ROTATION), 0, 1, 0);
 	else
 		M.setRotate(0, 0, 1, 0);
 
@@ -609,6 +618,172 @@ function drawLine(obj) {
 
 // Draws an object
 function drawObject(obj) {
+	for (let i = 1; i < obj.nodes.length; i++) {
+		for (let j = 0; j < obj.nodes[i].circle.length; j++) {
+			let vertices = [];
+			if (j == obj.nodes[i].circle.length - 1) {
+				// First
+				vertices.push(obj.nodes[i].circle[j].x);
+				vertices.push(obj.nodes[i].circle[j].y);
+				vertices.push(obj.nodes[i].circle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Second
+				vertices.push(obj.nodes[i - 1].circle[j].x);
+				vertices.push(obj.nodes[i - 1].circle[j].y);
+				vertices.push(obj.nodes[i - 1].circle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				if (draw_normals) {
+					// Second colored
+					vertices.push(obj.nodes[i - 1].circle[j].x);
+					vertices.push(obj.nodes[i - 1].circle[j].y);
+					vertices.push(obj.nodes[i - 1].circle[j].z);
+					vertices.push(1.0);
+					vertices.push(0.75);
+					vertices.push(0.79);
+					// Get normal vector
+					let pA = obj.nodes[i - 1].circle[j],
+						pB = obj.nodes[i - 1].circle[0],
+						pC = obj.nodes[i].circle[j];
+
+					let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pB.z];
+					let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
+
+					let n = crossProduct(v, w);
+
+					// Push point
+					vertices.push(pA.x - n[0]*2);
+					vertices.push(pA.y - n[1]*2);
+					vertices.push(pA.z - n[2]*2);
+					vertices.push(1.0);
+					vertices.push(0.75);
+					vertices.push(0.79);
+
+					// Second colored
+					vertices.push(obj.nodes[i - 1].circle[j].x);
+					vertices.push(obj.nodes[i - 1].circle[j].y);
+					vertices.push(obj.nodes[i - 1].circle[j].z);
+					vertices.push(1.0);
+					vertices.push(0.75);
+					vertices.push(0.79);
+
+					// Back to second
+					vertices.push(obj.nodes[i - 1].circle[j].x);
+					vertices.push(obj.nodes[i - 1].circle[j].y);
+					vertices.push(obj.nodes[i - 1].circle[j].z);
+					vertices.push(0.0);
+					vertices.push(1.0);
+					vertices.push(0.0);
+				}
+
+				// Third
+				vertices.push(obj.nodes[i - 1].circle[0].x);
+				vertices.push(obj.nodes[i - 1].circle[0].y);
+				vertices.push(obj.nodes[i - 1].circle[0].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Fourth
+				vertices.push(obj.nodes[i].circle[0].x);
+				vertices.push(obj.nodes[i].circle[0].y);
+				vertices.push(obj.nodes[i].circle[0].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+			} else {
+				// First
+				vertices.push(obj.nodes[i].circle[j].x);
+				vertices.push(obj.nodes[i].circle[j].y);
+				vertices.push(obj.nodes[i].circle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Second
+				vertices.push(obj.nodes[i - 1].circle[j].x);
+				vertices.push(obj.nodes[i - 1].circle[j].y);
+				vertices.push(obj.nodes[i - 1].circle[j].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				if (draw_normals) { 
+					// Second colored
+					vertices.push(obj.nodes[i - 1].circle[j].x);
+					vertices.push(obj.nodes[i - 1].circle[j].y);
+					vertices.push(obj.nodes[i - 1].circle[j].z);
+					vertices.push(1.0);
+					vertices.push(0.75);
+					vertices.push(0.79);
+
+					// Get normal vector
+					let pA = obj.nodes[i - 1].circle[j],
+						pB = obj.nodes[i - 1].circle[j + 1],
+						pC = obj.nodes[i].circle[j];
+
+					let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pB.z];
+					let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
+
+					let n = crossProduct(v, w);
+
+					// Push point
+					vertices.push(pA.x - n[0]*2);
+					vertices.push(pA.y - n[1]*2);
+					vertices.push(pA.z - n[2]*2);
+					vertices.push(1.0);
+					vertices.push(0.75);
+					vertices.push(0.79);
+
+					// Second colored
+					vertices.push(obj.nodes[i - 1].circle[j].x);
+					vertices.push(obj.nodes[i - 1].circle[j].y);
+					vertices.push(obj.nodes[i - 1].circle[j].z);
+					vertices.push(1.0);
+					vertices.push(0.75);
+					vertices.push(0.79);
+
+					// Back to second
+					vertices.push(obj.nodes[i - 1].circle[j].x);
+					vertices.push(obj.nodes[i - 1].circle[j].y);
+					vertices.push(obj.nodes[i - 1].circle[j].z);
+					vertices.push(0.0);
+					vertices.push(1.0);
+					vertices.push(0.0);
+				}
+
+				// Third
+				vertices.push(obj.nodes[i - 1].circle[j + 1].x);
+				vertices.push(obj.nodes[i - 1].circle[j + 1].y);
+				vertices.push(obj.nodes[i - 1].circle[j + 1].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+				// Fourth
+				vertices.push(obj.nodes[i].circle[j + 1].x);
+				vertices.push(obj.nodes[i].circle[j + 1].y);
+				vertices.push(obj.nodes[i].circle[j + 1].z);
+				vertices.push(0.0);
+				vertices.push(1.0);
+				vertices.push(0.0);
+
+			}
+
+			// Write vertex into buffer
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+			// Draw points
+			gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 6);
+		}
+	}
+
 	// Draw object nodes (circles)
 	for (let i = 0; i < obj.nodes.length; i++) {
 		let mid_vertices = [];
@@ -630,83 +805,6 @@ function drawObject(obj) {
 
 		// Draw lines
 		gl.drawArrays(gl.LINE_LOOP, 0, mid_vertices.length / 6);
-	}
-
-	for (let i = 1; i < obj.nodes.length; i++) {
-		for (let j = 0; j < obj.nodes[i].circle.length; j++) {
-			let vertices = [];
-			if (j == obj.nodes[i].circle.length - 1) {
-				// First
-				vertices.push(obj.nodes[i].circle[j].x);
-				vertices.push(obj.nodes[i].circle[j].y);
-				vertices.push(obj.nodes[i].circle[j].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-
-				// Second
-				vertices.push(obj.nodes[i - 1].circle[j].x);
-				vertices.push(obj.nodes[i - 1].circle[j].y);
-				vertices.push(obj.nodes[i - 1].circle[j].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-
-				// Third
-				vertices.push(obj.nodes[i - 1].circle[0].x);
-				vertices.push(obj.nodes[i - 1].circle[0].y);
-				vertices.push(obj.nodes[i - 1].circle[0].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-
-				// Fourth
-				vertices.push(obj.nodes[i].circle[0].x);
-				vertices.push(obj.nodes[i].circle[0].y);
-				vertices.push(obj.nodes[i].circle[0].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-			} else {
-				// First
-				vertices.push(obj.nodes[i].circle[j].x);
-				vertices.push(obj.nodes[i].circle[j].y);
-				vertices.push(obj.nodes[i].circle[j].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-
-				// Second
-				vertices.push(obj.nodes[i - 1].circle[j].x);
-				vertices.push(obj.nodes[i - 1].circle[j].y);
-				vertices.push(obj.nodes[i - 1].circle[j].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-
-				// Third
-				vertices.push(obj.nodes[i - 1].circle[j + 1].x);
-				vertices.push(obj.nodes[i - 1].circle[j + 1].y);
-				vertices.push(obj.nodes[i - 1].circle[j + 1].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-
-				// Fourth
-				vertices.push(obj.nodes[i].circle[j + 1].x);
-				vertices.push(obj.nodes[i].circle[j + 1].y);
-				vertices.push(obj.nodes[i].circle[j + 1].z);
-				vertices.push(0.0);
-				vertices.push(1.0);
-				vertices.push(0.0);
-			}
-
-			// Write vertex into buffer
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-			// Draw points
-			gl.drawArrays(gl.LINE_LOOP, 0, vertices.length / 6);
-		}
 	}
 }
 
