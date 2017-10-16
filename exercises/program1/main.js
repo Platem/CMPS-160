@@ -157,9 +157,10 @@ function setup() {
 	return true;
 }
 
+// Read multiple objects form file
 function readSOR2() {
 	let SORCollection = readFile2();
-
+	objects = [];
 	for (let i = 0; i < SORCollection.length; i++) {
 		let vertices = SORCollection[i].vertices;
 		let indexes = SORCollection[i].indexes;
@@ -230,6 +231,7 @@ function readSOR2() {
 	}
 }
 
+// Read object from file
 function readSOR() {
 	let objSOR = readFile();
 	let vertices = objSOR.vertices;
@@ -296,8 +298,9 @@ function readSOR() {
 	}
 }
 
+// Save objects to file
 function saveSOR2() {
-	SORCollection = [];
+	let SORCollection = [];
 	if (objects.length > 0) {
 		var name = prompt("Please enter a file name.\n\n[Note that only completed objects will be saved]", "object");
 		// Each object
@@ -351,10 +354,11 @@ function saveSOR2() {
 
 		saveFile2(SORCollection, name);
 	} else {
-		alert('There aren\'t any objects to be saved. Be sure you draw something and you complete it (right click).');
+		alert('There aren\'t any objects to be saved. Be sure you draw something and you complete it (right click).\n\n[Note that loaded objects don\'t count.]');
 	}
 }
 
+// Save first object to file
 function saveSOR() {
 	if (objects.length > 0 && objects[0].ended) {
 		var name = prompt("Please enter a name.\n\n[Note that only the first drawn object will be saved]", "object");
@@ -657,9 +661,9 @@ function drawObject(obj) {
 					let n = crossProduct(v, w);
 
 					// Push point
-					vertices.push(pA.x - n[0]*2);
-					vertices.push(pA.y - n[1]*2);
-					vertices.push(pA.z - n[2]*2);
+					vertices.push(pA.x - n[0]*5);
+					vertices.push(pA.y - n[1]*5);
+					vertices.push(pA.z - n[2]*5);
 					vertices.push(1.0);
 					vertices.push(0.75);
 					vertices.push(0.79);
@@ -734,9 +738,9 @@ function drawObject(obj) {
 					let n = crossProduct(v, w);
 
 					// Push point
-					vertices.push(pA.x - n[0]*2);
-					vertices.push(pA.y - n[1]*2);
-					vertices.push(pA.z - n[2]*2);
+					vertices.push(pA.x - n[0]*5);
+					vertices.push(pA.y - n[1]*5);
+					vertices.push(pA.z - n[2]*5);
 					vertices.push(1.0);
 					vertices.push(0.75);
 					vertices.push(0.79);
