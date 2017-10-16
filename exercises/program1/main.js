@@ -305,18 +305,20 @@ function saveSOR2() {
 				}
 
 				// Push indexes
-				for (let j = 0; j < objects[i].nodes.length - 1; j++) {
+				for (let j = 1; j < objects[i].nodes.length; j++) {
 					for (let k = 0; k < objects[i].nodes[j].circle.length; k++) {
 						if (k == objects[i].nodes[j].circle.length - 1) {
 							inds.push(objects[i].nodes[j].circle[k]);
+							inds.push(objects[i].nodes[j - 1].circle[k]);
+							inds.push(objects[i].nodes[j - 1].circle[0]);
 							inds.push(objects[i].nodes[j].circle[0]);
-							inds.push(objects[i].nodes[j + 1].circle[0]);
-							inds.push(objects[i].nodes[j + 1].circle[k]);
+							inds.push(objects[i].nodes[j].circle[k]);
 						} else {
 							inds.push(objects[i].nodes[j].circle[k]);
+							inds.push(objects[i].nodes[j - 1].circle[k]);
+							inds.push(objects[i].nodes[j - 1].circle[k + 1]);
 							inds.push(objects[i].nodes[j].circle[k + 1]);
-							inds.push(objects[i].nodes[j + 1].circle[k + 1]);
-							inds.push(objects[i].nodes[j + 1].circle[k]);
+							inds.push(objects[i].nodes[j].circle[k]);
 						}
 					}
 				}
