@@ -933,10 +933,10 @@ function drawObject(obj) {
 		let v2 = [B2.x - A2.x, B2.y - A2.y, B2.z - A2.z];
 		let w2 = [C2.x - A2.x, C2.y - A2.y, B2.z - C2.z];
 
-		let n2 = crossProduct(v1, w1, true);
+		let n2 = crossProduct(w1, v1, true);
 
 		// Get surface color
-		let S2 = dotProduct(n1, light.position);
+		let S2 = dotProduct(n2, light.position);
 		let Id2 = [surface_material.kd[0] * light.position[0] * S2,
 							surface_material.kd[1] * light.position[1] * S2,
 							surface_material.kd[2] * light.position[2] * S2];
