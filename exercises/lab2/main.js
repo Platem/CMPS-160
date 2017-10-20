@@ -704,31 +704,20 @@ function drawObject(obj) {
 		for (let i = 1; i < obj.nodes.length; i++) {
 			for (let j = 0; j < obj.nodes[i].circle.length; j++) {
 				let vertices = [];
-				let n = [];
-				let pA;
+				let pA = obj.nodes[i - 1].circle[j],
+						pB,
+						pc = pC = obj.nodes[i].circle[j];
+
 				if (j == obj.nodes[i].circle.length - 1) {
-					// Get normal vector
-					pA = obj.nodes[i - 1].circle[j];
-
-					let pB = obj.nodes[i - 1].circle[0],
-					pC = obj.nodes[i].circle[j];
-
-					let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pA.z];
-					let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
-
-					n = crossProduct(v, w, true);
+					pB = obj.nodes[i - 1].circle[0];
 				} else {
-					// Get normal vector
-					pA = obj.nodes[i - 1].circle[j];
-
-					let pB = obj.nodes[i - 1].circle[j + 1],
-					pC = obj.nodes[i].circle[j];
-
-					let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pA.z];
-					let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
-
-					n = crossProduct(v, w, true);
+					pB = obj.nodes[i - 1].circle[j + 1];
 				}
+
+				let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pA.z];
+				let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
+
+				let n = crossProduct(v, w, true);
 
 				// Second colored
 				vertices.push(obj.nodes[i - 1].circle[j].x);
@@ -746,6 +735,11 @@ function drawObject(obj) {
 				vertices.push(0.75);
 				vertices.push(0.79);
 
+				// Write vertices into buffer
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+				// Draw lines
+				gl.drawArrays(gl.LINES, 0, vertices.length / 6);
 			}
 		}
 	}
