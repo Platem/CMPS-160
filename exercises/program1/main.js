@@ -369,18 +369,20 @@ function saveSOR() {
 				pts.push(objects[0].nodes[i].circle[j]);
 			}
 		}
-		for (let i = 0; i < objects[0].nodes.length - 1; i++) {
+		for (let i = 1; i < objects[0].nodes.length; i++) {
 			for (let j = 0; j < objects[0].nodes[i].circle.length; j++) {
 				if (j == objects[0].nodes[i].circle.length - 1) {
 					ind.push(objects[0].nodes[i].circle[j]);
+					ind.push(objects[0].nodes[i - 1].circle[j]);
+					ind.push(objects[0].nodes[i - 1].circle[0]);
 					ind.push(objects[0].nodes[i].circle[0]);
-					ind.push(objects[0].nodes[i + 1].circle[0]);
-					ind.push(objects[0].nodes[i + 1].circle[j]);
+					ind.push(objects[0].nodes[i].circle[j]);
 				} else {
 					ind.push(objects[0].nodes[i].circle[j]);
+					ind.push(objects[0].nodes[i - 1].circle[j]);
+					ind.push(objects[0].nodes[i - 1].circle[j + 1]);
 					ind.push(objects[0].nodes[i].circle[j + 1]);
-					ind.push(objects[0].nodes[i + 1].circle[j + 1]);
-					ind.push(objects[0].nodes[i + 1].circle[j]);
+					ind.push(objects[0].nodes[i].circle[j]);
 				}
 			}
 		}
@@ -622,6 +624,7 @@ function drawLine(obj) {
 
 // Draws an object
 function drawObject(obj) {
+	// Draw Skeleton
 	for (let i = 1; i < obj.nodes.length; i++) {
 		for (let j = 0; j < obj.nodes[i].circle.length; j++) {
 			let vertices = [];
@@ -650,6 +653,7 @@ function drawObject(obj) {
 					vertices.push(1.0);
 					vertices.push(0.75);
 					vertices.push(0.79);
+
 					// Get normal vector
 					let pA = obj.nodes[i - 1].circle[j],
 						pB = obj.nodes[i - 1].circle[0],
@@ -658,12 +662,12 @@ function drawObject(obj) {
 					let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pB.z];
 					let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
 
-					let n = crossProduct(v, w);
+					let n = crossProduct(w, v, true);
 
 					// Push point
-					vertices.push(pA.x - n[0]*5);
-					vertices.push(pA.y - n[1]*5);
-					vertices.push(pA.z - n[2]*5);
+					vertices.push(pA.x + n[0] * 0.3);
+					vertices.push(pA.y + n[1] * 0.3);
+					vertices.push(pA.z + n[2] * 0.3);
 					vertices.push(1.0);
 					vertices.push(0.75);
 					vertices.push(0.79);
@@ -735,12 +739,12 @@ function drawObject(obj) {
 					let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pB.z];
 					let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
 
-					let n = crossProduct(v, w);
+					let n = crossProduct(w, v, true);
 
 					// Push point
-					vertices.push(pA.x - n[0]*5);
-					vertices.push(pA.y - n[1]*5);
-					vertices.push(pA.z - n[2]*5);
+					vertices.push(pA.x + n[0] * 0.3);
+					vertices.push(pA.y + n[1] * 0.3);
+					vertices.push(pA.z + n[2] * 0.3);
 					vertices.push(1.0);
 					vertices.push(0.75);
 					vertices.push(0.79);
@@ -788,7 +792,7 @@ function drawObject(obj) {
 		}
 	}
 
-	// Draw object nodes (circles)
+	// Draw object nodes (circles points)
 	for (let i = 0; i < obj.nodes.length; i++) {
 		let mid_vertices = [];
 		// Draw mid circle
@@ -796,9 +800,19 @@ function drawObject(obj) {
 			mid_vertices.push(obj.nodes[i].circle[j].x);
 			mid_vertices.push(obj.nodes[i].circle[j].y);
 			mid_vertices.push(obj.nodes[i].circle[j].z);
-			mid_vertices.push(obj.nodes[i].circle[j].r);
-			mid_vertices.push(obj.nodes[i].circle[j].g);
-			mid_vertices.push(obj.nodes[i].circle[j].b);
+			if (j == 0) {
+				mid_vertices.push(1.0);
+				mid_vertices.push(0.0);
+				mid_vertices.push(1.0);
+			} else if (j == 9) {
+				mid_vertices.push(1.0);
+				mid_vertices.push(0.0);
+				mid_vertices.push(0.0);
+			} else {
+				mid_vertices.push(obj.nodes[i].circle[j].r);
+				mid_vertices.push(obj.nodes[i].circle[j].g);
+				mid_vertices.push(obj.nodes[i].circle[j].b);
+			}
 		}
 
 		// Write vertices into buffer
@@ -959,7 +973,7 @@ function getPerpendicular(vector, length) {
 		}
 	} else {
 		// vector is [x, 0, 0] || [0, y, 0] || [x, y, 0] || [x, 0, z] || [0, y, z] || [x, y, z]
-		let l = Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
+		let l = Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2) + Math.pow(vector[2], 2));
 		return [(vector[1] * length) / l, (-vector[0] * length) / l, 0];
 	}
 }
@@ -971,9 +985,15 @@ function dotProduct(v1, v2) {
 }
 
 // Calculate cross product of two vectors
-function crossProduct(v1, v2) {
-
-	return [(v1[1] * v2[2] - v2[1] * v1[2]), -(v1[0] * v2[2] - v2[0] * v1[2]), (v1[0] * v2[1] - v2[0] * v1[1])];
+function crossProduct(v1, v2, normal) {
+	let ret = [(v1[1] * v2[2] - v2[1] * v1[2]), -(v1[0] * v2[2] - v2[0] * v1[2]), (v1[0] * v2[1] - v2[0] * v1[1])];
+	if (normal) {
+		let l = Math.sqrt(Math.pow(ret[0], 2) + Math.pow(ret[1], 2) + Math.pow(ret[2], 2));
+		ret[0] = ret[0] / l;
+		ret[1] = ret[1] / l;
+		ret[2] = ret[2] / l;
+	}
+	return ret;
 }
 
 // Calculate magnitude of vector
