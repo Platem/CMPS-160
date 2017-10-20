@@ -1073,6 +1073,24 @@ function drawObject(obj) {
 				gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 6);
 			}
 		}
+		for (let i = 0; i < obj.nodes.length; i++) {
+			let mid_vertices = [];
+			// Draw mid circle
+			for (let j = 0; j < obj.nodes[i].circle.length; j++) {
+				mid_vertices.push(obj.nodes[i].circle[j].x);
+				mid_vertices.push(obj.nodes[i].circle[j].y);
+				mid_vertices.push(obj.nodes[i].circle[j].z);
+				mid_vertices.push(obj.nodes[i].circle[j].r);
+				mid_vertices.push(obj.nodes[i].circle[j].g);
+				mid_vertices.push(obj.nodes[i].circle[j].b);
+			}
+
+			// Write vertices into buffer
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mid_vertices), gl.STATIC_DRAW);
+
+			// Draw lines
+			gl.drawArrays(gl.LINE_LOOP, 0, mid_vertices.length / 6);
+		}
 	}
 
 	// Draw object nodes (circles points)
@@ -1094,9 +1112,6 @@ function drawObject(obj) {
 
 			// Draw points
 			gl.drawArrays(gl.POINTS, 0, mid_vertices.length / 6);
-
-			// Draw lines
-			gl.drawArrays(gl.LINE_LOOP, 0, mid_vertices.length / 6);
 		}
 	}
 }
