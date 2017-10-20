@@ -44,6 +44,7 @@ mouse_point = {
 draw_normals = false,
 draw_skeleton = false,
 draw_surface = true,
+draw_points = false,
 light = {
 	color: [1.0, 1.0, 1.0],
 	position: [1.0, 1.0, 1.0]
@@ -146,6 +147,14 @@ function main() {
 		e.preventDefault();
 		draw_surface ? draw_surface = false : draw_surface = true;
 		document.getElementById('circle-s').classList.toggle('active');
+		draw();
+	});
+
+	// Draw points toggler
+	document.getElementById('bPoints').addEventListener('click', function(e) {
+		e.preventDefault();
+		draw_points ? draw_points = false : draw_points = true;
+		document.getElementById('circle-p').classList.toggle('active');
 		draw();
 	});
 
@@ -1073,26 +1082,28 @@ function drawObject(obj) {
 	}
 
 	// Draw object nodes (circles points)
-	for (let i = 0; i < obj.nodes.length; i++) {
-		let mid_vertices = [];
-		// Draw mid circle
-		for (let j = 0; j < obj.nodes[i].circle.length; j++) {
-			mid_vertices.push(obj.nodes[i].circle[j].x);
-			mid_vertices.push(obj.nodes[i].circle[j].y);
-			mid_vertices.push(obj.nodes[i].circle[j].z);
-			mid_vertices.push(obj.nodes[i].circle[j].r);
-			mid_vertices.push(obj.nodes[i].circle[j].g);
-			mid_vertices.push(obj.nodes[i].circle[j].b);
+	if (draw_points) {
+		for (let i = 0; i < obj.nodes.length; i++) {
+			let mid_vertices = [];
+			// Draw mid circle
+			for (let j = 0; j < obj.nodes[i].circle.length; j++) {
+				mid_vertices.push(obj.nodes[i].circle[j].x);
+				mid_vertices.push(obj.nodes[i].circle[j].y);
+				mid_vertices.push(obj.nodes[i].circle[j].z);
+				mid_vertices.push(obj.nodes[i].circle[j].r);
+				mid_vertices.push(obj.nodes[i].circle[j].g);
+				mid_vertices.push(obj.nodes[i].circle[j].b);
+			}
+
+			// Write vertices into buffer
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mid_vertices), gl.STATIC_DRAW);
+
+			// Draw points
+			gl.drawArrays(gl.POINTS, 0, mid_vertices.length / 6);
+
+			// Draw lines
+			gl.drawArrays(gl.LINE_LOOP, 0, mid_vertices.length / 6);
 		}
-
-		// Write vertices into buffer
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mid_vertices), gl.STATIC_DRAW);
-
-		// Draw points
-		gl.drawArrays(gl.POINTS, 0, mid_vertices.length / 6);
-
-		// Draw lines
-		gl.drawArrays(gl.LINE_LOOP, 0, mid_vertices.length / 6);
 	}
 }
 
