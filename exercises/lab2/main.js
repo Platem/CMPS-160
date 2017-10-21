@@ -787,7 +787,7 @@ function drawObject(obj) {
 				let vertices = [];
 				let pA = obj.nodes[i - 1].circle[j],
 						pB,
-						pc = pC = obj.nodes[i].circle[j];
+						pC = obj.nodes[i].circle[j];
 
 				if (j == obj.nodes[i].circle.length - 1) {
 					pB = obj.nodes[i - 1].circle[0];
@@ -800,15 +800,15 @@ function drawObject(obj) {
 
 				let n = crossProduct(v, w, true);
 
-				// Second colored
-				vertices.push(obj.nodes[i - 1].circle[j].x);
-				vertices.push(obj.nodes[i - 1].circle[j].y);
-				vertices.push(obj.nodes[i - 1].circle[j].z);
+				// pA colored
+				vertices.push(pA.x);
+				vertices.push(pA.y);
+				vertices.push(pA.z);
 				vertices.push(1.0);
 				vertices.push(0.75);
 				vertices.push(0.79);
 
-				// Push point
+				// Normal point
 				vertices.push(pA.x + n[0] * 0.3);
 				vertices.push(pA.y + n[1] * 0.3);
 				vertices.push(pA.z + n[2] * 0.3);
@@ -821,6 +821,7 @@ function drawObject(obj) {
 
 				// Draw lines
 				gl.drawArrays(gl.LINES, 0, vertices.length / 6);
+
 			}
 		}
 	}
