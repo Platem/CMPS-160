@@ -312,6 +312,7 @@ function readSOR2() {
 			}
 
 			objects.push(object);
+			updateList();
 
 			// let v = [],
 			// l = [];
@@ -409,6 +410,7 @@ function readSOR() {
 		}
 
 		objects.push(object);
+		updateList();
 
 		// let v = [],
 		// l = [];
@@ -465,7 +467,6 @@ function readSOR() {
 		// // Draw points
 		// gl.drawArrays(gl.LINE_STRIP, 0, l.length / 6);
 	}
-	
 	draw();
 }
 
