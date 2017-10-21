@@ -62,6 +62,11 @@ function main() {
 		return;
 	}
 
+	document.getElementById('bClear').onclick = function(event) {
+		event.preventDefault();
+		clearCanvas();
+	};
+
 	// Rotation
 	document.getElementById('bRotateL').onclick = function(event) {
 		event.preventDefault();
@@ -173,6 +178,31 @@ function main() {
 		e.preventDefault();
 		readSOR2();
 	});
+
+	// List
+	$(document).on('click', '.removeList', function(e) {
+		e.preventDefault();
+		let $li = $(e.target).parent();
+		let index = $li.index();
+		objects.splice(index, 1);
+		updateList();
+		draw();
+	});
+
+	$(document).on('click', '.toggleView', function(e) {
+		e.preventDefault();
+		let $li = $(e.target).parent();
+		let index = $li.index();
+
+		if (objects[index].visible) {
+		 objects[index].visible = false;
+		 $(e.target).text('Show');
+		} else {
+			objects[index].visible = true;
+		 $(e.target).text('Hide');
+		}
+		draw();
+	});
 }
 
 // Setup WebGL function
@@ -260,6 +290,7 @@ function readSOR2() {
 		} else {
 			let object = {
 				ended: true,
+				visible: true,
 				nodes: []
 			};
 
@@ -281,7 +312,6 @@ function readSOR2() {
 			}
 
 			objects.push(object);
-			draw();
 
 			// let v = [],
 			// l = [];
@@ -342,6 +372,7 @@ function readSOR2() {
 			// gl.drawArrays(gl.LINE_STRIP, 0, l.length / 6);
 		}
 	}
+	draw();
 }
 
 // Read object from file
@@ -356,6 +387,7 @@ function readSOR() {
 	} else {
 		let object = {
 			ended: true,
+			visible: true,
 			nodes: []
 		};
 
@@ -377,7 +409,6 @@ function readSOR() {
 		}
 
 		objects.push(object);
-		draw();
 
 		// let v = [],
 		// l = [];
@@ -434,6 +465,8 @@ function readSOR() {
 		// // Draw points
 		// gl.drawArrays(gl.LINE_STRIP, 0, l.length / 6);
 	}
+	
+	draw();
 }
 
 // Save objects to file
@@ -569,7 +602,8 @@ function draw() {
 	// Draw each polyline
 	for (let i = 0; i < objects.length; i++) {
 		if (objects[i].ended) {
-			drawObject(objects[i]);
+			if (objects[i].visible)
+				drawObject(objects[i]);
 		} else {
 			drawLine(objects[i]);
 		}
@@ -672,8 +706,11 @@ function newNode(coords, ends) {
 	if (active_object === -1) {
 		objects.push({
 			ended: false,
+			visible: true,
 			nodes: []
 		});
+
+		updateList();
 
 		active_object = objects.length - 1;
 		first = true;
@@ -1349,8 +1386,19 @@ function circleCenter(pA, pB) {
 
 // Clear canvas
 function clearCanvas() {
-	// Clear <canvas>
+	objects = [];
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+}
+
+// Remove from list
+function updateList() {
+	let $list = $('#list ul');
+	$list.empty();
+
+	for (let i = 0; i < objects.length; i++) {
+		let $li = $('<li><label>Object ' + i + '</label><button class="removeList">Remove</button><button class="toggleView">Hide</button></li>');
+		$list.append($li);
+	}
 }
 
 // Coord object
