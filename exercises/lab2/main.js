@@ -258,63 +258,88 @@ function readSOR2() {
 		} else if (indexes.length % (4 * 3) != 0) {
 			alert('Selected file doesn\'t match indexes (faces) format in [' + SORCollection[i].name + '] object. There should be groups of 4 points, each group forming a face.');
 		} else {
-			let v = [],
-			l = [];
+			let object = {
+				ended: true,
+				nodes: []
+			};
 
-			for (let j = 0; j < vertices.length; j += 3) {
-				v.push(vertices[j]);
-				v.push(vertices[j + 1]);
-				v.push(vertices[j + 2]);
-				v.push(0.0);
-				v.push(0.0);
-				v.push(1.0);
+			for (let i = 0; i < vertices.length / 36; i++) {
+				// Get circle
+				let circle = [];
+				for (let j = 0; j < 36; j += 3) {
+					let p = new Coord(vertices[i * 36 + j], vertices[i * 36 + j + 1], vertices[i * 36 + j + 2], 0.0, 0.0, 1.0);
+					circle.push(p);
+				}
+
+				// Calculate center
+				let center = circleCenter(circle[0], circle[6]);
+
+				// Create node and push it
+				let n = new Node(center);
+				n.circle = circle;
+				object.nodes.push(n);
 			}
 
-			// Write vertices into buffer
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
+			objects.push(object);
+			draw();
 
-			// Draw points
-			gl.drawArrays(gl.POINTS, 0, v.length / 6);
+			// let v = [],
+			// l = [];
 
-			for (let j = 0; j < indexes.length; j += 12) {
-				// Point 1
-				l.push(indexes[j]);
-				l.push(indexes[j + 1]);
-				l.push(indexes[j + 2]);
-				l.push(0.0);
-				l.push(1.0);
-				l.push(0.0);
+			// for (let j = 0; j < vertices.length; j += 3) {
+			// 	v.push(vertices[j]);
+			// 	v.push(vertices[j + 1]);
+			// 	v.push(vertices[j + 2]);
+			// 	v.push(0.0);
+			// 	v.push(0.0);
+			// 	v.push(1.0);
+			// }
 
-				// Point 2
-				l.push(indexes[j + 3]);
-				l.push(indexes[j + 4]);
-				l.push(indexes[j + 5]);
-				l.push(0.0);
-				l.push(1.0);
-				l.push(0.0);
+			// // Write vertices into buffer
+			// gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
 
-				// Point 2
-				l.push(indexes[j + 6]);
-				l.push(indexes[j + 7]);
-				l.push(indexes[j + 8]);
-				l.push(0.0);
-				l.push(1.0);
-				l.push(0.0);
+			// // Draw points
+			// gl.drawArrays(gl.POINTS, 0, v.length / 6);
 
-				// Point 2
-				l.push(indexes[j + 9]);
-				l.push(indexes[j + 10]);
-				l.push(indexes[j + 11]);
-				l.push(0.0);
-				l.push(1.0);
-				l.push(0.0);
-			}
+			// for (let j = 0; j < indexes.length; j += 12) {
+			// 	// Point 1
+			// 	l.push(indexes[j]);
+			// 	l.push(indexes[j + 1]);
+			// 	l.push(indexes[j + 2]);
+			// 	l.push(0.0);
+			// 	l.push(1.0);
+			// 	l.push(0.0);
 
-			// Write vertices into buffer
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(l), gl.STATIC_DRAW);
+			// 	// Point 2
+			// 	l.push(indexes[j + 3]);
+			// 	l.push(indexes[j + 4]);
+			// 	l.push(indexes[j + 5]);
+			// 	l.push(0.0);
+			// 	l.push(1.0);
+			// 	l.push(0.0);
 
-			// Draw points
-			gl.drawArrays(gl.LINE_STRIP, 0, l.length / 6);
+			// 	// Point 2
+			// 	l.push(indexes[j + 6]);
+			// 	l.push(indexes[j + 7]);
+			// 	l.push(indexes[j + 8]);
+			// 	l.push(0.0);
+			// 	l.push(1.0);
+			// 	l.push(0.0);
+
+			// 	// Point 2
+			// 	l.push(indexes[j + 9]);
+			// 	l.push(indexes[j + 10]);
+			// 	l.push(indexes[j + 11]);
+			// 	l.push(0.0);
+			// 	l.push(1.0);
+			// 	l.push(0.0);
+			// }
+
+			// // Write vertices into buffer
+			// gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(l), gl.STATIC_DRAW);
+
+			// // Draw points
+			// gl.drawArrays(gl.LINE_STRIP, 0, l.length / 6);
 		}
 	}
 }
@@ -329,60 +354,85 @@ function readSOR() {
 	} else if (indexes.length % (4 * 3) != 0) {
 		alert('Selected file doesn\'t match indexes (faces) format. There should be groups of 4 points, each group forming a face.');
 	} else {
-		let v = [],
-		l = [];
-		for (let i = 0; i < vertices.length; i += 3) {
-			v.push(vertices[i]);
-			v.push(vertices[i + 1]);
-			v.push(vertices[i + 2]);
-			v.push(0.0);
-			v.push(0.0);
-			v.push(1.0);
+		let object = {
+			ended: true,
+			nodes: []
+		};
+
+		for (let i = 0; i < vertices.length / 36; i++) {
+			// Get circle
+			let circle = [];
+			for (let j = 0; j < 36; j += 3) {
+				let p = new Coord(vertices[i * 36 + j], vertices[i * 36 + j + 1], vertices[i * 36 + j + 2], 0.0, 0.0, 1.0);
+				circle.push(p);
+			}
+
+			// Calculate center
+			let center = circleCenter(circle[0], circle[6]);
+
+			// Create node and push it
+			let n = new Node(center);
+			n.circle = circle;
+			object.nodes.push(n);
 		}
-		// Write vertices into buffer
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
 
-		// Draw points
-		gl.drawArrays(gl.POINTS, 0, v.length / 6);
+		objects.push(object);
+		draw();
 
-		for (let i = 0; i < indexes.length; i += 12) {
-			// Point 1
-			l.push(indexes[i]);
-			l.push(indexes[i + 1]);
-			l.push(indexes[i + 2]);
-			l.push(0.0);
-			l.push(1.0);
-			l.push(0.0);
+		// let v = [],
+		// l = [];
+		// for (let i = 0; i < vertices.length; i += 3) {
+		// 	v.push(vertices[i]);
+		// 	v.push(vertices[i + 1]);
+		// 	v.push(vertices[i + 2]);
+		// 	v.push(0.0);
+		// 	v.push(0.0);
+		// 	v.push(1.0);
+		// }
+		// // Write vertices into buffer
+		// gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
 
-			// Point 2
-			l.push(indexes[i + 3]);
-			l.push(indexes[i + 4]);
-			l.push(indexes[i + 5]);
-			l.push(0.0);
-			l.push(1.0);
-			l.push(0.0);
+		// // Draw points
+		// gl.drawArrays(gl.POINTS, 0, v.length / 6);
 
-			// Point 2
-			l.push(indexes[i + 6]);
-			l.push(indexes[i + 7]);
-			l.push(indexes[i + 8]);
-			l.push(0.0);
-			l.push(1.0);
-			l.push(0.0);
+		// for (let i = 0; i < indexes.length; i += 12) {
+		// 	// Point 1
+		// 	l.push(indexes[i]);
+		// 	l.push(indexes[i + 1]);
+		// 	l.push(indexes[i + 2]);
+		// 	l.push(0.0);
+		// 	l.push(1.0);
+		// 	l.push(0.0);
 
-			// Point 2
-			l.push(indexes[i + 9]);
-			l.push(indexes[i + 10]);
-			l.push(indexes[i + 11]);
-			l.push(0.0);
-			l.push(1.0);
-			l.push(0.0);
-		}
-		// Write vertices into buffer
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(l), gl.STATIC_DRAW);
+		// 	// Point 2
+		// 	l.push(indexes[i + 3]);
+		// 	l.push(indexes[i + 4]);
+		// 	l.push(indexes[i + 5]);
+		// 	l.push(0.0);
+		// 	l.push(1.0);
+		// 	l.push(0.0);
 
-		// Draw points
-		gl.drawArrays(gl.LINE_STRIP, 0, l.length / 6);
+		// 	// Point 2
+		// 	l.push(indexes[i + 6]);
+		// 	l.push(indexes[i + 7]);
+		// 	l.push(indexes[i + 8]);
+		// 	l.push(0.0);
+		// 	l.push(1.0);
+		// 	l.push(0.0);
+
+		// 	// Point 2
+		// 	l.push(indexes[i + 9]);
+		// 	l.push(indexes[i + 10]);
+		// 	l.push(indexes[i + 11]);
+		// 	l.push(0.0);
+		// 	l.push(1.0);
+		// 	l.push(0.0);
+		// }
+		// // Write vertices into buffer
+		// gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(l), gl.STATIC_DRAW);
+
+		// // Draw points
+		// gl.drawArrays(gl.LINE_STRIP, 0, l.length / 6);
 	}
 }
 
@@ -497,21 +547,14 @@ function saveSOR() {
 function draw() {
 	// Get rotation matrix and ortho
 	let mat = new Matrix4(),
-	matOrtho = new Matrix4(),
-	matRotateX = new Matrix4(),
-	matRotateY = new Matrix4();
+			matOrtho = new Matrix4(),
+			matRotateX = new Matrix4(),
+			matRotateY = new Matrix4();
 
 	mat.setIdentity();
 	matOrtho.setOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 	matRotateX.setRotate(rotation.x, 1, 0, 0);
 	matRotateY.setRotate(rotation.y, 0, 1, 0);
-
-	// Get new light point (rotate light)
-	let nl = new Vector3(light.position);
-	nl = matRotateX.multiplyVector3(nl);
-	nl = matRotateY.multiplyVector3(nl);
-
-	// light.position = nl;
 
 	// Set Orthoview rotated
 	mat.multiply(matRotateX);
@@ -548,6 +591,9 @@ function rotate(side) {
 	else if (side == "clear") {
 		rotation.x = 0.0;
 		rotation.y = 0.0;
+		light.position[0] = 1.0;
+		light.position[1] = 1.0;
+		light.position[2] = 1.0;
 	}
 
 	draw();
@@ -626,9 +672,7 @@ function newNode(coords, ends) {
 	if (active_object === -1) {
 		objects.push({
 			ended: false,
-			nodes: [],
-			g_points: [],
-			g_indexes: []
+			nodes: []
 		});
 
 		active_object = objects.length - 1;
@@ -1295,6 +1339,12 @@ function vectorMagnitude(v) {
 	}
 
 	return Math.sqrt(s);
+}
+
+// Calculate center of a circle (pA and pB are on oposite sides!)
+function circleCenter(pA, pB) {
+	let r = [(pB.x - pA.x) / 2, ((pB.y - pA.y) / 2), ((pB.z - pA.z) / 2)];
+	return new Coord(pA.x + r[0], pA.y + r[1], pA.z + r[2], 1.0, 0.0, 0.0);
 }
 
 // Clear canvas
