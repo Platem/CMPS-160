@@ -1,107 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>[Driver] Kevin Romero - Lab 2</title>
-        <style>
-            body {
-                height: 100%;
-                width: 100%;
-                padding: 0;
-                margin: 0;
-            }
-            #navbar {
-                width: 100%;
-                height: 40px;
-                background: gray;
-                text-align: center;
-                vertical-align: middle;
-                line-height: 40px;
-            }
-            #content {
-                margin-top: 15px;
-            }
-            #webgl {
-                border: 1px solid black;
-                padding: 0;
-                margin: auto;
-                display: block;
-            }
-            #footer {
-                width: 100%;
-                text-align: center;
-                vertical-align: middle;
-            }
-            #options {
-                width: 800px;
-                padding: 0;
-                margin: auto;
-                margin-top: 15px;
-            }
-            #options button{
-                float: right;
-            }
-            #options div{
-                float: left;
-            }
-            #options div button{
-                float: left;
-            }
-            .circle {
-                float: right !important;
-                height: 10px;
-                width: 10px;
-                margin-top: 5px;
-                border-radius: 5px;
-                background: red;
-            }
-            .circle.active {
-                background: green;
-            }
-        </style>
-    </head>
+<head>
+	<meta charset="utf-8" />
+	<title>[Driver] Kevin Romero - Lab 2</title>
+	<link rel="stylesheet" href="css/main.css">
+</head>
 
-    <body onload="main()">
-        <div id="page-container">
-            <div id="navbar">
-                <span>Lab 2 - Driver</span>
-            </div>
-            <div id="footer">
-                <a href="features.html">Go to features</a>
-            </div>   
-            <div id="content">
-                <canvas id="webgl" height="800" width="800">
-                    Please use a browser that supports "canvas".
-                </canvas>
-            </div>
-            <form action="" id="options">
-                <div>
-                    <button id="fSave">Save file</button>
-                    <button id="fLoad" disabled>Extract data</button>
-                    <input type="file" id="fOpen">
-                </div>
-                <button id="bRotateC">Center</button>
-                <button id="bRotateR">Rotate Right</button>
-                <button id="bRotateD">Rotate Down</button>
-                <button id="bRotateU">Rotate Up</button>
-                <button id="bRotateL">Rotate Left</button>
-                <button onclick="clearCanvas()">Clear</button>
-                <button id="bNormals">Toggle Normals</button>
-                <div id="circle-n" class="circle"></div>
-                <button id="bSkeleton">Toggle Skeleton</button>
-                <div id="circle-sk" class="circle"></div>
-                <button id="bPoints">Toggle Points</button>
-                <div id="circle-p" class="circle"></div>
-                <button id="bSurface">Toggle Surface</button>
-                <div id="circle-s" class="circle active"></div>
-            </form>
-        </div>        
+<body onload="main()">
+	<div id="page-container">
+		<div id="navbar">
+			<span>Lab 2 - Driver</span>
+		</div>
+		<div id="nav">
+			<a href="features.html">Go to features</a>
+		</div>
 
-        <script src="../lib/webgl-utils.js"></script>
-        <script src="../lib/webgl-debug.js"></script>
-        <script src="../lib/cuon-utils.js"></script>
-        <script src="../lib/cuon-matrix.js"></script>
-        <script src="./lib/mod_ioSOR.js"></script>
-        <script src="main.js"></script>
-    </body>
+		<form action="" id="options">
+			<h2>Options</h2>
+
+			<h5>File</h5>
+			<div id="file">
+				<button id="fSave">Save file</button>
+				<button id="fLoad" disabled>Extract data</button>
+				<input type="file" id="fOpen">
+			</div>
+
+			<h5>Rotation</h5>
+			<div id="rotation">
+				<div>
+					<button id="bRotateU">Rotate Up</button>
+				</div>
+				<div>
+					<button id="bRotateR">Rotate Right</button>
+					<button id="bRotateD">Rotate Down</button>
+					<button id="bRotateL">Rotate Left</button>
+				</div>
+				<div>
+					<button id="bRotateC">Center</button>
+				</div>
+			</div>
+
+			<h5>Toggles</h5>
+			<div id="toggles">
+				<div>
+					<button id="bNormals">Toggle Normals</button>
+					<div id="circle-n" class="circle"></div>
+				</div>
+				<div>
+					<button id="bSkeleton">Toggle Skeleton</button>
+					<div id="circle-sk" class="circle"></div>
+				</div>
+				<div>
+					<button id="bPoints">Toggle Points</button>
+					<div id="circle-p" class="circle"></div>
+				</div>
+				<div>
+					<button id="bSurface">Toggle Surface</button>
+					<div id="circle-s" class="circle active"></div>
+				</div>
+			</div>
+
+			<h5>Misc</h5>
+			<div id="misc">
+				<button onclick="clearCanvas()">Clear</button>
+			</div>
+		</form>
+
+		<!--<div id="list">
+			asda
+		</div>-->
+
+		<div id="content">
+			<canvas id="webgl" height="800" width="800">
+				Please use a browser that supports "canvas".
+			</canvas>
+		</div>
+
+
+	</div>        
+
+	<script src="../lib/webgl-utils.js"></script>
+	<script src="../lib/webgl-debug.js"></script>
+	<script src="../lib/cuon-utils.js"></script>
+	<script src="../lib/cuon-matrix.js"></script>
+	<script src="./lib/mod_ioSOR.js"></script>
+	<script src="main.js"></script>
+</body>
 </html>
