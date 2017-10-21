@@ -97,24 +97,35 @@
                         <h3>Loading cylinders</h3>
                         <ul>
                             <li>Click on 'Choose file' to load a previously sabed '.obj' file containing objects. Then click 'Extract data' to draw them.</li>
+                            <li>When a file is load the objects are saved in memory. This means that you can draw over the loaded file and continue the drawing.</li>
                         </ul>
                     </ul>
 
                     <h2>Extra features</h2>
                     <ul>
                         <li>Here are some of the extra features aded.</li>
-                        <h3>Cylinder intersection</h3>
+                        <h3>Surface Triggering</h3>
                         <ul>
-                            <li>Instead of simply drawing a cylinder between each consecutive pair of points, the intersections are calculated to make a smooth transition from one cylinder to the next one.</li>
+                            <li>There's an option to toggle drawing of cylinders' surfaces.</li>
                         </ul>
-                        <h3>Normal Drawing</h3>
+                        <h3>Point Triggering</h3>
                         <ul>
-                            <li>There's an option to toggle drawing of the side faces ob the cylinders. They'll be drawn in pink color.</li>
+                            <li>There's an option to toggle drawing of cylinders' points.</li>
+                        </ul>
+                        <h3>Skeleton Triggering</h3>
+                        <ul>
+                            <li>There's an option to toggle drawing of cylinders' skeleton.</li>
+                        </ul>
+                        <h3>Normal Triggering</h3>
+                        <ul>
+                            <li>There's an option to toggle drawing of cylinders' faces normals.</li>
                         </ul>
                         <h3>Cylinder Rotation</h3>
                         <ul>
-                            <li>Two buttons have been added to rotate objects in the viewport. This is done using a 10 degrees rotation matrix around the Y axis.</li>
+                            <li>Four buttons have been added to rotate objects in the viewport. This is done using a rotation matrix around the Y/X axis.</li>
                             <li>This feature also contributes to better appreciate the Normal Drawing.</li>
+                            <li>This rotation can be achieved using the arrow keys too.</li>
+                            <li>A 'center' button has been added to center the object again (Enter key).</li>
                         </ul>
                         <h3>Multiple object saving / loading</h3>
                         <ul>
@@ -125,15 +136,17 @@
 
                     <h1>Screenshots and demos</h1>
                     <h2>Basic demo on drawing</h2>
-                    <img src="./demo_draw.gif" alt="">
+                    <img src="./gif/demo_draw.gif" alt="">
                     <h2>Saving object to file</h2>
-                    <img src="./demo_save_single.gif" alt="">
+                    <img src="./gif/demo_save_single.gif" alt="">
+                    <h2>Loading object from file and continue drawing</h2>
+                    <img src="./gif/demo_load_continue.gif" alt="">
                     <h2>Saving multiple objects to file</h2>
-                    <img src="./demo_save_multiple.gif" alt="">
+                    <img src="./gif/demo_save_multiple.gif" alt="">
                     <h2>Rotating the draw</h2>
-                    <img src="./demo_rotate.gif" alt="">
-                    <h2>Toggling draw of normals</h2>
-                    <img src="./demo_normals.gif" alt="">
+                    <img src="./gif/demo_rotation.gif" alt="">
+                    <h2>Toggling draws</h2>
+                    <img src="./gif/demo_toggles.gif" alt="">
                 </div>
             </div>         
         </div>
