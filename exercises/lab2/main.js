@@ -626,9 +626,6 @@ function rotate(side) {
 	else if (side == "clear") {
 		rotation.x = 0.0;
 		rotation.y = 0.0;
-		light.position[0] = 1.0;
-		light.position[1] = 1.0;
-		light.position[2] = 1.0;
 	}
 
 	draw();
@@ -844,7 +841,8 @@ function drawObject(obj) {
 		let n1 = crossProduct(v1, w1, true);
 
 		// Get surface color
-		let S1 = dotProduct(n1, light.position);
+		let S1 = Math.min(Math.max(dotProduct(n1, light.position), 0.0), 1);
+
 		let Id1 = [surface_material.kd[0] * light.position[0] * S1,
 							surface_material.kd[1] * light.position[1] * S1,
 							surface_material.kd[2] * light.position[2] * S1];
@@ -915,7 +913,8 @@ function drawObject(obj) {
 					let n = crossProduct(v, w, true);
 
 					// Get surface color
-					let S = dotProduct(n, light.position);
+					let S = Math.min(Math.max(dotProduct(n, light.position), 0.0), 1);
+					console.log(S);
 					let Id = [surface_material.kd[0] * light.position[0] * S,
 										surface_material.kd[1] * light.position[1] * S,
 										surface_material.kd[2] * light.position[2] * S];
@@ -1022,7 +1021,8 @@ function drawObject(obj) {
 		let n2 = crossProduct(w1, v1, true);
 
 		// Get surface color
-		let S2 = dotProduct(n2, light.position);
+		let S2 = Math.min(Math.max(dotProduct(n2, light.position), 0.0), 1);
+
 		let Id2 = [surface_material.kd[0] * light.position[0] * S2,
 							surface_material.kd[1] * light.position[1] * S2,
 							surface_material.kd[2] * light.position[2] * S2];
