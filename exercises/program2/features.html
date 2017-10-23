@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>[Features] Kevin Romero - Program 2</title>
+        <style>
+            body {
+                height: 100%;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            #navbar {
+                width: 100%;
+                height: 40px;
+                background: gray;
+                text-align: center;
+                vertical-align: middle;
+                line-height: 40px;
+            }
+            #content {
+                margin-top: 15px;
+            }
+            #features {
+                width: 600px;
+                margin: auto;
+                text-align: justify;
+            }
+            #features h1, h2 {
+                text-align: center;
+            }
+            #features img {
+                margin-left: -100px;
+                width: 800px;
+            }
+            #footer {
+                width: 100%;
+                text-align: center;
+                vertical-align: middle;
+            }
+        </style>
+    </head>
+
+    <body onload="main()">
+        <div id="page-container">
+            <div id="navbar">
+                <span>Program 2 - Features</span>
+            </div>
+            <div id="footer">
+                <a href="driver.html">Go to driver</a>
+            </div>   
+            <div id="content">
+                <div id="features">
+                    <h1>Description</h1>
+                    <h2>Student Info</h2>
+                    <ul>
+                        <li>Name: Kevin Romero Peces-Barba</li>
+                        <li>CruzID: kromero8</li>
+                        <li>Student ID: 1635745</li>
+                    </ul>
+
+                    <h2>Clicks and drawing</h2>
+                    <ul>
+                        <li>The program has an <b>event</b> that detects mouse clicks on the <b>canvas</b>.</li>
+                        <li>It can check which mouse button was clicked. It only accepts <b>right</b> and <b>left</b> clicks.</li>
+                        <li>Mouse clicks will draw a point. Theese points will be part of a <b>polyline</b>.</li>
+                        <h3>Left Click</h3>
+                        <ul>
+                            <li><b>Left</b> click indicates a non-ending point.</li>
+                            <li>It can be the first point of a polyline or an intermediate one.</li>
+                        </ul>
+                        <h3>Right Click</h3>
+                        <ul>
+                            <li><b>Right</b> click is used to indicate an ending point. This will be the <b>last</b> point of the current polyline and will draw the cylinder asociated to the line.</li>
+                            <li>The <b>exception</b> for this is that if a right click is detected with <b>no active</b> polyline/cylinder it will work as the first point of it and won't be ending point.</li>
+                        </ul>
+                        <h3>Line drawing</h3>
+                        <ul>
+                            <li>The program will draw the lines between every polyline points until the polyline is completed and the cylinder is drawn.</li>
+                        </ul>
+                    </ul>
+                    
+                    <h2>Mouse movement</h2>
+                    <ul>
+                        <li>The program will detect the mouse movement around the <b>canvas</b>.</li>
+                        <li>If there is no active polyline nothing will happen. If there is any active polyline then a <b>rubberband line</b> will be drawn from the last point of the polyline to the current mouse position.</li>
+                    </ul>
+
+                    <h2>Cylinder drawing</h2>
+                    <ul>
+                        <li>When a polyline is completed a <i>poly-cylinder</i> will be asoicated to it. This means every point will become a node and between every consecutive pair of nodes a cylinder will be drawn.</li>
+                        <h3>Saving cylinders</h3>
+                        <ul>
+                            <li>Once a cylinder (or more) has been drawn the 'Save file' button can be pressed and our objects will be saved to a '.obj' file. Also the name of the file will be asked.</li>
+                            <li>One the file is saved you can still draw more objects.</li>
+                        </ul>
+                        <h3>Loading cylinders</h3>
+                        <ul>
+                            <li>Click on 'Choose file' to load a previously sabed '.obj' file containing objects. Then click 'Extract data' to draw them.</li>
+                            <li>When a file is load the objects are saved in memory. This means that you can draw over the loaded file and continue the drawing.</li>
+                        </ul>
+                    </ul>
+
+                    <h2>Extra features</h2>
+                    <ul>
+                        <li>Here are some of the extra features aded.</li>
+                        <h3>Surface Triggering</h3>
+                        <ul>
+                            <li>There's an option to toggle drawing of cylinders' surfaces.</li>
+                        </ul>
+                        <h3>Point Triggering</h3>
+                        <ul>
+                            <li>There's an option to toggle drawing of cylinders' points.</li>
+                        </ul>
+                        <h3>Skeleton Triggering</h3>
+                        <ul>
+                            <li>There's an option to toggle drawing of cylinders' skeleton.</li>
+                        </ul>
+                        <h3>Normal Triggering</h3>
+                        <ul>
+                            <li>There's an option to toggle drawing of cylinders' faces normals.</li>
+                        </ul>
+                        <h3>Cylinder Rotation</h3>
+                        <ul>
+                            <li>Four buttons have been added to rotate objects in the viewport. This is done using a rotation matrix around the Y/X axis.</li>
+                            <li>This feature also contributes to better appreciate the Normal Drawing.</li>
+                            <li>This rotation can be achieved using the arrow keys too.</li>
+                            <li>A 'center' button has been added to center the object again (Enter key).</li>
+                        </ul>
+                        <h3>Multiple object saving / loading</h3>
+                        <ul>
+                            <li>I've modified the ioSOR library to make it posible to save several objects in one file (and be able to load a file containing more than one object).</li>
+                            <li>This modified 'mod_ioSOR.js' file is located in the 'lib' folder.</li>
+                        </ul>
+                        <h3>Object management</h3>
+                        <ul>
+                            <li>In the right side of the page theres a list with current objects in canvas.</li>
+                            <li>There are two options for each object: toggle visibility and remove them.</li>
+                        </ul>
+                    </ul>
+
+                    <h1>Screenshots and demos</h1>
+                    <h2>Basic demo on drawing</h2>
+                    <img src="./gif/demo_draw.gif" alt="">
+                    <h2>Saving object to file</h2>
+                    <img src="./gif/demo_save_single.gif" alt="">
+                    <h2>Loading object from file and continue drawing</h2>
+                    <img src="./gif/demo_load_continue.gif" alt="">
+                    <h2>Saving multiple objects to file</h2>
+                    <img src="./gif/demo_save_multiple.gif" alt="">
+                    <h2>Rotating the draw</h2>
+                    <img src="./gif/demo_rotation.gif" alt="">
+                    <h2>Toggling draws</h2>
+                    <img src="./gif/demo_toggles.gif" alt="">
+                    <h2>Managing objects</h2>
+                    <img src="./gif/demo_management.gif" alt="">
+                </div>
+            </div>         
+        </div>
+    </body>
+</html>
