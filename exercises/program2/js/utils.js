@@ -97,6 +97,28 @@ function vectorMagnitude(v) {
 	return Math.sqrt(s);
 }
 
+// Calculate angle between two vectors
+function getAngle(v1, v2, degrees) {
+	let l1 = vectorMagnitude(v1);
+	let l2 = vectorMagnitude(v2);
+	let d = dotProduct(v1, v2);
+	let cos = d / (l1 * l2);
+	if (degrees)
+		return Math.acos(cos) * 180 / Math.PI;
+	else
+		return Math.acos(cos);
+}
+
+// Reflection of v about w
+// r = v - (2(v·w)/|w|^2) * w
+function getReflection(v, w) {
+	let k = 2 * dotProduct(v, w) / Math.pow(vectorMagnitude(w), 2);
+
+	return [v[0] - k * w[0],
+					v[1] - k * w[1],
+					v[2] - k * w[2]];
+}
+
 // Calculate center of a circle (pA and pB are on oposite sides!)
 function circleCenter(pA, pB) {
 	let r = [(pB.x - pA.x) / 2, ((pB.y - pA.y) / 2), ((pB.z - pA.z) / 2)];

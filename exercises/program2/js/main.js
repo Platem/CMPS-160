@@ -6,6 +6,7 @@ var objects = [],
 			z: 0.0
 		};
 
+// Main function
 function main() {
 	if (!setup()) {
 		console.log('There was an error in the setup. Exiting now.');
@@ -63,7 +64,6 @@ function main() {
 		rotate("clear");
 	};
 
-
 	// Mouse press event
 	canvas.onmousedown = function(event) {
 		event.preventDefault();
@@ -100,7 +100,7 @@ function main() {
 	// Draw surface toggler
 	document.getElementById('bSurface').addEventListener('click', function(e) {
 		e.preventDefault();
-		draw_options.draw_surface ? draw_options.draw_surface = false : draw_options.draw_surface = true;
+		draw_options.draw_surfaces ? draw_options.draw_surfaces = false : draw_options.draw_surfaces = true;
 		document.getElementById('circle-s').classList.toggle('active');
 		draw();
 	});
@@ -111,6 +111,30 @@ function main() {
 		draw_options.draw_points ? draw_options.draw_points = false : draw_options.draw_points = true;
 		document.getElementById('circle-p').classList.toggle('active');
 		draw();
+	});
+
+	// Specular toggler
+	document.getElementById('bSpecular').addEventListener('click', function(e) {
+		e.preventDefault();
+		draw_options.light_specular ? draw_options.light_specular = false : draw_options.light_specular = true;
+		document.getElementById('circle-sp').classList.toggle('active');
+		draw();
+	});
+
+	// Smooth shading toggler
+	document.getElementById('bSmooth').addEventListener('click', function(e) {
+		e.preventDefault();
+		draw_options.smooth_shading ? draw_options.smooth_shading = false : draw_options.smooth_shading = true;
+		document.getElementById('circle-sm').classList.toggle('active');
+		draw();
+	});
+
+	// Ns slider
+	document.getElementById('ns').addEventListener('input', function(e) {
+		e.preventDefault();
+		let val = this.value;
+		draw_options.surface_ns = val;
+		document.getElementById('ns-val').innerHTML = draw_options.surface_ns;
 	});
 
 	// Setup ioSOR

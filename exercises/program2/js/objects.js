@@ -3,10 +3,6 @@ var Coord = function(x, y, z) {
 	this.y = y;
 	this.z = z;
 
-	this.r = 0.0;
-	this.r = 0.0;
-	this.r = 0.0;
-
 	this.n = [0.0, 0.0, 0.0];
 }
 
@@ -20,10 +16,31 @@ var Line = function() {
 	this.nodes = [];
 };
 
-var Polygon = function() {
+var Polygon = function(e) {
+	// Array of vertices
 	this.elements = [];
 
+	for (let i = 0; i < e.length; i++) {
+		this.elements[i] = e[i];
+	}
+
 	this.n = [0.0, 0.0, 0.0];
+
+	// Calculate normal if this is a polygon
+	if (this.elements.length >= 3) {
+		let pA = this.elements[1],
+				pB = this.elements[0],
+				pC = this.elements[2];
+
+		let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pA.z],
+				w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
+
+		let normal = crossProduct(v, w, true);
+
+		this.n[0] = normal[0];
+		this.n[1] = normal[1];
+		this.n[2] = -normal[2];	
+	}
 }
 
 var Obj = function() {
@@ -36,8 +53,6 @@ var Obj = function() {
 	this.polygons = [];
 
 	this.generate = function() {
-		this.ended = true;
-
 		// Each node of the line (starting from second)
 		for (let i = 1; i <= this.line.nodes.length; i++) {
 			if (i == 1) {
@@ -114,7 +129,97 @@ var Obj = function() {
 				this.line.nodes[i - 1].circle = mid;
 			}
 		}
+
+		this.ended = true;
+		this.setVertices();
+		this.setPolygons();
 	};
+
+	this.setVertices = function() {
+		if (this.ended) {
+			// Simply add every point in nodes circles
+			for (let i = 0; i < this.line.nodes.length; i++) {
+				for (let j = 0; j < this.line.nodes[i].circle.length; j++) {
+					this.vertices.push(this.line.nodes[i].circle[j]);
+				}
+			}
+		}
+	}
+
+	this.setPolygons = function() {
+		if (this.ended) {
+			// Create polygon for first face
+			let pol1 = [];
+
+			for (let i = 0; i < this.line.nodes[0].circle.length; i++) {
+				pol1.push(this.line.nodes[0].circle[i]);
+			}
+
+			this.polygons.push(new Polygon(pol1));
+
+			// Create polygon for every middle face (12 x node)
+			for (let i = 1; i < this.line.nodes.length; i++) {
+				for (let j = 0; j < this.line.nodes[i].circle.length; j++) {
+					let pA = this.line.nodes[i].circle[j],
+							pB = this.line.nodes[i - 1].circle[j],
+							pC, pD;
+
+					if (j == this.line.nodes[i].circle.length - 1) {
+						pC = this.line.nodes[i - 1].circle[0];
+						pD = this.line.nodes[i].circle[0];
+					} else {
+						pC = this.line.nodes[i - 1].circle[j + 1];
+						pD = this.line.nodes[i].circle[j + 1];
+					}
+
+					let pol = new Polygon([pA, pB, pC, pD]);
+
+					// Update pA normal
+					this.line.nodes[i].circle[j].n[0] += pol.n[0];
+					this.line.nodes[i].circle[j].n[1] += pol.n[1];
+					this.line.nodes[i].circle[j].n[2] += pol.n[2];
+					// Update pB normal
+					this.line.nodes[i - 1].circle[j].n[0] += pol.n[0];
+					this.line.nodes[i - 1].circle[j].n[1] += pol.n[1];
+					this.line.nodes[i - 1].circle[j].n[2] += pol.n[2];
+
+					if (j == this.line.nodes[i].circle.length - 1) {
+						// Update pC normal
+						this.line.nodes[i - 1].circle[0].n[0] += pol.n[0];
+						this.line.nodes[i - 1].circle[0].n[1] += pol.n[1];
+						this.line.nodes[i - 1].circle[0].n[2] += pol.n[2];
+						// Update pD normal
+						this.line.nodes[i].circle[0].n[0] += pol.n[0];
+						this.line.nodes[i].circle[0].n[1] += pol.n[1];
+						this.line.nodes[i].circle[0].n[2] += pol.n[2];
+					} else {
+						// Update pC normal
+						this.line.nodes[i - 1].circle[j + 1].n[0] += pol.n[0];
+						this.line.nodes[i - 1].circle[j + 1].n[1] += pol.n[1];
+						this.line.nodes[i - 1].circle[j + 1].n[2] += pol.n[2];
+						// Update pD normal
+						this.line.nodes[i].circle[j + 1].n[0] += pol.n[0];
+						this.line.nodes[i].circle[j + 1].n[1] += pol.n[1];
+						this.line.nodes[i].circle[j + 1].n[2] += pol.n[2];
+					}
+
+					// Add polygon
+					this.polygons.push(pol);
+				}
+			}
+
+			// Create polygon with last face
+			let pol2 = [];
+			
+			for (let i = 0; i < this.line.nodes[this.line.nodes.length - 1].circle.length; i++) {
+				pol2.push(this.line.nodes[this.line.nodes.length - 1].circle[i]);
+			}
+
+			this.polygons.push(new Polygon(pol2));
+
+			console.log(this);
+		}
+	}
 
 	this.drawLine = function(m_point) {
 		let vertices = [];
@@ -204,308 +309,120 @@ var Obj = function() {
 			}
 		}
 
-		// Draw surfaces
+		// Draw polygons
 		if (draw_options.draw_surfaces) {
-			let surf1 = [],
-					surf2 = [];
+			for (let i = 0; i < this.polygons.length; i++) {
+				let v = [];
 
-			// First circle surface
-			// Calculate normal with fisrt 3 points to get color
-			let A1 = this.line.nodes[0].circle[1],
-					B1 = this.line.nodes[0].circle[0],
-					C1 = this.line.nodes[0].circle[2];
+				for (let j = 0; j < this.polygons[i].elements.length; j++) {
+					let index = this.vertices.indexOf(this.polygons[i].elements[j]);
+					let vertex = this.vertices[index];
 
-			let v1 = [B1.x - A1.x, B1.y - A1.y, B1.z - A1.z];
-			let w1 = [C1.x - A1.x, C1.y - A1.y, B1.z - C1.z];
+					// Calc light
+					let I = [0.0, 0.0, 0.0];
+					let normal = vertex.n;
 
-			let n1 = crossProduct(v1, w1, true);
-
-			// Get surface color
-			let S1 = Math.min(Math.max(dotProduct(n1, draw_options.light_position), 0.0), 1);
-
-			let Id1 = [draw_options.surface_kd[0] * draw_options.light_position[0] * S1,
-								 draw_options.surface_kd[1] * draw_options.light_position[1] * S1,
-								 draw_options.surface_kd[2] * draw_options.light_position[2] * S1];
-
-			for (let i = 0; i < this.line.nodes[0].circle.length; i++) {
-				surf1.push(this.line.nodes[0].circle[i].x);
-				surf1.push(this.line.nodes[0].circle[i].y);
-				surf1.push(this.line.nodes[0].circle[i].z);
-				surf1.push(Id1[0]);
-				surf1.push(Id1[1]);
-				surf1.push(Id1[2]);
-			}
-
-			// Write vertex into buffer
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(surf1), gl.STATIC_DRAW);
-
-			// Draw points
-			gl.drawArrays(gl.TRIANGLE_FAN, 0, surf1.length / 6);
-
-			// Nodes
-			for (let i = 1; i < this.line.nodes.length; i++) {
-				// Previous faces
-				for (let j = 0; j < this.line.nodes[i].circle.length; j++) {
-					let vertices = [];
-					if (j == this.line.nodes[i].circle.length - 1) {
-						// Get normal vector
-						let pA = this.line.nodes[i - 1].circle[j],
-								pB = this.line.nodes[i - 1].circle[0],
-								pC = this.line.nodes[i].circle[j];
-
-						let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pA.z];
-						let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
-
-						let n = crossProduct(v, w, true);
-
-						// Get surface color
-						let S = Math.min(Math.max(dotProduct(n, draw_options.light_position), 0.0), 1);
-						let Id = [draw_options.surface_kd[0] * draw_options.light_position[0] * S,
-											draw_options.surface_kd[1] * draw_options.light_position[1] * S,
-											draw_options.surface_kd[2] * draw_options.light_position[2] * S];
-						
-						// First
-						vertices.push(this.line.nodes[i].circle[j].x);
-						vertices.push(this.line.nodes[i].circle[j].y);
-						vertices.push(this.line.nodes[i].circle[j].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
-
-						// Second
-						vertices.push(this.line.nodes[i - 1].circle[j].x);
-						vertices.push(this.line.nodes[i - 1].circle[j].y);
-						vertices.push(this.line.nodes[i - 1].circle[j].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
-
-						// Third
-						vertices.push(this.line.nodes[i - 1].circle[0].x);
-						vertices.push(this.line.nodes[i - 1].circle[0].y);
-						vertices.push(this.line.nodes[i - 1].circle[0].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
-
-						// Fourth
-						vertices.push(this.line.nodes[i].circle[0].x);
-						vertices.push(this.line.nodes[i].circle[0].y);
-						vertices.push(this.line.nodes[i].circle[0].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
-					} else {
-						// Get normal vector
-						let pA = this.line.nodes[i - 1].circle[j],
-								pB = this.line.nodes[i - 1].circle[j + 1],
-								pC = this.line.nodes[i].circle[j];
-
-						let v = [pB.x - pA.x, pB.y - pA.y, pB.z - pA.z];
-						let w = [pC.x - pA.x, pC.y - pA.y, pB.z - pC.z];
-
-						let n = crossProduct(v, w, true);
-
-						// Get surface color
-						let S = Math.min(Math.max(dotProduct(n, draw_options.light_position), 0.0), 1);
-						let Id = [draw_options.surface_kd[0] * draw_options.light_position[0] * S,
-											draw_options.surface_kd[1] * draw_options.light_position[1] * S,
-											draw_options.surface_kd[2] * draw_options.light_position[2] * S];
-						
-						// First
-						vertices.push(this.line.nodes[i].circle[j].x);
-						vertices.push(this.line.nodes[i].circle[j].y);
-						vertices.push(this.line.nodes[i].circle[j].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
-
-						// Second
-						vertices.push(this.line.nodes[i - 1].circle[j].x);
-						vertices.push(this.line.nodes[i - 1].circle[j].y);
-						vertices.push(this.line.nodes[i - 1].circle[j].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
-
-						// Third
-						vertices.push(this.line.nodes[i - 1].circle[j + 1].x);
-						vertices.push(this.line.nodes[i - 1].circle[j + 1].y);
-						vertices.push(this.line.nodes[i - 1].circle[j + 1].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
-
-						// Fourth
-						vertices.push(this.line.nodes[i].circle[j + 1].x);
-						vertices.push(this.line.nodes[i].circle[j + 1].y);
-						vertices.push(this.line.nodes[i].circle[j + 1].z);
-						vertices.push(Id[0]);
-						vertices.push(Id[1]);
-						vertices.push(Id[2]);
+					// If smooth shading is not enable then normal of the polygon is used
+					if (!draw_options.smooth_shading) {
+						normal = this.polygons[i].n;
 					}
 
-					// Write vertex into buffer
-					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+					if (draw_options.light_ambient) {
+						let Ia = [draw_options.surface_ka[0] * draw_options.light_color[0],
+											draw_options.surface_ka[1] * draw_options.light_color[1],
+											draw_options.surface_ka[2] * draw_options.light_color[2]];
 
-					// Draw points
-					gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length / 6);
-				}
-			}
-
-			// Last circle surface
-			// Calculate normal with fisrt 3 points to get color
-			let A2 = this.line.nodes[this.line.nodes.length - 1].circle[1],
-					B2 = this.line.nodes[this.line.nodes.length - 1].circle[0],
-					C2 = this.line.nodes[this.line.nodes.length - 1].circle[2];
-
-			let v2 = [B2.x - A2.x, B2.y - A2.y, B2.z - A2.z];
-			let w2 = [C2.x - A2.x, C2.y - A2.y, B2.z - C2.z];
-
-			let n2 = crossProduct(w1, v1, true);
-
-			// Get surface color
-			let S2 = Math.min(Math.max(dotProduct(n2, draw_options.light_position), 0.0), 1);
-
-			let Id2 = [draw_options.surface_kd[0] * draw_options.light_position[0] * S2,
-								 draw_options.surface_kd[1] * draw_options.light_position[1] * S2,
-								 draw_options.surface_kd[2] * draw_options.light_position[2] * S2];
-
-			for (let i = 0; i < this.line.nodes[this.line.nodes.length - 1].circle.length; i++) {
-				surf2.push(this.line.nodes[this.line.nodes.length - 1].circle[i].x);
-				surf2.push(this.line.nodes[this.line.nodes.length - 1].circle[i].y);
-				surf2.push(this.line.nodes[this.line.nodes.length - 1].circle[i].z);
-				surf2.push(Id1[0]);
-				surf2.push(Id1[1]);
-				surf2.push(Id1[2]);
-			}
-
-			// Write vertex into buffer
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(surf2), gl.STATIC_DRAW);
-
-			// Draw points
-			gl.drawArrays(gl.TRIANGLE_FAN, 0, surf2.length / 6);
-		}
-
-		// Draw skeleton
-		if (draw_options.draw_skeleton) {
-			for (let i = 1; i < this.line.nodes.length; i++) {
-				for (let j = 0; j < this.line.nodes[i].circle.length; j++) {
-					let vertices = [];
-
-					if (j == this.line.nodes[i].circle.length - 1) {
-						// First
-						vertices.push(this.line.nodes[i].circle[j].x);
-						vertices.push(this.line.nodes[i].circle[j].y);
-						vertices.push(this.line.nodes[i].circle[j].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
-
-						// Second
-						vertices.push(this.line.nodes[i - 1].circle[j].x);
-						vertices.push(this.line.nodes[i - 1].circle[j].y);
-						vertices.push(this.line.nodes[i - 1].circle[j].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
-
-						// Third
-						vertices.push(this.line.nodes[i - 1].circle[0].x);
-						vertices.push(this.line.nodes[i - 1].circle[0].y);
-						vertices.push(this.line.nodes[i - 1].circle[0].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
-
-						// Fourth
-						vertices.push(this.line.nodes[i].circle[0].x);
-						vertices.push(this.line.nodes[i].circle[0].y);
-						vertices.push(this.line.nodes[i].circle[0].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
-					} else {
-						// First
-						vertices.push(this.line.nodes[i].circle[j].x);
-						vertices.push(this.line.nodes[i].circle[j].y);
-						vertices.push(this.line.nodes[i].circle[j].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
-
-						// Second
-						vertices.push(this.line.nodes[i - 1].circle[j].x);
-						vertices.push(this.line.nodes[i - 1].circle[j].y);
-						vertices.push(this.line.nodes[i - 1].circle[j].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
-
-						// Third
-						vertices.push(this.line.nodes[i - 1].circle[j + 1].x);
-						vertices.push(this.line.nodes[i - 1].circle[j + 1].y);
-						vertices.push(this.line.nodes[i - 1].circle[j + 1].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
-
-						// Fourth
-						vertices.push(this.line.nodes[i].circle[j + 1].x);
-						vertices.push(this.line.nodes[i].circle[j + 1].y);
-						vertices.push(this.line.nodes[i].circle[j + 1].z);
-						vertices.push(0.0);
-						vertices.push(0.0);
-						vertices.push(1.0);
+						I[0] += Ia[0];
+						I[1] += Ia[1];
+						I[2] += Ia[2];
 					}
 
-					// Write vertex into buffer
-					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+					if (draw_options.light_difuse) {
+						let S = Math.min(Math.max(dotProduct(normal, draw_options.light_position), 0.0), 1.0);
 
-					// Draw points
-					gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 6);
-				}
-			}		
-			for (let i = 0; i < this.line.nodes.length; i++) {
-				let vertices = [];
-				// Draw mid circle
-				for (let j = 0; j < this.line.nodes[i].circle.length; j++) {
-					vertices.push(this.line.nodes[i].circle[j].x);
-					vertices.push(this.line.nodes[i].circle[j].y);
-					vertices.push(this.line.nodes[i].circle[j].z);
-					vertices.push(0.0);
-					vertices.push(0.0);
-					vertices.push(1.0);
+						let Id = [draw_options.surface_kd[0] * draw_options.light_color[0] * S,
+											draw_options.surface_kd[1] * draw_options.light_color[1] * S,
+											draw_options.surface_kd[2] * draw_options.light_color[2] * S];
+
+						I[0] += Id[0];
+						I[1] += Id[1];
+						I[2] += Id[2];
+					}
+
+					if (draw_options.light_specular) {
+						// Get reflection
+						let r = getReflection(draw_options.light_position, normal);
+						// Get angle
+						let a = getAngle(draw_options.viewer_position, r, false);
+
+						// Get light
+						let S = Math.pow(Math.cos(a), draw_options.surface_ns);
+						let Is = [draw_options.surface_ks[0] * draw_options.light_color[0] * S,
+											draw_options.surface_ks[1] * draw_options.light_color[1] * S,
+											draw_options.surface_ks[2] * draw_options.light_color[2] * S];
+
+						I[0] += Is[0];
+						I[1] += Is[1];
+						I[2] += Is[2];
+					}
+
+					// Push vertex
+					v.push(vertex.x);
+					v.push(vertex.y);
+					v.push(vertex.z);
+					v.push(I[0]);
+					v.push(I[1]);
+					v.push(I[2]);
 				}
 
 				// Write vertices into buffer
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-				// Draw lines
-				gl.drawArrays(gl.LINE_LOOP, 0, vertices.length / 6);
-			}
-		}
-
-		// Draw points
-		if (draw_options.draw_points) {
-			for (let i = 0; i < this.line.nodes.length; i++) {
-				let vertices = [];
-
-				for (let j = 0; j < this.line.nodes[i].circle.length; j++) {
-					vertices.push(this.line.nodes[i].circle[j].x);
-					vertices.push(this.line.nodes[i].circle[j].y);
-					vertices.push(this.line.nodes[i].circle[j].z);
-					vertices.push(1.0);
-					vertices.push(0.0);
-					vertices.push(0.0);
-				}
-
-				// Write vertices into buffer
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
 
 				// Draw points
-				gl.drawArrays(gl.POINTS, 0, vertices.length / 6);
+				gl.drawArrays(gl.TRIANGLE_FAN, 0, v.length / 6);
 			}
+		}
+
+		// Draw polygons border
+		if (draw_options.draw_skeleton) {
+			for (let i = 0; i < this.polygons.length; i++) {
+				let v = [];
+
+				for (let j = 0; j < this.polygons[i].elements.length; j++) {
+					v.push(this.polygons[i].elements[j].x);
+					v.push(this.polygons[i].elements[j].y);
+					v.push(this.polygons[i].elements[j].z);
+					v.push(draw_options.skeleton_color[0]);
+					v.push(draw_options.skeleton_color[1]);
+					v.push(draw_options.skeleton_color[2]);
+				}
+
+				// Write vertices into buffer
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
+
+				// Draw points
+				gl.drawArrays(gl.LINE_LOOP, 0, v.length / 6);
+			}
+		}
+
+		// Draw vertices
+		if (draw_options.draw_points) {
+			let v = [];
+
+			for (let i = 0; i < this.vertices.length; i++) {
+				v.push(this.vertices[i].x);
+				v.push(this.vertices[i].y);
+				v.push(this.vertices[i].z);
+				v.push(draw_options.points_color[0]);
+				v.push(draw_options.points_color[1]);
+				v.push(draw_options.points_color[2]);
+			}
+
+			// Write vertices into buffer
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
+
+			// Draw points
+			gl.drawArrays(gl.POINTS, 0, v.length / 6);
 		}
 	}
 }
