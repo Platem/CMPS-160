@@ -1,68 +1,73 @@
 body {
-  height: 100%;
-  width: 100%;
-  padding: 0;
   margin: 0;
+  padding: 0;
+}
+
+#page-container {
+  display: none;
+}
+
+.wrapper {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+  font-weight: bold;
+  text-align: center;
+}
+.wrapper > * {
+  padding: 10px;
+  flex: 1 100%;
+}
+
+.wrapper > * {
+  padding: 10px;
+  flex: 1 100%;
 }
 
 #navbar {
-  width: 100%;
-  height: 40px;
   background: gray;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 40px;
 }
 
-#nav {
-  width: 100%;
-  height: 20px;
-  text-align: center;
-  vertical-align: middle;
+#content {
+  margin: 0;
+  padding: 0;
+  height: 800px;
+  margin-bottom: 10px;
+}
+#content #webgl {
+  outline: 1px solid black;
 }
 
 #options {
-  position: absolute;
-  left: 0;
-  top: 60px;
-  height: 800px;
-  width: 18%;
-  margin-left: 2%;
+  margin: 0;
+  padding: 0;
   outline: 1px solid black;
+  height: 800px;
+  width: 50%;
   overflow: auto;
 }
-#options h2 {
-  text-align: center;
-}
-#options h5 {
-  margin-left: 5px;
-}
-#options div {
+#options #file {
   margin: 5px;
 }
 #options #file button {
-  width: 44%;
-  margin-left: 4%;
+  width: 90px;
 }
 #options #file input {
-  width: 92%;
-  margin-left: 4%;
-}
-#options #rotation {
-  text-align: center;
+  width: 180px;
 }
 #options #rotation button {
   width: 90px;
-}
-#options #toggles h6 {
-  text-align: center;
 }
 #options #toggles div {
   height: 20px;
 }
 #options #toggles div button {
-  margin-left: 20%;
-  width: 60%;
+  margin-left: 15%;
+  width: 70%;
   float: left;
 }
 #options #toggles div .circle {
@@ -70,72 +75,111 @@ body {
   width: 10px;
   float: left;
   border-radius: 5px;
+  margin-left: 5px;
+  margin-top: 5px;
   background: red;
 }
 #options #toggles div .circle.active {
   background: green;
 }
-#options #toggles div label {
-  margin-left: 20%;
-  width: 60%;
+#options #toggles form {
+  margin-top: 10px;
 }
-#options #toggles div input {
-  margin-left: 20%;
+#options #toggles form input {
   width: 60%;
+  margin-left: 10%;
+  float: left;
 }
-#options #misc {
-  text-align: center;
+#options #toggles form label {
+  width: 20%;
 }
 #options #misc button {
-  width: 50%;
-}
-
-#content {
-  position: absolute;
-  left: 20%;
-  top: 60px;
-  min-width: 60%;
-}
-#content #webgl {
-  outline: 1px solid black;
-  margin-left: calc(50% - 400px);
+  width: 70%;
 }
 
 #list {
-  position: absolute;
-  right: 0;
-  top: 60px;
-  height: 800px;
-  width: 18%;
-  margin-right: 2%;
+  margin: 0;
+  padding: 0;
   outline: 1px solid black;
+  height: 800px;
+  width: 50%;
   overflow: auto;
-}
-#list h2 {
-  text-align: center;
 }
 #list ul {
   list-style-type: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 #list ul li {
   height: 30px;
   width: 90%;
   margin-left: 5%;
+  margin-bottom: 10px;
   border-radius: 3px;
   background: #b4b4b4;
   line-height: 30px;
-  margin-bottom: 10px;
 }
 #list ul li label {
   float: left;
-  margin-left: 20px;
+  margin-left: 10px;
 }
 #list ul li button {
   float: right;
   margin-top: 6px;
-  margin-right: 20px;
+  margin-right: 10px;
+}
+
+@media all and (min-width: 600px) {
+  .aside {
+    flex: 1 auto;
+  }
+
+  #navbar {
+    order: 1;
+  }
+
+  #nav {
+    order: 2;
+  }
+
+  #options {
+    order: 4;
+  }
+
+  #content {
+    order: 3;
+  }
+
+  #list {
+    order: 5;
+  }
+}
+@media all and (min-width: 1280px) {
+  #content {
+    flex: 3 0px;
+  }
+
+  #navbar {
+    order: 1;
+  }
+
+  #nav {
+    order: 2;
+  }
+
+  #options {
+    order: 3;
+    max-width: 240px;
+  }
+
+  #content {
+    order: 4;
+  }
+
+  #list {
+    order: 5;
+    max-width: 240px;
+  }
 }
 
 /*# sourceMappingURL=main.css.map */

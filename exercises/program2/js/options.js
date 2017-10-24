@@ -24,7 +24,7 @@ var draw_options = {
 	surface_ka: [0.0, 0.0, 0.2],
 	surface_kd: [1.0, 0.0, 0.0],
 	surface_ks: [0.0, 1.0, 0.0],
-	surface_ns: 1.0,
+	surface_ns: 20.0,
 
 	points_color: [0.0, 0.0, 1.0],
 	skeleton_color: [0.0, 0.0, 1.0]

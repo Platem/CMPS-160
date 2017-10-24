@@ -16,6 +16,7 @@ function main() {
 	document.getElementById('bClear').onclick = function(event) {
 		event.preventDefault();
 		clearCanvas();
+		updateList();
 	};
 
 	// Rotation
@@ -135,6 +136,7 @@ function main() {
 		let val = this.value;
 		draw_options.surface_ns = val;
 		document.getElementById('ns-val').innerHTML = draw_options.surface_ns;
+		draw();
 	});
 
 	// Setup ioSOR

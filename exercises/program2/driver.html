@@ -7,40 +7,49 @@
 </head>
 
 <body onload="main()">
-	<div id="page-container">
+	<div class="wrapper">
 		<div id="navbar">
 			<span>Program 2 - Driver</span>
 		</div>
+
 		<div id="nav">
 			<a href="features.html">Go to features</a>
 		</div>
 
-		<form action="" id="options">
+		<div id="content">
+			<canvas id="webgl" height="800" width="800">
+				Please use a browser that supports "canvas".
+			</canvas>
+		</div>
+
+		<aside class="aside" id="options">
 			<h2>Options</h2>
 
-			<h5>File</h5>
+			<h4>File</h4>
 			<div id="file">
 				<button id="fSave">Save file</button>
 				<button id="fLoad" disabled>Extract data</button>
 				<input type="file" id="fOpen">
 			</div>
 
-			<h5>Rotation</h5>
+			<h4>Rotation</h4>
 			<div id="rotation">
 				<div>
 					<button id="bRotateU">Rotate Up</button>
 				</div>
 				<div>
-					<button id="bRotateR">Rotate Right</button>
-					<button id="bRotateD">Rotate Down</button>
 					<button id="bRotateL">Rotate Left</button>
+					<button id="bRotateR">Rotate Right</button>
+				</div>
+				<div>
+					<button id="bRotateD">Rotate Down</button>
 				</div>
 				<div>
 					<button id="bRotateC">Center</button>
 				</div>
 			</div>
 
-			<h5>Toggles and adjustments</h5>
+			<h4>Toggles and adjustments</h4>
 			<div id="toggles">
 				<h6>Drawing</h6>
 				<div>
@@ -68,30 +77,23 @@
 					<button id="bSmooth">Toggle Smooth Shading</button>
 					<div id="circle-sm" class="circle"></div>
 				</div>
-				<div>
-					<label for="ns">Ns: <span id="ns-val">1</span></label>
-					<input type="range" min="1" max="20" value="1" id="ns">
-				</div>
+				<form>
+					<input type="range" min="1" max="20" value="20" id="ns">
+					<label for="ns">Ns: <span id="ns-val">20</span></label>
+				</form>
 			</div>
 
-			<h5>Misc</h5>
+			<h4>Misc</h4>
 			<div id="misc">
 				<button id="bClear">Clear</button>
 			</div>
-		</form>
+		</aside>
 
-		<div id="list">
+		<aside class="aside" id="list">
 			<h2>Objects</h2>
 			<ul>
 			</ul>
-		</div>
-
-		<div id="content">
-			<canvas id="webgl" height="800" width="800">
-				Please use a browser that supports "canvas".
-			</canvas>
-		</div>
-
+		</aside>
 	</div>
 
 	<script src="./lib/jquery-3.2.1.min.js"></script>

@@ -356,7 +356,7 @@ var Obj = function() {
 						let a = getAngle(draw_options.viewer_position, r, false);
 
 						// Get light
-						let S = Math.pow(Math.cos(a), draw_options.surface_ns);
+						let S = Math.pow(Math.abs(Math.cos(a)), draw_options.surface_ns);
 						let Is = [draw_options.surface_ks[0] * draw_options.light_color[0] * S,
 											draw_options.surface_ks[1] * draw_options.light_color[1] * S,
 											draw_options.surface_ks[2] * draw_options.light_color[2] * S];
