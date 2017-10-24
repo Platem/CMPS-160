@@ -147,12 +147,12 @@ function main() {
 
 	document.getElementById('fSave').addEventListener('click', function(e) {
 		e.preventDefault();
-		saveSOR2();
+		saveSOR();
 	});
 
 	document.getElementById('fLoad').addEventListener('click', function(e) {
 		e.preventDefault();
-		readSOR2();
+		readSOR();
 	});
 
 	// List
@@ -312,6 +312,115 @@ function draw() {
 	return objects.length;
 }
 
+// Read objects from file
+function readSOR() {
+	let SORCollection = readFile2();
+	objects = [];
+
+	for (let i = 0; i < SORCollection.length; i++) {
+		let vertices = SORCollection[i].vertices;
+		let indexes = SORCollection[i].indexes;
+		console.log(indexes);
+		if (vertices.length % (36) != 0) {
+			alert('Selected file doesn\'t match vertices (points) format in [' + SORCollection[i].name + '] object. There should be groups of 12 points, each group forming a circle.');
+		} else if ((indexes.length - 24 * 3) % (12) != 0) {
+			alert('Selected file doesn\'t match indexes (faces) format in [' + SORCollection[i].name + '] object. There should be groups of 4 points, each group forming a face.');
+		} else {
+			// Retrieve object
+			let object = new Obj();
+			let j = 0;
+
+			// Get vertices
+			for (let k = 0; k < vertices.length; k += 3) {
+				object.vertices.push(new Coord(vertices[k], vertices[k + 1], vertices[k + 2]));
+			}
+
+			// Get faces
+			let face1 = [],
+					laterals = [],
+					face2 = [];
+
+			// Get fisrt face
+			for (j; j < 36; j += 3) {
+				let p = new Coord(indexes[j], indexes[j + 1], indexes[j + 2]);
+				face1.push(p);
+			}
+
+			// Get laterals (made of 4 points each)
+			for (j; j < indexes.length - 36; j += 12) {
+				let pol = [];
+
+				pol.push(new Coord(indexes[j], indexes[j + 1], indexes[j + 2]));
+				pol.push(new Coord(indexes[j + 3], indexes[j + 4], indexes[j + 5]));
+				pol.push(new Coord(indexes[j + 6], indexes[j + 7], indexes[j + 8]));
+				pol.push(new Coord(indexes[j + 9], indexes[j + 10], indexes[j + 11]));
+
+				laterals.push(pol);
+			}
+
+			// Get second face
+			for (j; j < indexes.length; j += 3) {
+				let p = new Coord(indexes[j], indexes[j + 1], indexes[j + 2]);
+				face2.push(p);
+			}
+
+			// Push polygons
+			object.polygons.push(new Polygon(face1));
+			for (let k = 0; k < laterals.length; k++) {
+				object.polygons.push(new Polygon(laterals[k]));
+			}
+			object.polygons.push(new Polygon(face2));
+
+			// Add object
+			object.ended = true;
+			object.verticesNormal();
+			objects.push(object);
+			updateList();
+		}
+	}
+
+	draw();
+}
+
+// Save objects to file
+function saveSOR() {
+	let SORCollection = [];
+
+	if (objects.length > 0) {
+		var name = prompt("Please enter a file name.\n\n[Note that only completed objects will be saved]", "object");
+		// Each object
+		for (let i = 0; i < objects.length; i++) {
+			if (objects[i].ended) {
+				let sor = new SOR(name + '_' + i, [], []);
+
+				// Push all vertices
+				for (let j = 0; j < objects[i].vertices.length; j++) {
+					sor.vertices.push(objects[i].vertices[j].x);
+					sor.vertices.push(objects[i].vertices[j].y);
+					sor.vertices.push(objects[i].vertices[j].z);
+				}
+
+				// Get faces (polygons of object)
+				for (let j = 0; j < objects[i].polygons.length; j++) {
+					// Push each point of polygon: 12 for first and last, 4 for the others.
+					for (let k = 0; k < objects[i].polygons[j].elements.length; k++) {
+						sor.indexes.push(objects[i].polygons[j].elements[k].x);
+						sor.indexes.push(objects[i].polygons[j].elements[k].y);
+						sor.indexes.push(objects[i].polygons[j].elements[k].z);
+					}
+				}
+
+				// Push SOR
+				SORCollection.push(sor);
+			}
+		}
+
+		saveFile2(SORCollection, name);
+	} else {
+		alert('There aren\'t any objects to be saved. Be sure you draw something and you complete it (right click).\n\n[Note that loaded objects don\'t count.]');
+	}
+}
+
 // Clear canvas
 function clearCanvas() {
 	objects = [];
@@ -328,6 +437,3 @@ function updateList() {
 		$list.append($li);
 	}
 }
-
-
-

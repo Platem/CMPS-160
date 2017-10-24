@@ -144,7 +144,24 @@ var Obj = function() {
 				}
 			}
 		}
-	}
+	};
+
+	this.verticesNormal = function() {
+		console.log(this);
+		for (let i = 0; i < this.polygons.length; i++) {
+			for (let j = 0; j < this.polygons[i].elements.length; j++) {
+				let index = this.searchVertexIndex(this.polygons[i].elements[j]);
+				if (index > -1) {
+					console.log(index);
+					this.vertices[index].n[0] += this.polygons[i].n[0];
+					this.vertices[index].n[1] += this.polygons[i].n[1];
+					this.vertices[index].n[2] += this.polygons[i].n[2];
+				} else {
+					console.log(this.polygons[i].elements[j]);
+				}
+			}
+		}
+	};
 
 	this.setPolygons = function() {
 		if (this.ended) {
@@ -219,7 +236,7 @@ var Obj = function() {
 
 			console.log(this);
 		}
-	}
+	};
 
 	this.drawLine = function(m_point) {
 		let vertices = [];
@@ -260,7 +277,15 @@ var Obj = function() {
 
 		// Draw lines
 		gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 6);
-	}
+	};
+
+	this.searchVertexIndex = function(v) {
+		for (let i = 0; i < this.vertices.length; i++) {
+			if (this.vertices[i].x == v.x && this.vertices[i].y == v.y && this.vertices[i].z == v.z)
+				return i;
+		}
+		return -1;
+	};
 	
 	this.drawObject = function() {
 		// Draw normals
@@ -315,7 +340,7 @@ var Obj = function() {
 				let v = [];
 
 				for (let j = 0; j < this.polygons[i].elements.length; j++) {
-					let index = this.vertices.indexOf(this.polygons[i].elements[j]);
+					let index = this.searchVertexIndex(this.polygons[i].elements[j]);
 					let vertex = this.vertices[index];
 
 					// Calc light
@@ -424,5 +449,5 @@ var Obj = function() {
 			// Draw points
 			gl.drawArrays(gl.POINTS, 0, v.length / 6);
 		}
-	}
+	};
 }
