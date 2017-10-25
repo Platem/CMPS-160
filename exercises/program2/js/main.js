@@ -471,6 +471,8 @@ function updateList() {
 			
 			$div.append($slider);
 			$li.append($div);
+		} else {
+			$li.css('height', '30px');
 		}
 
 		$list.append($li);

@@ -253,7 +253,11 @@ var Obj = function() {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
 		// Draw points
-		gl.drawArrays(gl.POINTS, 0, vertices.length / 6);
+		if (draw_options.opacity_enabled) {
+			gl.drawArrays(gl.POINTS, 0, vertices.length / 7);
+		} else {
+			gl.drawArrays(gl.POINTS, 0, vertices.length / 6);
+		}
 
 		vertices = [];
 		for (let i = 0; i < this.line.nodes.length; i++) {
@@ -276,8 +280,13 @@ var Obj = function() {
 		// Write vertices into buffer
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-		// Draw lines
-		gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 6);
+		if (draw_options.opacity_enabled) {
+			// Draw lines
+			gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 7);
+		} else {
+			// Draw lines
+			gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 6);
+		}
 	};
 
 	this.searchVertexIndex = function(v) {
@@ -421,8 +430,13 @@ var Obj = function() {
 				// Write vertices into buffer
 				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
 
-				// Draw points
-				gl.drawArrays(gl.TRIANGLE_FAN, 0, v.length / 6);
+				if (draw_options.opacity_enabled) {
+					// Draw points
+					gl.drawArrays(gl.TRIANGLE_FAN, 0, v.length / 7);
+				} else {
+					// Draw points
+					gl.drawArrays(gl.TRIANGLE_FAN, 0, v.length / 6);
+				}
 			}
 		}
 

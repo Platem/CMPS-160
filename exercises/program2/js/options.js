@@ -27,5 +27,7 @@ var draw_options = {
 	surface_ns: 20.0,
 
 	points_color: [0.0, 0.0, 1.0],
-	skeleton_color: [0.0, 0.0, 1.0]
+	skeleton_color: [0.0, 0.0, 1.0],
+
+	opacity_enabled: false
 };

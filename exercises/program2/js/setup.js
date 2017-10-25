@@ -67,14 +67,13 @@ function setup() {
 	if (draw_options.opacity_enabled) {
 		// Assign buffer to a_Position variable
 		gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FLOAT_BYTES * 7, 0);
-		// Enable the assignment to a_Position variable
-		gl.enableVertexAttribArray(a_Position);
 	} else {
 		// Assign buffer to a_Position variable
 		gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FLOAT_BYTES * 6, 0);
-		// Enable the assignment to a_Position variable
-		gl.enableVertexAttribArray(a_Position);
 	}
+
+	// Enable the assignment to a_Position variable
+	gl.enableVertexAttribArray(a_Position);
 
 	// Get the storage location of a_Color
 	a_Color = gl.getAttribLocation(gl.program, 'a_Color');
@@ -86,14 +85,13 @@ function setup() {
 	if (draw_options.opacity_enabled) {
 		// Assign buffer to a_Color variable
 		gl.vertexAttribPointer(a_Color, 4, gl.FLOAT, false, FLOAT_BYTES * 7, FLOAT_BYTES * 3);
-		// Enable the assignment to a_Color variable
-		gl.enableVertexAttribArray(a_Color);
 	} else {
 		// Assign buffer to a_Color variable
 		gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, FLOAT_BYTES * 6, FLOAT_BYTES * 3);
-		// Enable the assignment to a_Color variable
-		gl.enableVertexAttribArray(a_Color);
 	}
+
+	// Enable the assignment to a_Color variable
+	gl.enableVertexAttribArray(a_Color);
 
 	// Get the storage location of u_ProjMatrix
 	u_ProjMatrix = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
