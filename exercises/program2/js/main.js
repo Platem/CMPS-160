@@ -114,6 +114,22 @@ function main() {
 		draw();
 	});
 
+	// Ambient toggler
+	document.getElementById('bAmbient').addEventListener('click', function(e) {
+		e.preventDefault();
+		draw_options.light_ambient ? draw_options.light_ambient = false : draw_options.light_ambient = true;
+		document.getElementById('circle-am').classList.toggle('active');
+		draw();
+	});
+
+	// Specular toggler
+	document.getElementById('bDiffuse').addEventListener('click', function(e) {
+		e.preventDefault();
+		draw_options.light_difuse ? draw_options.light_difuse = false : draw_options.light_difuse = true;
+		document.getElementById('circle-di').classList.toggle('active');
+		draw();
+	});
+
 	// Specular toggler
 	document.getElementById('bSpecular').addEventListener('click', function(e) {
 		e.preventDefault();
@@ -177,6 +193,20 @@ function main() {
 			objects[index].visible = true;
 		 $(e.target).text('Hide');
 		}
+		draw();
+	});
+
+	// Opacity sliders
+	$(document).on('input', '.opacity', function(e) {
+		let $li = $(e.target).parent().parent();
+		let $label = $li.find('.opacity-val');
+
+		let index = $li.index();
+		let val = $(this).val();
+
+		$label.text(val);
+
+		objects[index].opacity = parseFloat(val);
 		draw();
 	});
 }
@@ -434,6 +464,15 @@ function updateList() {
 
 	for (let i = 0; i < objects.length; i++) {
 		let $li = $('<li><label>Object ' + i + '</label><button class="removeList">Remove</button><button class="toggleView">Hide</button></li>');
+
+		if (draw_options.opacity_enabled) {
+			let $div = $('<div><label>Opacity: <span class="opacity-val">1.0</span></label></div>');
+			let $slider = $('<input type="range" min="0.0" max="1.0" step="0.1" value="1.0" class="opacity" />');
+			
+			$div.append($slider);
+			$li.append($div);
+		}
+
 		$list.append($li);
 	}
 }

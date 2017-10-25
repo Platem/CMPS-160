@@ -46,6 +46,7 @@ var Polygon = function(e) {
 var Obj = function() {
 	this.ended = false;
 	this.visible = true;
+	this.opacity = 1.0;
 
 	this.line = new Line();
 
@@ -147,7 +148,6 @@ var Obj = function() {
 	};
 
 	this.verticesNormal = function() {
-		console.log(this);
 		for (let i = 0; i < this.polygons.length; i++) {
 			for (let j = 0; j < this.polygons[i].elements.length; j++) {
 				let index = this.searchVertexIndex(this.polygons[i].elements[j]);
@@ -233,8 +233,6 @@ var Obj = function() {
 			}
 
 			this.polygons.push(new Polygon(pol2));
-
-			console.log(this);
 		}
 	};
 
@@ -248,6 +246,7 @@ var Obj = function() {
 			vertices.push(1.0);
 			vertices.push(0.0);
 			vertices.push(0.0);
+			if (draw_options.opacity_enabled) vertices.push(1.0);
 		}
 
 		// Write vertices into buffer
@@ -264,6 +263,7 @@ var Obj = function() {
 			vertices.push(0.6);
 			vertices.push(0.6);
 			vertices.push(0.6);
+			if (draw_options.opacity_enabled) vertices.push(1.0);
 		}
 		vertices.push(m_point.x);
 		vertices.push(m_point.y);
@@ -271,6 +271,7 @@ var Obj = function() {
 		vertices.push(0.0);
 		vertices.push(1.0);
 		vertices.push(0.0);
+		if (draw_options.opacity_enabled) vertices.push(1.0);
 
 		// Write vertices into buffer
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -315,6 +316,7 @@ var Obj = function() {
 					vertices.push(1.0);
 					vertices.push(0.75);
 					vertices.push(0.79);
+					if (draw_options.opacity_enabled) vertices.push(1.0);
 
 					// Normal point
 					vertices.push(pA.x + n[0] * 0.3);
@@ -323,6 +325,7 @@ var Obj = function() {
 					vertices.push(1.0);
 					vertices.push(0.75);
 					vertices.push(0.79);
+					if (draw_options.opacity_enabled) vertices.push(1.0);
 
 					// Write vertices into buffer
 					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -363,7 +366,7 @@ var Obj = function() {
 					}
 
 					if (draw_options.light_difuse) {
-						let S = Math.min(Math.max(dotProduct(normal, draw_options.light_position), 0.0), 1.0);
+						let S = Math.min(dotProduct(normalizeVector(normal), normalizeVector(draw_options.light_position)), 1.0);
 
 						let Id = [draw_options.surface_kd[0] * draw_options.light_color[0] * S,
 											draw_options.surface_kd[1] * draw_options.light_color[1] * S,
@@ -375,13 +378,27 @@ var Obj = function() {
 					}
 
 					if (draw_options.light_specular) {
-						// Get reflection
-						let r = getReflection(draw_options.light_position, normal);
+						// Get reflection: r = 2 (n · l) * n - l
+						let _n = normalizeVector(normal);
+						let _l = normalizeVector(draw_options.light_position);
+						let k = 2 * dotProduct(_n, _l);
+
+						let r = [k * _n[0] - _l[0],
+										 k * _n[1] - _l[1],
+										 k * _n[2] - _l[2],];
+
 						// Get angle
 						let a = getAngle(draw_options.viewer_position, r, false);
 
 						// Get light
-						let S = Math.pow(Math.abs(Math.cos(a)), draw_options.surface_ns);
+						let S = 0.0;
+
+						if (a > 0 && a < Math.PI / 2) {
+							S = Math.min(Math.pow(Math.cos(a), draw_options.surface_ns), 1.0);
+						}
+
+						console.log(S);
+
 						let Is = [draw_options.surface_ks[0] * draw_options.light_color[0] * S,
 											draw_options.surface_ks[1] * draw_options.light_color[1] * S,
 											draw_options.surface_ks[2] * draw_options.light_color[2] * S];
@@ -398,6 +415,7 @@ var Obj = function() {
 					v.push(I[0]);
 					v.push(I[1]);
 					v.push(I[2]);
+					if (draw_options.opacity_enabled) v.push(this.opacity);
 				}
 
 				// Write vertices into buffer
@@ -420,6 +438,7 @@ var Obj = function() {
 					v.push(draw_options.skeleton_color[0]);
 					v.push(draw_options.skeleton_color[1]);
 					v.push(draw_options.skeleton_color[2]);
+					if (draw_options.opacity_enabled) v.push(1.0);
 				}
 
 				// Write vertices into buffer
@@ -441,6 +460,7 @@ var Obj = function() {
 				v.push(draw_options.points_color[0]);
 				v.push(draw_options.points_color[1]);
 				v.push(draw_options.points_color[2]);
+				if (draw_options.opacity_enabled) v.push(1.0);
 			}
 
 			// Write vertices into buffer
