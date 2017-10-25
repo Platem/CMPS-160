@@ -146,6 +146,53 @@ function main() {
 		draw();
 	});
 
+	// Light colors
+	document.getElementsByName('color_picker').forEach(function(item, index) {
+		item.addEventListener('input', function(e) {
+			e.preventDefault();
+			let color = hexToRgb(this.value);
+
+			switch (this.id) {
+				case "ambientColor":
+					draw_options.surface_ka[0] = color.r / 255;
+					draw_options.surface_ka[1] = color.g / 255;
+					draw_options.surface_ka[2] = color.b / 255;
+					break;
+				case "diffuseColor":
+					draw_options.surface_kd[0] = color.r / 255;
+					draw_options.surface_kd[1] = color.g / 255;
+					draw_options.surface_kd[2] = color.b / 255;
+					break;
+				case "specularColor":
+					draw_options.surface_ks[0] = color.r / 255;
+					draw_options.surface_ks[1] = color.g / 255;
+					draw_options.surface_ks[2] = color.b / 255;
+					break;
+				case "normalsColor":
+					draw_options.normals_color[0] = color.r / 255;
+					draw_options.normals_color[1] = color.g / 255;
+					draw_options.normals_color[2] = color.b / 255;
+					break;
+				case "skeletonColor":
+					draw_options.skeleton_color[0] = color.r / 255;
+					draw_options.skeleton_color[1] = color.g / 255;
+					draw_options.skeleton_color[2] = color.b / 255;
+					break;
+				case "pointsColor":
+					draw_options.points_color[0] = color.r / 255;
+					draw_options.points_color[1] = color.g / 255;
+					draw_options.points_color[2] = color.b / 255;
+					break;
+				default:
+					break;
+			}
+
+			draw();
+		});
+	});
+
+
+
 	// Ns slider
 	document.getElementById('ns').addEventListener('input', function(e) {
 		e.preventDefault();

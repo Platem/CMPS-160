@@ -107,6 +107,20 @@ body {
 				width: 20%;
 			}
 		}
+
+		form.color {
+			input {
+				width: 10px;
+				height: 10px;
+				margin-left: 20%;
+				margin-right: 0;
+			}
+
+			label {
+				margin-left: calc(-20% - 10px);
+				width: 80%;
+			}
+		}
 	}
 
 	#misc {

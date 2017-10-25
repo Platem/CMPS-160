@@ -68,7 +68,8 @@
 					<button id="bSurface">Toggle Surface</button>
 					<div id="circle-s" class="circle active"></div>
 				</div>
-				<h6>Coloring</h6>
+
+				<h6>Lightning</h6>
 				<div>
 					<button id="bAmbient">Toggle Ambient Lightning</button>
 					<div id="circle-am" class="circle active"></div>
@@ -85,9 +86,36 @@
 					<button id="bSmooth">Toggle Smooth Shading</button>
 					<div id="circle-sm" class="circle"></div>
 				</div>
+
+				<h6>Coloring</h6>
+				<form class="color">
+					<input type="color" name="color_picker" id="ambientColor" value="#000033">
+					<label for="ambientColor">Ambient color</label>
+				</form>
+				<form class="color">
+					<input type="color" name="color_picker" id="diffuseColor" value="#ff0000">
+					<label for="diffuseColor">Diffuse color</label>
+				</form>
+				<form class="color">
+					<input type="color" name="color_picker" id="specularColor" value="#00ff00">
+					<label for="specularColor">Specular color</label>
+				</form>
 				<form>
 					<input type="range" min="1" max="200" value="20" id="ns">
 					<label for="ns">Ns: <span id="ns-val">20</span></label>
+				</form>
+
+				<form class="color">
+					<input type="color" name="color_picker" id="normalsColor" value="#ffc8c8">
+					<label for="normalsColor">Normals color</label>
+				</form>
+				<form class="color">
+					<input type="color" name="color_picker" id="skeletonColor" value="#0000ff">
+					<label for="skeletonColor">Skeleton color</label>
+				</form>
+				<form class="color">
+					<input type="color" name="color_picker" id="pointsColor" value="#0000ff">
+					<label for="pointsColor">Points color</label>
 				</form>
 			</div>
 

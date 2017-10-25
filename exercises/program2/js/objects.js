@@ -322,26 +322,29 @@ var Obj = function() {
 					vertices.push(pA.x);
 					vertices.push(pA.y);
 					vertices.push(pA.z);
-					vertices.push(1.0);
-					vertices.push(0.75);
-					vertices.push(0.79);
+					vertices.push(draw_options.normals_color[0]);
+					vertices.push(draw_options.normals_color[1]);
+					vertices.push(draw_options.normals_color[2]);
 					if (draw_options.opacity_enabled) vertices.push(1.0);
 
 					// Normal point
 					vertices.push(pA.x + n[0] * 0.3);
 					vertices.push(pA.y + n[1] * 0.3);
 					vertices.push(pA.z + n[2] * 0.3);
-					vertices.push(1.0);
-					vertices.push(0.75);
-					vertices.push(0.79);
+					vertices.push(draw_options.normals_color[0]);
+					vertices.push(draw_options.normals_color[1]);
+					vertices.push(draw_options.normals_color[2]);
 					if (draw_options.opacity_enabled) vertices.push(1.0);
 
 					// Write vertices into buffer
 					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-					// Draw lines
-					gl.drawArrays(gl.LINES, 0, vertices.length / 6);
-
+					if (draw_options.opacity_enabled) {
+						gl.drawArrays(gl.LINES, 0, vertices.length / 7);
+					} else {
+						// Draw lines
+						gl.drawArrays(gl.LINES, 0, vertices.length / 6);
+					}
 				}
 			}
 		}
