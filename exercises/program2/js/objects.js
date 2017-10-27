@@ -390,7 +390,7 @@ var Obj = function() {
 					}
 
 					if (draw_options.light_specular) {
-						// Get reflection: r = 2 (n · l) * n - l
+						// Get reflection: r = 2 * (n · l) * n - l
 						let _n = normalizeVector(normal);
 						let _l = normalizeVector(draw_options.light_position);
 						let k = 2 * dotProduct(_n, _l);
@@ -405,11 +405,9 @@ var Obj = function() {
 						// Get light
 						let S = 0.0;
 
-						if (a > 0 && a < Math.PI / 2) {
+						if (a > 0 && a < Math.PI / 2 && k > 0) { // This can be only k > 0
 							S = Math.min(Math.pow(Math.cos(a), draw_options.surface_ns), 1.0);
 						}
-
-						console.log(S);
 
 						let Is = [draw_options.surface_ks[0] * draw_options.light_color[0] * S,
 											draw_options.surface_ks[1] * draw_options.light_color[1] * S,
