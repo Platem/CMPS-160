@@ -41,7 +41,7 @@
         </style>
     </head>
 
-    <body onload="main()">
+    <body>
         <div id="page-container">
             <div id="navbar">
                 <span>Program 2 - Features</span>
@@ -99,6 +99,23 @@
                             <li>Click on 'Choose file' to load a previously sabed '.obj' file containing objects. Then click 'Extract data' to draw them.</li>
                             <li>When a file is load the objects are saved in memory. This means that you can draw over the loaded file and continue the drawing.</li>
                         </ul>
+                        <h3>Normal Triggering</h3>
+                        <ul>
+                            <li>There's an option to toggle drawing of cylinders' faces normals.</li>
+                        </ul>
+                        <h3>Ambient light</h3>
+                        <ul>
+                            <li>A blueish ambient light is added to the scene.</li>
+                        </ul>
+                        <h3>Specular light</h3>
+                        <ul>
+                            <li>A greenish specular light can be toggled in the scene. This creates lightning highlights.</li>
+                            <li>The glossiness of the cylinders surface can be adjusted to change the highlights intensity.</li>
+                        </ul>
+                        <h3>Smooth shading</h3>
+                        <ul>
+                            <li>Smooth shading can be toggled to calculate colors for each vertex instead of each face (flat shading).</li>
+                        </ul>
                     </ul>
 
                     <h2>Extra features</h2>
@@ -116,9 +133,21 @@
                         <ul>
                             <li>There's an option to toggle drawing of cylinders' skeleton.</li>
                         </ul>
-                        <h3>Normal Triggering</h3>
+                        <h3>Surface Triggering</h3>
                         <ul>
-                            <li>There's an option to toggle drawing of cylinders' faces normals.</li>
+                            <li>There's an option to toggle drawing of cylinders' surface.</li>
+                        </ul>
+                        <h3>Color selection</h3>
+                        <ul>
+                            <li>Color selection is enabled for all drawable elements:</li>
+                            <ul>
+                                <li>Ambient light</li>
+                                <li>Diffuse light</li>
+                                <li>Specular light</li>
+                                <li>Face normals</li>
+                                <li>Cylinders skeleton</li>
+                                <li>Cylinders points</li>
+                            </ul>
                         </ul>
                         <h3>Cylinder Rotation</h3>
                         <ul>
@@ -146,6 +175,12 @@
                     <img src="./gif/demo_save_single.gif" alt="">
                     <h2>Loading object from file and continue drawing</h2>
                     <img src="./gif/demo_load_continue.gif" alt="">
+                    <h2>Toggling smooth shading without specular lightning</h2>
+                    <img src="./gif/demo_smooth.gif" alt="">
+                    <h2>Toggling smooth shading with specular lightning</h2>
+                    <img src="./gif/demo_smooth_specular.gif" alt="">
+                    <h2>Changing drawing colors</h2>
+                    <img src="./gif/demo_colors.gif" alt="">
                     <h2>Saving multiple objects to file</h2>
                     <img src="./gif/demo_save_multiple.gif" alt="">
                     <h2>Rotating the draw</h2>
