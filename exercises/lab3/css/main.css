@@ -1,0 +1,235 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+  font-weight: bold;
+  text-align: center;
+}
+.wrapper > * {
+  padding: 10px;
+  flex: 1 100%;
+}
+
+.wrapper > * {
+  padding: 10px;
+  flex: 1 100%;
+}
+
+#navbar {
+  text-align: left;
+  height: 40px;
+  background: gray;
+  margin: 0;
+  padding: 0;
+}
+#navbar span {
+  float: left;
+  margin-left: 15px;
+  margin-right: 15px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+  width: 150px;
+}
+#navbar a.menu-item {
+  float: left;
+  height: 40px;
+  width: 100px;
+  line-height: 40px;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+  color: silver;
+}
+#navbar a.menu-item:hover, #navbar a.menu-item:focus {
+  background: #8d8d8d;
+}
+
+#content #webgl {
+  outline: 1px solid black;
+}
+
+.trigger {
+  float: right;
+  margin-right: 15px;
+  height: 40px;
+  width: 100px;
+  line-height: 40px;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+  color: silver;
+}
+.trigger:hover, .trigger:focus {
+  background: #8d8d8d;
+}
+
+#options h3 {
+  height: 30px;
+  margin: 0;
+  line-height: 30px;
+}
+#options div.opt {
+  height: 770px;
+  width: 300px;
+  outline: 1px solid black;
+  margin: auto;
+  overflow: auto;
+}
+#options #file {
+  margin: 5px;
+}
+#options #file button {
+  width: 90px;
+}
+#options #file input {
+  width: 180px;
+}
+#options #rotation button {
+  width: 90px;
+}
+#options #toggles div {
+  height: 20px;
+}
+#options #toggles div button {
+  margin-left: 15%;
+  width: 70%;
+  float: left;
+}
+#options #toggles div .circle {
+  height: 10px;
+  width: 10px;
+  float: left;
+  border-radius: 5px;
+  margin-left: 5px;
+  margin-top: 5px;
+  background: red;
+}
+#options #toggles div .circle.active {
+  background: green;
+}
+#options #toggles form {
+  margin-top: 10px;
+}
+#options #toggles form input {
+  width: 60%;
+  margin-left: 10%;
+  float: left;
+}
+#options #toggles form label {
+  width: 20%;
+}
+#options #toggles form.color input {
+  width: 10px;
+  height: 10px;
+  margin-left: 20%;
+  margin-right: 0;
+}
+#options #toggles form.color label {
+  margin-left: calc(-20% - 10px);
+  width: 80%;
+}
+#options #misc button {
+  width: 70%;
+}
+
+#list h3 {
+  height: 30px;
+  margin: 0;
+  line-height: 30px;
+}
+#list ul {
+  padding: 0;
+  height: 770px;
+  width: 300px;
+  outline: 1px solid black;
+  margin: auto;
+  list-style-type: none;
+  overflow: auto;
+}
+#list ul li {
+  width: 90%;
+  margin-left: 5%;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: #b4b4b4;
+  line-height: 30px;
+}
+#list ul li label {
+  float: left;
+  margin-left: 10px;
+}
+#list ul li button {
+  float: right;
+  margin-top: 6px;
+  margin-right: 10px;
+}
+#list ul li div label {
+  width: 90%;
+  margin-left: 5%;
+}
+#list ul li div input {
+  width: 90%;
+  margin-left: 5%;
+}
+
+#navbar {
+  order: 1;
+}
+
+#content {
+  order: 2;
+}
+
+#options {
+  display: block;
+  order: 3;
+  flex: 1 0px;
+}
+
+#list {
+  display: block;
+  order: 4;
+  flex: 1 0px;
+}
+
+@media all and (min-width: 1500px) {
+  #navbar {
+    order: 1;
+  }
+
+  #content {
+    order: 3;
+    flex: 3 0px;
+  }
+
+  #options {
+    order: 2;
+    flex: 1 0px;
+  }
+
+  #list {
+    order: 4;
+    flex: 1 0px;
+  }
+}
+#features {
+  margin: auto;
+  width: 600px;
+  text-align: left;
+}
+#features h1, #features h2 {
+  text-align: center;
+}
+#features img {
+  width: 600px;
+}
