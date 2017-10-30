@@ -1,10 +1,10 @@
 var objects = [],
-		active_object = -1,
-		mouse_point = {
-			x: 0.0,
-			y: 0.0,
-			z: 0.0
-		};
+active_object = -1,
+mouse_point = {
+	x: 0.0,
+	y: 0.0,
+	z: 0.0
+};
 
 // Main function
 function main() {
@@ -43,20 +43,20 @@ function main() {
 	document.addEventListener("keydown", function(e) {
 		switch(e.keyCode) {
 			case 37:
-				rotate('left');
-				break;
+			rotate('left');
+			break;
 			case 39:
-				rotate('right');
-				break;
+			rotate('right');
+			break;
 			case 38:
-				rotate('up');
-				break;
+			rotate('up');
+			break;
 			case 40:
-				rotate('down');
-				break;
+			rotate('down');
+			break;
 			case 13:
-				rotate('clear');
-				break;
+			rotate('clear');
+			break;
 		}
 	});
 
@@ -154,37 +154,37 @@ function main() {
 
 			switch (this.id) {
 				case "ambientColor":
-					draw_options.surface_ka[0] = color.r / 255;
-					draw_options.surface_ka[1] = color.g / 255;
-					draw_options.surface_ka[2] = color.b / 255;
-					break;
+				draw_options.surface_ka[0] = color.r / 255;
+				draw_options.surface_ka[1] = color.g / 255;
+				draw_options.surface_ka[2] = color.b / 255;
+				break;
 				case "diffuseColor":
-					draw_options.surface_kd[0] = color.r / 255;
-					draw_options.surface_kd[1] = color.g / 255;
-					draw_options.surface_kd[2] = color.b / 255;
-					break;
+				draw_options.surface_kd[0] = color.r / 255;
+				draw_options.surface_kd[1] = color.g / 255;
+				draw_options.surface_kd[2] = color.b / 255;
+				break;
 				case "specularColor":
-					draw_options.surface_ks[0] = color.r / 255;
-					draw_options.surface_ks[1] = color.g / 255;
-					draw_options.surface_ks[2] = color.b / 255;
-					break;
+				draw_options.surface_ks[0] = color.r / 255;
+				draw_options.surface_ks[1] = color.g / 255;
+				draw_options.surface_ks[2] = color.b / 255;
+				break;
 				case "normalsColor":
-					draw_options.normals_color[0] = color.r / 255;
-					draw_options.normals_color[1] = color.g / 255;
-					draw_options.normals_color[2] = color.b / 255;
-					break;
+				draw_options.normals_color[0] = color.r / 255;
+				draw_options.normals_color[1] = color.g / 255;
+				draw_options.normals_color[2] = color.b / 255;
+				break;
 				case "skeletonColor":
-					draw_options.skeleton_color[0] = color.r / 255;
-					draw_options.skeleton_color[1] = color.g / 255;
-					draw_options.skeleton_color[2] = color.b / 255;
-					break;
+				draw_options.skeleton_color[0] = color.r / 255;
+				draw_options.skeleton_color[1] = color.g / 255;
+				draw_options.skeleton_color[2] = color.b / 255;
+				break;
 				case "pointsColor":
-					draw_options.points_color[0] = color.r / 255;
-					draw_options.points_color[1] = color.g / 255;
-					draw_options.points_color[2] = color.b / 255;
-					break;
+				draw_options.points_color[0] = color.r / 255;
+				draw_options.points_color[1] = color.g / 255;
+				draw_options.points_color[2] = color.b / 255;
+				break;
 				default:
-					break;
+				break;
 			}
 
 			draw();
@@ -234,11 +234,11 @@ function main() {
 		let index = $li.index();
 
 		if (objects[index].visible) {
-		 objects[index].visible = false;
-		 $(e.target).text('Show');
+			objects[index].visible = false;
+			$(e.target).text('Show');
 		} else {
 			objects[index].visible = true;
-		 $(e.target).text('Hide');
+			$(e.target).text('Hide');
 		}
 		draw();
 	});
@@ -277,14 +277,14 @@ function click(event) {
 	// Which button was pressed?
 	switch (event.button) {
 		case 0:
-			coords.e = newNode(coords, false);
-			break;
-			case 2:
-			coords.e = newNode(coords, true);
-			break;
-			default:
-			break;
-		}
+		coords.e = newNode(coords, false);
+		break;
+		case 2:
+		coords.e = newNode(coords, true);
+		break;
+		default:
+		break;
+	}
 
 	// Draw
 	draw();
@@ -357,9 +357,9 @@ function rotate(side) {
 function draw() {
 	// Get rotation matrix and ortho
 	let mat = new Matrix4(),
-			matOrtho = new Matrix4(),
-			matRotateX = new Matrix4(),
-			matRotateY = new Matrix4();
+	matOrtho = new Matrix4(),
+	matRotateX = new Matrix4(),
+	matRotateY = new Matrix4();
 
 	mat.setIdentity();
 	matOrtho.setOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
@@ -414,8 +414,8 @@ function readSOR() {
 
 			// Get faces
 			let face1 = [],
-					laterals = [],
-					face2 = [];
+			laterals = [],
+			face2 = [];
 
 			// Get fisrt face
 			for (j; j < 36; j += 3) {
@@ -510,7 +510,11 @@ function updateList() {
 	$list.empty();
 
 	for (let i = 0; i < objects.length; i++) {
-		let $li = $('<li><label>Object ' + i + '</label><button class="removeList">Remove</button><button class="toggleView">Hide</button></li>');
+		let $li;
+		if (objects[i].visible)
+			$li = $('<li><label>Object ' + i + '</label><button class="removeList">Remove</button><button class="toggleView">Hide</button></li>');
+		else
+			$li = $('<li><label>Object ' + i + '</label><button class="removeList">Remove</button><button class="toggleView">Show</button></li>');
 
 		if (draw_options.opacity_enabled) {
 			let $div = $('<div><label>Opacity: <span class="opacity-val">1.0</span></label></div>');
