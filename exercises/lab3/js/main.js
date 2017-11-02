@@ -256,6 +256,8 @@ function main() {
 		objects[index].opacity = parseFloat(val);
 		draw();
 	});
+
+	draw();
 }
 
 // Event handler for mouse click
@@ -269,9 +271,11 @@ function click(event) {
 	// Canvas positioning
 	let rect = event.target.getBoundingClientRect();
 
+	let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
+
 	// Draw coordinates
-	coords.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width / 2);
-	coords.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2);
+	coords.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width / 2) * s;
+	coords.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2) * s;
 	coords.z = 0.0;
 
 	// Which button was pressed?
@@ -299,9 +303,11 @@ function move(event) {
 	// Canvas positioning
 	let rect = event.target.getBoundingClientRect();
 
+	let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
+
 	// Draw coordinates
-	mouse_point.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width / 2);
-	mouse_point.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2);
+	mouse_point.x = ((x_mouse - rect.left) - canvas.width / 2) / (canvas.width / 2) * s;
+	mouse_point.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2) * s;
 
 	// Draw
 	draw();
@@ -362,7 +368,7 @@ function draw() {
 	matRotateY = new Matrix4();
 
 	mat.setIdentity();
-	matOrtho.setOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+	matOrtho.setOrtho(draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1]);
 	matRotateX.setRotate(draw_options.draw_rotation.x, 1, 0, 0);
 	matRotateY.setRotate(draw_options.draw_rotation.y, 0, 1, 0);
 
@@ -376,7 +382,17 @@ function draw() {
 	// Clear
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
-	// Draw each polyline
+	// Draw light sources:
+	for (let i = 0; i < draw_options.light_sources.length; i++) {
+		if (draw_options.light_sources[i].type === 'directional') {
+			// Draw an object from 0.0 to light direction
+			drawDirectionLight(draw_options.light_sources[i]);
+		} else if (draw_options.light_sources[i].type === 'point') {
+			drawPointLight(draw_options.light_sources[i], 50);
+		}
+	}
+
+	// Draw each object
 	for (let i = 0; i < objects.length; i++) {
 		if (objects[i].ended) {
 			if (objects[i].visible)
@@ -529,3 +545,154 @@ function updateList() {
 		$list.append($li);
 	}
 }
+
+function drawDirectionLight(light) {
+	let r = 5;
+	
+	let v1 = [
+		light.direction[0] - r / 2,
+		light.direction[1] + r / 2,
+		light.direction[2] + r / 2
+	],
+	v2 = [
+		light.direction[0] - r / 2,
+		light.direction[1] - r / 2,
+		light.direction[2] + r / 2
+	],
+	v3 = [
+		light.direction[0] + r / 2,
+		light.direction[1] - r / 2,
+		light.direction[2] + r / 2
+	],
+	v4 = [
+		light.direction[0] + r / 2,
+		light.direction[1] + r / 2,
+		light.direction[2] + r / 2
+	],
+	v5 = [
+		0.0 - r / 2,
+		0.0 + r / 2,
+		0.0 - r / 2
+	],
+	v6 = [
+		0.0 - r / 2,
+		0.0 - r / 2,
+		0.0 - r / 2
+	],
+	v7 = [
+		0.0 + r / 2,
+		0.0 - r / 2,
+		0.0 - r / 2
+	],
+	v8 = [
+		0.0 + r / 2,
+		0.0 + r / 2,
+		0.0 - r / 2
+	];
+
+	let color = [];
+	if (light.enabled)
+		color = [1.0, 0.0, 0.0];
+	else 
+		color = [0.6, 0.6, 0.6];
+
+	// Front face
+	drawPolygon([v1, v2, v3, v4], color);
+	// Back face
+	drawPolygon([v8, v7, v6, v5], color);
+	// Top face
+	drawPolygon([v5, v1, v4, v8], color);
+	// Bot face
+	drawPolygon([v2, v6, v7, v3], color);
+	// Left face
+	drawPolygon([v5, v6, v2, v1], color);
+	// Right face
+	drawPolygon([v4, v3, v7, v8], color);
+}
+
+function drawPointLight(light, r) {
+	let v1 = [
+		light.point[0] - r / 2,
+		light.point[1] + r / 2,
+		light.point[2] + r / 2
+	],
+	v2 = [
+		light.point[0] - r / 2,
+		light.point[1] - r / 2,
+		light.point[2] + r / 2
+	],
+	v3 = [
+		light.point[0] + r / 2,
+		light.point[1] - r / 2,
+		light.point[2] + r / 2
+	],
+	v4 = [
+		light.point[0] + r / 2,
+		light.point[1] + r / 2,
+		light.point[2] + r / 2
+	],
+	v5 = [
+		light.point[0] - r / 2,
+		light.point[1] + r / 2,
+		light.point[2] - r / 2
+	],
+	v6 = [
+		light.point[0] - r / 2,
+		light.point[1] - r / 2,
+		light.point[2] - r / 2
+	],
+	v7 = [
+		light.point[0] + r / 2,
+		light.point[1] - r / 2,
+		light.point[2] - r / 2
+	],
+	v8 = [
+		light.point[0] + r / 2,
+		light.point[1] + r / 2,
+		light.point[2] - r / 2
+	];
+
+	let color = [];
+	if (light.enabled)
+		color = light.color;
+	else 
+		color = [0.6, 0.6, 0.6];
+
+	// Front face
+	drawPolygon([v1, v2, v3, v4], color);
+	// Back face
+	drawPolygon([v8, v7, v6, v5], color);
+	// Top face
+	drawPolygon([v5, v1, v4, v8], color);
+	// Bot face
+	drawPolygon([v2, v6, v7, v3], color);
+	// Left face
+	drawPolygon([v5, v6, v2, v1], color);
+	// Right face
+	drawPolygon([v4, v3, v7, v8], color);
+}
+
+function drawPolygon(points, color) {
+	let v = [];
+	for (let i = 0; i < points.length; i++) {
+		v.push(points[i][0]);
+		v.push(points[i][1]);
+		v.push(points[i][2]);
+		v.push(color[0]);
+		v.push(color[1]);
+		v.push(color[2]);
+
+		if (draw_options.opacity_enabled) v.push(1.0);
+	}
+
+	// Write vertices into buffer
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
+
+	if (draw_options.opacity_enabled) {
+		// Draw points
+		gl.drawArrays(gl.TRIANGLE_FAN, 0, v.length / 7);
+	} else {
+		// Draw points
+		gl.drawArrays(gl.TRIANGLE_FAN, 0, v.length / 6);
+	}
+};

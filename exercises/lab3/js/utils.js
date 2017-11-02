@@ -17,12 +17,8 @@ function generateCircles(n1, n2) {
 
 	// Get vector from p1 to p2
 	let v = [p2.x - p1.x,
-	p2.y - p1.y,
-	p2.z - p1.z,
-	0.0,
-	0.0,
-	0.0
-	];
+					 p2.y - p1.y,
+					 p2.z - p1.z];
 
 	// Calculate normal vector
 	let n = getPerpendicular(v, RADIUS);

@@ -20,7 +20,7 @@ var FSHADER_SOURCE =
 
 // Program vars
 const FLOAT_BYTES = 4,
-			RADIUS = 0.1;
+			RADIUS = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) * 0.05;
 
 var canvas,
 		gl,
@@ -36,6 +36,9 @@ function setup() {
 
 	// Get the rendering context for WebGL
 	gl = getWebGLContext(canvas);
+	// gl = WebGLUtils.setupWebGL(canvas, {
+	// 	preserveDrawingBuffer: true}
+	// );
 	if (!gl) {
 		console.log('Failed to get the rendering context for WebGL');
 		return false;

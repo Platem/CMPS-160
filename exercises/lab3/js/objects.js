@@ -123,7 +123,7 @@ var Obj = function() {
 					pA.z + dirAB[2] * h1
 					];
 
-					mid.push(new Coord(pB[0], pB[1], pB[2], 0.0, 0.0, 1.0));
+					mid.push(new Coord(pB[0], pB[1], pB[2]));
 				}
 
 				// Now we have mid circle
@@ -367,56 +367,81 @@ var Obj = function() {
 						normal = this.polygons[i].n;
 					}
 
-					if (draw_options.light_ambient) {
-						let Ia = [draw_options.surface_ka[0] * draw_options.light_color[0],
-											draw_options.surface_ka[1] * draw_options.light_color[1],
-											draw_options.surface_ka[2] * draw_options.light_color[2]];
 
-						I[0] += Ia[0];
-						I[1] += Ia[1];
-						I[2] += Ia[2];
-					}
+					for (let j = 0; j < draw_options.light_sources.length; j++) {
+						if (draw_options.light_sources[j].enabled) {
 
-					if (draw_options.light_difuse) {
-						let S = Math.min(dotProduct(normalizeVector(normal), normalizeVector(draw_options.light_position)), 1.0);
+							if (draw_options.light_ambient) {
+								let Ia = [draw_options.surface_ka[0] * draw_options.light_sources[j].color[0],
+													draw_options.surface_ka[1] * draw_options.light_sources[j].color[1],
+													draw_options.surface_ka[2] * draw_options.light_sources[j].color[2]];
 
-						let Id = [draw_options.surface_kd[0] * draw_options.light_color[0] * S,
-											draw_options.surface_kd[1] * draw_options.light_color[1] * S,
-											draw_options.surface_kd[2] * draw_options.light_color[2] * S];
+								I[0] += Ia[0];
+								I[1] += Ia[1];
+								I[2] += Ia[2];
+							}
 
-						I[0] += Id[0];
-						I[1] += Id[1];
-						I[2] += Id[2];
-					}
+							let light_direction = [];
 
-					if (draw_options.light_specular) {
-						// Get reflection: r = 2 * (n · l) * n - l
-						let _n = normalizeVector(normal);
-						let _l = normalizeVector(draw_options.light_position);
-						let k = 2 * dotProduct(_n, _l);
+							if (draw_options.light_sources[j].type === "directional") {
+								light_direction[0] = draw_options.light_sources[j].direction[0];
+								light_direction[1] = draw_options.light_sources[j].direction[1];
+								light_direction[2] = draw_options.light_sources[j].direction[2];
+							} else if (draw_options.light_sources[j].type === "point") {
+								light_direction[0] = draw_options.light_sources[j].point[0] - vertex.x;
+								light_direction[1] = draw_options.light_sources[j].point[1] - vertex.y;
+								light_direction[2] = draw_options.light_sources[j].point[2] - vertex.z;
+							} else {
+								light_direction = [0, 0, 0];
+							}
 
-						let r = [k * _n[0] - _l[0],
-										 k * _n[1] - _l[1],
-										 k * _n[2] - _l[2],];
+							if (draw_options.light_difuse) {
+								let S = Math.min(dotProduct(normalizeVector(normal), normalizeVector(light_direction)), 1.0);
 
-						// Get angle
-						let a = getAngle(draw_options.viewer_position, r, false);
+								let Id = [draw_options.surface_kd[0] * draw_options.light_sources[j].color[0] * S,
+													draw_options.surface_kd[1] * draw_options.light_sources[j].color[1] * S,
+													draw_options.surface_kd[2] * draw_options.light_sources[j].color[2] * S];
 
-						// Get light
-						let S = 0.0;
+								I[0] += Id[0];
+								I[1] += Id[1];
+								I[2] += Id[2];
+							}
 
-						if (a > 0 && a < Math.PI / 2 && k > 0) { // This can be only k > 0
-							S = Math.min(Math.pow(Math.cos(a), draw_options.surface_ns), 1.0);
+							if (draw_options.light_specular) {
+								// Get reflection: r = 2 * (n · l) * n - l
+								let _n = normalizeVector(normal);
+								let _l = normalizeVector(light_direction);
+								let k = 2 * dotProduct(_n, _l);
+
+								let r = [k * _n[0] - _l[0],
+												 k * _n[1] - _l[1],
+												 k * _n[2] - _l[2],];
+
+								// Get angle
+								let a = getAngle(draw_options.viewer_position, r, false);
+
+								// Get light
+								let S = 0.0;
+
+								if (a > 0 && a < Math.PI / 2 && k > 0) { // This can be only k > 0
+									S = Math.min(Math.pow(Math.cos(a), draw_options.surface_ns), 1.0);
+								}
+
+								let Is = [draw_options.surface_ks[0] * draw_options.light_sources[j].color[0] * S,
+													draw_options.surface_ks[1] * draw_options.light_sources[j].color[1] * S,
+													draw_options.surface_ks[2] * draw_options.light_sources[j].color[2] * S];
+
+								I[0] += Is[0];
+								I[1] += Is[1];
+								I[2] += Is[2];
+							}
 						}
-
-						let Is = [draw_options.surface_ks[0] * draw_options.light_color[0] * S,
-											draw_options.surface_ks[1] * draw_options.light_color[1] * S,
-											draw_options.surface_ks[2] * draw_options.light_color[2] * S];
-
-						I[0] += Is[0];
-						I[1] += Is[1];
-						I[2] += Is[2];
 					}
+
+					// Check light values
+					I[0] = Math.min(Math.max(I[0], 0.0), 1.0);
+					I[1] = Math.min(Math.max(I[1], 0.0), 1.0);
+					I[2] = Math.min(Math.max(I[2], 0.0), 1.0);
 
 					// Push vertex
 					v.push(vertex.x);

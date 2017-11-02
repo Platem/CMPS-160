@@ -10,10 +10,21 @@ var draw_options = {
 		z: 0.0	
 	},
 
-	viewer_position: [0.0, 0.0, 1.0],
+	scale_range: [-500, 500],
 
-	light_color: [1.0, 1.0, 1.0],
-	light_position: [1.0, 1.0, 1.0],
+	viewer_position: [0.0, 0.0, 500.0],
+
+	light_sources: [{
+		type: "directional",
+		direction: [500.0, 500.0, 500.0],
+		color: [1.0, 1.0, 1.0],
+		enabled: true
+	}, {
+		type: "point",
+		point: [0.0, 500.0, 0.0],
+		color: [1.0, 1.0, 0.0],
+		enabled: true
+	}],
 
 	light_ambient: true,
 	light_difuse: true,
