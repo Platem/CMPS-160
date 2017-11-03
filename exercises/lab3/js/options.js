@@ -15,11 +15,13 @@ var draw_options = {
 	viewer_position: [0.0, 0.0, 500.0],
 
 	light_sources: [{
+		id: "",
 		type: "directional",
 		direction: [500.0, 500.0, 500.0],
 		color: [1.0, 1.0, 1.0],
 		enabled: true
 	}, {
+		id: "",
 		type: "point",
 		point: [0.0, 500.0, 0.0],
 		color: [1.0, 1.0, 0.0],
@@ -41,5 +43,5 @@ var draw_options = {
 	points_color: [0.0, 0.0, 1.0],
 	skeleton_color: [0.0, 0.0, 1.0],
 
-	opacity_enabled: false
+	opacity_enabled: true
 };

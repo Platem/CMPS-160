@@ -1,4 +1,5 @@
-var objects = [],
+var lights = [],
+objects = [],
 active_object = -1,
 mouse_point = {
 	x: 0.0,
@@ -74,6 +75,7 @@ function main() {
 	// Mouse move event
 	canvas.onmousemove = function(event) {
 		event.preventDefault();
+		/*if (active_object != -1)*/ 
 		move(event);
 	};
 
@@ -257,6 +259,12 @@ function main() {
 		draw();
 	});
 
+	// Get lights
+	for (let i = 0; i < draw_options.light_sources.length; i++) {
+		lights.push(draw_options.light_sources[i]);
+		lights[i].id = hexID();
+	}
+
 	draw();
 }
 
@@ -278,16 +286,40 @@ function click(event) {
 	coords.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2) * s;
 	coords.z = 0.0;
 
+	let x2 = x_mouse - rect.left,
+	y2 = rect.bottom - y_mouse;
+
+	draw(true);
+
 	// Which button was pressed?
 	switch (event.button) {
 		case 0:
-		coords.e = newNode(coords, false);
-		break;
+			let isLight = checkForLight(x2, y2);
+			if (active_object == -1 && isLight.is) {
+				// Pick a light while not making a new line
+				let index = isLight.index;
+				lights[index].enabled = lights[index].enabled ? false : true;
+				draw();
+			} else {
+				// Not pick a light OR making a new line so basically making a new line
+				coords.e = newNode(coords, false);
+			}
+
+			break;
 		case 2:
-		coords.e = newNode(coords, true);
-		break;
+			let isObject = checkForObject(x2, y2);
+			if (active_object == -1 && isObject.is) {
+				// Pick an object while not making a new line
+				let index = isObject.index;
+				objects[index].picked = objects[index].picked ? false : true;
+				draw();
+			} else {
+				// Not pick an object OR making a new line so basically making a new line
+				coords.e = newNode(coords, true);
+			}
+			break;
 		default:
-		break;
+			break;
 	}
 
 	// Draw
@@ -310,7 +342,8 @@ function move(event) {
 	mouse_point.y = (canvas.height / 2 - (y_mouse - rect.top)) / (canvas.height / 2) * s;
 
 	// Draw
-	draw();
+	if (active_object != -1)
+		draw();
 }
 
 // Insert new node into active object or create new object
@@ -356,11 +389,12 @@ function rotate(side) {
 		draw_options.draw_rotation.y = 0.0;
 	}
 
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	draw();
 }
 
 // Draw
-function draw() {
+function draw(withID) {
 	// Get rotation matrix and ortho
 	let mat = new Matrix4(),
 	matOrtho = new Matrix4(),
@@ -379,16 +413,16 @@ function draw() {
 
 	gl.uniformMatrix4fv(u_ProjMatrix, false, mat.elements);
 
-	// Clear
-	gl.clear(gl.COLOR_BUFFER_BIT);
+	// if (!withID) 
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	// Draw light sources:
-	for (let i = 0; i < draw_options.light_sources.length; i++) {
-		if (draw_options.light_sources[i].type === 'directional') {
+	for (let i = 0; i < lights.length; i++) {
+		if (lights[i].type === 'directional') {
 			// Draw an object from 0.0 to light direction
-			drawDirectionLight(draw_options.light_sources[i]);
-		} else if (draw_options.light_sources[i].type === 'point') {
-			drawPointLight(draw_options.light_sources[i], 50);
+			drawDirectionLight(lights[i], withID);
+		} else if (lights[i].type === 'point') {
+			drawPointLight(lights[i], 50, withID);
 		}
 	}
 
@@ -396,13 +430,11 @@ function draw() {
 	for (let i = 0; i < objects.length; i++) {
 		if (objects[i].ended) {
 			if (objects[i].visible)
-				objects[i].drawObject();
+				objects[i].drawObject(withID);
 		} else {
 			objects[i].drawLine(mouse_point);
 		}
 	}
-
-	return objects.length;
 }
 
 // Read objects from file
@@ -546,55 +578,60 @@ function updateList() {
 	}
 }
 
-function drawDirectionLight(light) {
+function drawDirectionLight(light, withID) {
 	let r = 5;
 	
 	let v1 = [
-		light.direction[0] - r / 2,
-		light.direction[1] + r / 2,
-		light.direction[2] + r / 2
+	light.direction[0] - r / 2,
+	light.direction[1] + r / 2,
+	light.direction[2] + r / 2
 	],
 	v2 = [
-		light.direction[0] - r / 2,
-		light.direction[1] - r / 2,
-		light.direction[2] + r / 2
+	light.direction[0] - r / 2,
+	light.direction[1] - r / 2,
+	light.direction[2] + r / 2
 	],
 	v3 = [
-		light.direction[0] + r / 2,
-		light.direction[1] - r / 2,
-		light.direction[2] + r / 2
+	light.direction[0] + r / 2,
+	light.direction[1] - r / 2,
+	light.direction[2] + r / 2
 	],
 	v4 = [
-		light.direction[0] + r / 2,
-		light.direction[1] + r / 2,
-		light.direction[2] + r / 2
+	light.direction[0] + r / 2,
+	light.direction[1] + r / 2,
+	light.direction[2] + r / 2
 	],
 	v5 = [
-		0.0 - r / 2,
-		0.0 + r / 2,
-		0.0 - r / 2
+	0.0 - r / 2,
+	0.0 + r / 2,
+	0.0 - r / 2
 	],
 	v6 = [
-		0.0 - r / 2,
-		0.0 - r / 2,
-		0.0 - r / 2
+	0.0 - r / 2,
+	0.0 - r / 2,
+	0.0 - r / 2
 	],
 	v7 = [
-		0.0 + r / 2,
-		0.0 - r / 2,
-		0.0 - r / 2
+	0.0 + r / 2,
+	0.0 - r / 2,
+	0.0 - r / 2
 	],
 	v8 = [
-		0.0 + r / 2,
-		0.0 + r / 2,
-		0.0 - r / 2
+	0.0 + r / 2,
+	0.0 + r / 2,
+	0.0 - r / 2
 	];
 
 	let color = [];
 	if (light.enabled)
 		color = [1.0, 0.0, 0.0];
-	else 
+	else
 		color = [0.6, 0.6, 0.6];
+
+	if (withID) {
+		let c = hexToRgb(light.id)
+		color = [c.r, c.g, c.b];
+	}
 
 	// Front face
 	drawPolygon([v1, v2, v3, v4], color);
@@ -610,53 +647,58 @@ function drawDirectionLight(light) {
 	drawPolygon([v4, v3, v7, v8], color);
 }
 
-function drawPointLight(light, r) {
+function drawPointLight(light, r, withID) {
 	let v1 = [
-		light.point[0] - r / 2,
-		light.point[1] + r / 2,
-		light.point[2] + r / 2
+	light.point[0] - r / 2,
+	light.point[1] + r / 2,
+	light.point[2] + r / 2
 	],
 	v2 = [
-		light.point[0] - r / 2,
-		light.point[1] - r / 2,
-		light.point[2] + r / 2
+	light.point[0] - r / 2,
+	light.point[1] - r / 2,
+	light.point[2] + r / 2
 	],
 	v3 = [
-		light.point[0] + r / 2,
-		light.point[1] - r / 2,
-		light.point[2] + r / 2
+	light.point[0] + r / 2,
+	light.point[1] - r / 2,
+	light.point[2] + r / 2
 	],
 	v4 = [
-		light.point[0] + r / 2,
-		light.point[1] + r / 2,
-		light.point[2] + r / 2
+	light.point[0] + r / 2,
+	light.point[1] + r / 2,
+	light.point[2] + r / 2
 	],
 	v5 = [
-		light.point[0] - r / 2,
-		light.point[1] + r / 2,
-		light.point[2] - r / 2
+	light.point[0] - r / 2,
+	light.point[1] + r / 2,
+	light.point[2] - r / 2
 	],
 	v6 = [
-		light.point[0] - r / 2,
-		light.point[1] - r / 2,
-		light.point[2] - r / 2
+	light.point[0] - r / 2,
+	light.point[1] - r / 2,
+	light.point[2] - r / 2
 	],
 	v7 = [
-		light.point[0] + r / 2,
-		light.point[1] - r / 2,
-		light.point[2] - r / 2
+	light.point[0] + r / 2,
+	light.point[1] - r / 2,
+	light.point[2] - r / 2
 	],
 	v8 = [
-		light.point[0] + r / 2,
-		light.point[1] + r / 2,
-		light.point[2] - r / 2
+	light.point[0] + r / 2,
+	light.point[1] + r / 2,
+	light.point[2] - r / 2
 	];
 
 	let color = [];
 	if (light.enabled)
 		color = light.color;
-	else 
+	else
 		color = [0.6, 0.6, 0.6];
+
+	if (withID) {
+		let c = hexToRgb(light.id)
+		color = [c.r, c.g, c.b];
+	}
 
 	// Front face
 	drawPolygon([v1, v2, v3, v4], color);
@@ -696,3 +738,47 @@ function drawPolygon(points, color) {
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, v.length / 6);
 	}
 };
+
+function checkForLight(x, y) {
+	let pixels = new Uint8Array(4);
+	gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+	let is = false;
+	let index = -1;
+
+	out: for (let i = 0; i < lights.length; i++) {
+		let id = hexToRgb(lights[i].id);
+		if ((pixels[0] / 255) == id.r && (pixels[1] / 255) == id.g && (pixels[2] / 255) == id.b) {
+			index = i;
+			is = true;
+			break out;
+		}
+	}
+
+	return {
+		is: is,
+		index: index
+	}
+}
+
+function checkForObject(x, y) {
+	let pixels = new Uint8Array(4);
+	gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+	let is = false;
+	let index = -1;
+
+	out: for (let i = 0; i < objects.length; i++) {
+		let id = hexToRgb(objects[i].id);
+		if ((pixels[0] / 255) == id.r && (pixels[1] / 255) == id.g && (pixels[2] / 255) == id.b) {
+			index = i;
+			is = true;
+			break out;
+		}
+	}
+
+	return {
+		is: is,
+		index: index
+	}
+}

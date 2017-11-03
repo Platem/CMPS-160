@@ -28,17 +28,16 @@ var canvas,
 		u_ProjMatrix,
 		a_Color;
 
-
 // Setup WebGL function
 function setup() {
 	// Retrieve <canvas> element
 	canvas = document.getElementById('webgl');
 
 	// Get the rendering context for WebGL
-	gl = getWebGLContext(canvas);
-	// gl = WebGLUtils.setupWebGL(canvas, {
-	// 	preserveDrawingBuffer: true}
-	// );
+	// gl = getWebGLContext(canvas);
+	gl = WebGLUtils.setupWebGL(canvas, {
+		preserveDrawingBuffer: true}
+	);
 	if (!gl) {
 		console.log('Failed to get the rendering context for WebGL');
 		return false;

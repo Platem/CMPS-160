@@ -1,10 +1,20 @@
+function hexID() {		
+	let possible = '0123456789ABCDEF';
+	let text = '#';
+
+	for (let i = 0; i < 6; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+
 function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result ? {
+		r: parseInt(result[1], 16) / 255,
+		g: parseInt(result[2], 16) / 255,
+		b: parseInt(result[3], 16) / 255
+	} : null;
 }
 
 // Generate circle with center in n1 perpendicular to n1->n2
@@ -17,8 +27,8 @@ function generateCircles(n1, n2) {
 
 	// Get vector from p1 to p2
 	let v = [p2.x - p1.x,
-					 p2.y - p1.y,
-					 p2.z - p1.z];
+	p2.y - p1.y,
+	p2.z - p1.z];
 
 	// Calculate normal vector
 	let n = getPerpendicular(v, RADIUS);
