@@ -23,47 +23,63 @@ function main() {
 	// Rotation
 	document.getElementById('bRotateL').onclick = function(event) {
 		event.preventDefault();
-		rotate("left");
+		rotateView("left");
 	};
 
 	document.getElementById('bRotateR').onclick = function(event) {
 		event.preventDefault();
-		rotate("right");
+		rotateView("right");
 	};
 
 	document.getElementById('bRotateU').onclick = function(event) {
 		event.preventDefault();
-		rotate("up");
+		rotateView("up");
 	};
 
 	document.getElementById('bRotateD').onclick = function(event) {
 		event.preventDefault();
-		rotate("down");
+		rotateView("down");
 	};
 
 	document.addEventListener("keydown", function(e) {
+		e.preventDefault();
 		switch(e.keyCode) {
 			case 37:
-			rotate('left');
+			rotateView('left');
 			break;
 			case 39:
-			rotate('right');
+			rotateView('right');
 			break;
 			case 38:
-			rotate('up');
+			rotateView('up');
 			break;
 			case 40:
-			rotate('down');
+			rotateView('down');
 			break;
 			case 13:
-			rotate('clear');
+			rotateView('clear');
+			break;
+			case 65:
+			moveView('left');
+			break;
+			case 68:
+			moveView('right');
+			break;
+			case 87:
+			moveView('up');
+			break;
+			case 83:
+			moveView('down');
+			break;
+			case 32:
+			moveView('clear');
 			break;
 		}
 	});
 
 	document.getElementById('bRotateC').onclick = function(event) {
 		event.preventDefault();
-		rotate("clear");
+		rotateView("clear");
 	};
 
 	// Mouse press event
@@ -83,6 +99,15 @@ function main() {
 	canvas.oncontextmenu = function(event) {
 		return false;
 	}
+
+	// View perspective
+	document.getElementById('bPerspective').addEventListener('click', function(e) {
+		e.preventDefault();
+		draw_options.perspective.enabled ? draw_options.perspective.enabled = false : draw_options.perspective.enabled = true;
+		document.getElementById('circle-pers').classList.toggle('active');
+		draw();
+	});
+
 
 	// Draw normals toggler
 	document.getElementById('bNormals').addEventListener('click', function(e) {
@@ -375,21 +400,78 @@ function newNode(coords, ends) {
 }
 
 // Rotates all points
-function rotate(side) {
-	if (side == "right")
+function rotateView(side) {
+	if (side == "right") {
 		draw_options.draw_rotation.y -= 10.0;
-	else if (side == "left")
+
+		let p = rotatePointAboutPoint(draw_options.viewer.position, draw_options.viewer.center, 0.0, 10.0);
+
+		draw_options.viewer.position[0] = p[0];
+		draw_options.viewer.position[1] = p[1];
+		draw_options.viewer.position[2] = p[2];
+	} else if (side == "left") {
 		draw_options.draw_rotation.y += 10.0;
-	else if (side == "up")
+
+		let p = rotatePointAboutPoint(draw_options.viewer.position, draw_options.viewer.center, 0.0, -10.0);
+
+		draw_options.viewer.position[0] = p[0];
+		draw_options.viewer.position[1] = p[1];
+		draw_options.viewer.position[2] = p[2];
+	} else if (side == "up") {
 		draw_options.draw_rotation.x += 10.0;
-	else if (side == "down")
+
+		let p = rotatePointAboutPoint(draw_options.viewer.position, draw_options.viewer.center, 10.0, 0.0);
+		
+		draw_options.viewer.position[0] = p[0];
+		draw_options.viewer.position[1] = p[1];
+		draw_options.viewer.position[2] = p[2];
+	} else if (side == "down") {
 		draw_options.draw_rotation.x -= 10.0;
-	else if (side == "clear") {
+
+		let p = rotatePointAboutPoint(draw_options.viewer.position, draw_options.viewer.center, -10.0, 0.0);
+		
+		draw_options.viewer.position[0] = p[0];
+		draw_options.viewer.position[1] = p[1];
+		draw_options.viewer.position[2] = p[2];
+	} else if (side == "clear") {
 		draw_options.draw_rotation.x = 0.0;
 		draw_options.draw_rotation.y = 0.0;
+
+		draw_options.viewer.position = [0.0, 0.0, 500];
 	}
 
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	draw();
+}
+
+function moveView(side) {
+	if (side == "right") {
+		draw_options.draw_translate.x += 0.1;
+
+		draw_options.viewer.position[0] += 10.0;
+		draw_options.viewer.center[0] += 10.0;
+	} else if (side == "left") {
+		draw_options.draw_translate.x -= 0.1;
+		
+		draw_options.viewer.position[0] -= 10.0;
+		draw_options.viewer.center[0] -= 10.0;
+	} else if (side == "up") {
+		draw_options.draw_translate.y += 0.1;
+		
+		draw_options.viewer.position[1] += 10.0;
+		draw_options.viewer.center[1] += 10.0;
+	} else if (side == "down") {
+		draw_options.draw_translate.y -= 0.1;
+		
+		draw_options.viewer.position[1] -= 10.0;
+		draw_options.viewer.center[1] -= 10.0;
+	} else if (side == "clear") {
+		draw_options.draw_translate.x = 0.0;
+		draw_options.draw_translate.y = 0.0;
+		
+		draw_options.viewer.position = [0.0, 0.0, 500];
+		draw_options.viewer.center = [0.0, 0.0, 0.0];
+	}
+
 	draw();
 }
 
@@ -397,23 +479,36 @@ function rotate(side) {
 function draw(withID) {
 	// Get rotation matrix and ortho
 	let mat = new Matrix4(),
+	matPersp = new Matrix4(),
 	matOrtho = new Matrix4(),
 	matRotateX = new Matrix4(),
-	matRotateY = new Matrix4();
+	matRotateY = new Matrix4(),
+	matTranslate = new Matrix4();
 
 	mat.setIdentity();
-	matOrtho.setOrtho(draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1]);
-	matRotateX.setRotate(draw_options.draw_rotation.x, 1, 0, 0);
-	matRotateY.setRotate(draw_options.draw_rotation.y, 0, 1, 0);
+	if (draw_options.perspective.enabled) {
+		matPersp.setPerspective(draw_options.perspective.fovy, draw_options.perspective.aspect, draw_options.perspective.near, draw_options.perspective.far);
+		matPersp.lookAt(draw_options.viewer.position[0], draw_options.viewer.position[1], draw_options.viewer.position[2],
+										draw_options.viewer.center[0], draw_options.viewer.center[1], draw_options.viewer.center[2],
+										draw_options.viewer.up[0], draw_options.viewer.up[1], draw_options.viewer.up[2]);
+	} else {
+		matOrtho.setOrtho(draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1]);
+		matRotateX.setRotate(draw_options.draw_rotation.x, 1, 0, 0);
+		matRotateY.setRotate(draw_options.draw_rotation.y, 0, 1, 0);
+		matTranslate.setTranslate(draw_options.draw_translate.x, draw_options.draw_translate.y, draw_options.draw_translate.z);
+	}
 
-	// Set Orthoview rotated
-	mat.multiply(matRotateX);
-	mat.multiply(matRotateY);
-	mat.multiply(matOrtho);
+	if (draw_options.perspective.enabled) {
+		mat.multiply(matPersp);
+	} else {
+		mat.multiply(matRotateX);
+		mat.multiply(matRotateY);
+		mat.multiply(matTranslate);
+		mat.multiply(matOrtho);
+	}
 
 	gl.uniformMatrix4fv(u_ProjMatrix, false, mat.elements);
 
-	// if (!withID) 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	// Draw light sources:

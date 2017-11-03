@@ -10,9 +10,27 @@ var draw_options = {
 		z: 0.0	
 	},
 
+	draw_translate: {
+		x: 0.0,
+		y: 0.0,
+		z: 0.0
+	},
+
 	scale_range: [-500, 500],
 
-	viewer_position: [0.0, 0.0, 500.0],
+	viewer: {
+		position: [0.0, 0.0, 500.0],
+		center: [0.0, 0.0, 0.0],
+		up: [0.0, 500.0, 0.0]
+	},
+
+	perspective: {
+		enabled: true,
+		fovy: 100,
+		aspect: 1,
+		near: 500,
+		far: 1
+	},
 
 	light_sources: [{
 		id: "",

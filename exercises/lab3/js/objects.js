@@ -452,7 +452,7 @@ var Obj = function() {
 													 k * _n[2] - _l[2],];
 
 									// Get angle
-									let a = getAngle(draw_options.viewer_position, r, false);
+									let a = getAngle(draw_options.viewer.position, r, false);
 
 									// Get light
 									let S = 0.0;

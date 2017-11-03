@@ -135,3 +135,41 @@ function circleCenter(pA, pB) {
 	let r = [(pB.x - pA.x) / 2, ((pB.y - pA.y) / 2), ((pB.z - pA.z) / 2)];
 	return new Coord(pA.x + r[0], pA.y + r[1], pA.z + r[2], 1.0, 0.0, 0.0);
 }
+
+function rotatePointAboutPoint(pA, pB, angleX, angleY) {
+	let ret = [pA[0], pA[1], pA[2]];
+	let aX = Math.PI * angleX / 180;
+	let aY = Math.PI * angleY / 180;
+
+	console.log(ret);
+
+	// First translate pA as to put pB in the origin
+	ret[0] = ret[0] - pB[0];
+	ret[1] = ret[1] - pB[1];
+	ret[2] = ret[2] - pB[2];
+
+	console.log(ret);
+
+	// Rotate around X axis
+	ret[0] = ret[0];
+	ret[1] = ret[1] * Math.cos(aX) - ret[2] * Math.sin(aX); 
+	ret[2] = ret[1] * Math.sin(aX) + ret[2] * Math.cos(aX);
+
+	console.log(ret);
+
+	// Rotate around Y axis
+	ret[0] = ret[0] * Math.cos(aY) + ret[2] * Math.sin(aY); 
+	ret[1] = ret[1];
+	ret[2] = - ret[0] * Math.sin(aY) + ret[2] * Math.cos(aY);
+
+	console.log(ret);
+
+	// Then translate back
+	ret[0] = ret[0] + pB[0];
+	ret[1] = ret[1] + pB[1];
+	ret[2] = ret[2] + pB[2];
+
+	console.log(ret);
+	console.log('---');
+	return ret;
+}
