@@ -29,6 +29,19 @@ function main() {
 		draw();
 	};
 
+	$(document).on('click', '.toggleLightType', function(e) {
+		e.preventDefault();
+		let $li = $(e.target).parent();
+		let index = $li.index();
+
+		let t = lights[index].type;
+		if (t === 'point') lights[index].type = 'directional';
+		else if (t === 'directional') lights[index].type = 'point';
+
+		updateLightList();
+		draw();
+	});
+
 	$(document).on('click', '.removeLightList', function(e) {
 		e.preventDefault();
 		let $li = $(e.target).parent();
@@ -120,19 +133,19 @@ function main() {
 			break;
 			case 65:
 			e.preventDefault();
-			moveView('left');
+			moveView('right');
 			break;
 			case 68:
 			e.preventDefault();
-			moveView('right');
+			moveView('left');
 			break;
 			case 87:
 			e.preventDefault();
-			moveView('up');
+			moveView('down');
 			break;
 			case 83:
 			e.preventDefault();
-			moveView('down');
+			moveView('up');
 			break;
 			case 32:
 			e.preventDefault();

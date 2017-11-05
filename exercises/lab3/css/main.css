@@ -236,7 +236,14 @@ body {
 }
 #features h1, #features h2 {
   text-align: center;
+  width: 100%;
 }
 #features img {
   width: 600px;
+}
+#features img.half {
+  width: 300px;
+}
+#features img.half + img.half {
+  float: left;
 }
