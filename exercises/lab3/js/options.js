@@ -25,22 +25,24 @@ var draw_options = {
 	},
 
 	perspective: {
-		enabled: true,
+		enabled: false,
 		fovy: 100,
 		aspect: 1,
-		near: 500,
-		far: 1
+		near: 1,
+		far: 1000
 	},
 
 	light_sources: [{
 		id: "",
 		type: "directional",
+		point: [500.0, 500.0, 500.0],
 		direction: [500.0, 500.0, 500.0],
 		color: [1.0, 1.0, 1.0],
 		enabled: true
 	}, {
 		id: "",
 		type: "point",
+		direction: [0.0, 500.0, 0.0],
 		point: [0.0, 500.0, 0.0],
 		color: [1.0, 1.0, 0.0],
 		enabled: true

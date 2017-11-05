@@ -122,7 +122,7 @@
 
 	ul {
 		padding: 0;
-		height: 770px;
+		height: 370px;
 		width: 300px;
 		outline: 1px solid black;
 		margin: auto;
@@ -130,33 +130,52 @@
 		overflow: auto;
 
 		li {
-			width: 90%;
-			margin-left: 5%;
-			margin-top: 10px;
-			border-radius: 3px;
-			background: rgb(180, 180, 180);
-			line-height: 30px;
+				width: 90%;
+				margin-left: 5%;
+				margin-top: 10px;
+				border-radius: 3px;
+				background: rgb(180, 180, 180);
+				line-height: 30px;
 
-			label {
-				float: left;
-				margin-left: 10px;
-			}
-
-			button {
-				float: right;
-				margin-top: 6px;
-				margin-right: 10px;
-			}
-
-			div {
 				label {
-					width: 90%;
-					margin-left: 5%;
+					float: left;
+					margin-left: 10px;
 				}
 
-				input {
+				button {
+					float: right;
+					margin-top: 6px;
+					margin-right: 10px;
+				}
+		}
+	
+		&.objects {
+			li {
+				div {
+					label {
+						width: 90%;
+						margin-left: 5%;
+					}
+
+					input {
+						width: 90%;
+						margin-left: 5%;
+					}
+				}
+			}
+		}
+
+		&.lights {
+			li {
+				button.toggleLightType {
+					float: none;
 					width: 90%;
-					margin-left: 5%;
+				}
+
+				form {
+					button {
+						float: none;
+					}
 				}
 			}
 		}

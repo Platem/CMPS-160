@@ -141,35 +141,35 @@ function rotatePointAboutPoint(pA, pB, angleX, angleY) {
 	let aX = Math.PI * angleX / 180;
 	let aY = Math.PI * angleY / 180;
 
-	console.log(ret);
+	// console.log(ret);
 
 	// First translate pA as to put pB in the origin
 	ret[0] = ret[0] - pB[0];
 	ret[1] = ret[1] - pB[1];
 	ret[2] = ret[2] - pB[2];
 
-	console.log(ret);
+	// console.log(ret);
 
 	// Rotate around X axis
 	ret[0] = ret[0];
 	ret[1] = ret[1] * Math.cos(aX) - ret[2] * Math.sin(aX); 
 	ret[2] = ret[1] * Math.sin(aX) + ret[2] * Math.cos(aX);
 
-	console.log(ret);
+	// console.log(ret);
 
 	// Rotate around Y axis
 	ret[0] = ret[0] * Math.cos(aY) + ret[2] * Math.sin(aY); 
 	ret[1] = ret[1];
 	ret[2] = - ret[0] * Math.sin(aY) + ret[2] * Math.cos(aY);
 
-	console.log(ret);
+	// console.log(ret);
 
 	// Then translate back
 	ret[0] = ret[0] + pB[0];
 	ret[1] = ret[1] + pB[1];
 	ret[2] = ret[2] + pB[2];
 
-	console.log(ret);
-	console.log('---');
+	// console.log(ret);
+	// console.log('---');
 	return ret;
 }

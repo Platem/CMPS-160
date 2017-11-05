@@ -14,6 +14,61 @@ function main() {
 		return;
 	}
 
+	// Lights
+	document.getElementById('bAddLight').onclick = function(event) {
+		event.preventDefault();
+		lights.push({
+			id: hexID(),
+			type: "point",
+			point: [0.0, 0.0, 0.0],
+			direction: [0.0, 0.0, 0.0],
+			color: [1.0, 1.0, 1.0],
+			enabled: true
+		});
+		updateLightList();
+		draw();
+	};
+
+	$(document).on('click', '.removeLightList', function(e) {
+		e.preventDefault();
+		let $li = $(e.target).parent();
+		let index = $li.index();
+		lights.splice(index, 1);
+
+		updateLightList();
+		draw();
+	});
+
+	$(document).on('click', '.toggleLightView', function(e) {
+		e.preventDefault();
+		let $li = $(e.target).parent();
+		let index = $li.index();
+		lights[index].enabled = lights[index].enabled ? false : true;
+
+		updateLightList();
+		draw();
+	});
+
+	$(document).on('click', '.bUpdate', function(e) {
+		e.preventDefault();
+		let $li = $(e.target).parent().parent().parent(),
+				index = $li.index(),
+				valx = parseInt($li.find('input[data-c="x"]').val()),
+				valy = parseInt($li.find('input[data-c="y"]').val()),
+				valz = parseInt($li.find('input[data-c="z"]').val());
+
+		lights[index].point[0] = valx;
+		lights[index].direction[0] = valx;
+		lights[index].point[1] = valy;
+		lights[index].direction[1] = valy;
+		lights[index].point[2] = valz;
+		lights[index].direction[2] = valz;
+
+		updateLightList();
+		draw();
+	});
+
+	// Clear
 	document.getElementById('bClear').onclick = function(event) {
 		event.preventDefault();
 		clearCanvas();
@@ -42,36 +97,45 @@ function main() {
 	};
 
 	document.addEventListener("keydown", function(e) {
-		e.preventDefault();
 		switch(e.keyCode) {
 			case 37:
+			e.preventDefault();
 			rotateView('left');
 			break;
 			case 39:
+			e.preventDefault();
 			rotateView('right');
 			break;
 			case 38:
+			e.preventDefault();
 			rotateView('up');
 			break;
 			case 40:
+			e.preventDefault();
 			rotateView('down');
 			break;
 			case 13:
+			e.preventDefault();
 			rotateView('clear');
 			break;
 			case 65:
+			e.preventDefault();
 			moveView('left');
 			break;
 			case 68:
+			e.preventDefault();
 			moveView('right');
 			break;
 			case 87:
+			e.preventDefault();
 			moveView('up');
 			break;
 			case 83:
+			e.preventDefault();
 			moveView('down');
 			break;
 			case 32:
+			e.preventDefault();
 			moveView('clear');
 			break;
 		}
@@ -108,6 +172,47 @@ function main() {
 		draw();
 	});
 
+	document.getElementById('p-fovy').addEventListener('input', function(e) {
+		e.preventDefault();
+		let val = this.value;
+		draw_options.perspective.fovy = val;
+		document.getElementById('p-fovy-val').innerHTML = draw_options.perspective.fovy;
+		draw();
+	});
+
+	document.getElementById('p-aspect').addEventListener('input', function(e) {
+		e.preventDefault();
+		let val = this.value;
+		draw_options.perspective.aspect = val;
+		document.getElementById('p-aspect-val').innerHTML = draw_options.perspective.aspect;
+		draw();
+	});
+
+	document.getElementById('p-far').addEventListener('input', function(e) {
+		e.preventDefault();
+		let val = parseInt(this.value);
+
+		let near = parseInt(document.getElementById('p-near').value);
+
+		if (val <= near) val = near + 1;
+
+		draw_options.perspective.far = val;
+		document.getElementById('p-far-val').innerHTML = draw_options.perspective.far;
+		draw();
+	});
+
+	document.getElementById('p-near').addEventListener('input', function(e) {
+		e.preventDefault();
+		let val = parseInt(this.value);
+
+		let far = parseInt(document.getElementById('p-far').value);
+
+		if (val >= far) val = far - 1;
+
+		draw_options.perspective.near = val;
+		document.getElementById('p-near-val').innerHTML = draw_options.perspective.near;
+		draw();
+	});
 
 	// Draw normals toggler
 	document.getElementById('bNormals').addEventListener('click', function(e) {
@@ -218,8 +323,6 @@ function main() {
 		});
 	});
 
-
-
 	// Ns slider
 	document.getElementById('ns').addEventListener('input', function(e) {
 		e.preventDefault();
@@ -289,6 +392,8 @@ function main() {
 		lights.push(draw_options.light_sources[i]);
 		lights[i].id = hexID();
 	}
+
+	updateLightList();
 
 	draw();
 }
@@ -649,7 +754,7 @@ function clearCanvas() {
 
 // Remove from list
 function updateList() {
-	let $list = $('#list ul');
+	let $list = $('#list ul.objects');
 	$list.empty();
 
 	for (let i = 0; i < objects.length; i++) {
@@ -669,6 +774,33 @@ function updateList() {
 			$li.css('height', '30px');
 		}
 
+		$list.append($li);
+	}
+}
+function updateLightList() {
+	let $list = $('#list ul.lights');
+	$list.empty();
+
+	for (let i = 0; i < lights.length; i++) {
+		let $li;
+		if (lights[i].enabled)
+			$li = $('<li><label>Light ' + i + '</label><button class="removeLightList">Remove</button><button class="toggleLightView">ON</button></li>');
+		else
+			$li = $('<li><label>Light ' + i + '</label><button class="removeLightList">Remove</button><button class="toggleLightView">OFF</button></li>');
+
+		if (lights[i].type === 'directional') {
+			let $but = $('<button class="toggleLightType">Directional</button>');
+			
+			$li.append($but);
+		} else if (lights[i].type === 'point') {
+			let $but = $('<button class="toggleLightType">Point</button>');
+			
+			$li.append($but);
+		}
+
+		let $form = $('<form><div><label for="">x:</label><input type="number" class="light-value" data-c="x" value="' + lights[i].point[0] + '"/></div><div><label for="">y:</label><input type="number" class="light-value" data-c="y" value="' + lights[i].point[1] + '"/></div><div><label for="">z:</label><input type="number" class="light-value" data-c="z" value="' + lights[i].point[2] + '"/></div><div><button class="bUpdate">Update</button></div></form>');
+
+		$li.append($form);
 		$list.append($li);
 	}
 }
@@ -786,7 +918,7 @@ function drawPointLight(light, r, withID) {
 
 	let color = [];
 	if (light.enabled)
-		color = light.color;
+		color = [1.0, 1.0, 0.0];
 	else
 		color = [0.6, 0.6, 0.6];
 

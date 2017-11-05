@@ -401,28 +401,28 @@ var Obj = function() {
 							normal = this.polygons[i].n;
 						}
 
-						for (let j = 0; j < draw_options.light_sources.length; j++) {
-							if (draw_options.light_sources[j].enabled) {
+						for (let j = 0; j < lights.length; j++) {
+							if (lights[j].enabled) {
 
 								let light_direction = [];
 
-								if (draw_options.light_sources[j].type === "directional") {
-									light_direction[0] = draw_options.light_sources[j].direction[0];
-									light_direction[1] = draw_options.light_sources[j].direction[1];
-									light_direction[2] = draw_options.light_sources[j].direction[2];
-								} else if (draw_options.light_sources[j].type === "point") {
-									light_direction[0] = draw_options.light_sources[j].point[0] - vertex.x;
-									light_direction[1] = draw_options.light_sources[j].point[1] - vertex.y;
-									light_direction[2] = draw_options.light_sources[j].point[2] - vertex.z;
+								if (lights[j].type === "directional") {
+									light_direction[0] = lights[j].direction[0];
+									light_direction[1] = lights[j].direction[1];
+									light_direction[2] = lights[j].direction[2];
+								} else if (lights[j].type === "point") {
+									light_direction[0] = lights[j].point[0] - vertex.x;
+									light_direction[1] = lights[j].point[1] - vertex.y;
+									light_direction[2] = lights[j].point[2] - vertex.z;
 								} else {
 									light_direction = [0, 0, 0];
 								}
 
 
 								if (draw_options.light_ambient) {
-									let Ia = [draw_options.surface_ka[0] * draw_options.light_sources[j].color[0],
-														draw_options.surface_ka[1] * draw_options.light_sources[j].color[1],
-														draw_options.surface_ka[2] * draw_options.light_sources[j].color[2]];
+									let Ia = [draw_options.surface_ka[0] * lights[j].color[0],
+														draw_options.surface_ka[1] * lights[j].color[1],
+														draw_options.surface_ka[2] * lights[j].color[2]];
 
 									I[0] += Ia[0];
 									I[1] += Ia[1];
@@ -432,9 +432,9 @@ var Obj = function() {
 								if (draw_options.light_difuse) {
 									let S = Math.min(dotProduct(normalizeVector(normal), normalizeVector(light_direction)), 1.0);
 
-									let Id = [draw_options.surface_kd[0] * draw_options.light_sources[j].color[0] * S,
-														draw_options.surface_kd[1] * draw_options.light_sources[j].color[1] * S,
-														draw_options.surface_kd[2] * draw_options.light_sources[j].color[2] * S];
+									let Id = [draw_options.surface_kd[0] * lights[j].color[0] * S,
+														draw_options.surface_kd[1] * lights[j].color[1] * S,
+														draw_options.surface_kd[2] * lights[j].color[2] * S];
 
 									I[0] += Id[0];
 									I[1] += Id[1];
@@ -461,9 +461,9 @@ var Obj = function() {
 										S = Math.min(Math.pow(Math.cos(a), draw_options.surface_ns), 1.0);
 									}
 
-									let Is = [draw_options.surface_ks[0] * draw_options.light_sources[j].color[0] * S,
-														draw_options.surface_ks[1] * draw_options.light_sources[j].color[1] * S,
-														draw_options.surface_ks[2] * draw_options.light_sources[j].color[2] * S];
+									let Is = [draw_options.surface_ks[0] * lights[j].color[0] * S,
+														draw_options.surface_ks[1] * lights[j].color[1] * S,
+														draw_options.surface_ks[2] * lights[j].color[2] * S];
 
 									I[0] += Is[0];
 									I[1] += Is[1];

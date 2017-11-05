@@ -149,7 +149,7 @@ body {
 }
 #list ul {
   padding: 0;
-  height: 770px;
+  height: 370px;
   width: 300px;
   outline: 1px solid black;
   margin: auto;
@@ -173,13 +173,20 @@ body {
   margin-top: 6px;
   margin-right: 10px;
 }
-#list ul li div label {
+#list ul.objects li div label {
   width: 90%;
   margin-left: 5%;
 }
-#list ul li div input {
+#list ul.objects li div input {
   width: 90%;
   margin-left: 5%;
+}
+#list ul.lights li button.toggleLightType {
+  float: none;
+  width: 90%;
+}
+#list ul.lights li form button {
+  float: none;
 }
 
 #navbar {
