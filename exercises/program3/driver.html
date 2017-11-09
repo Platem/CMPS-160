@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>[Driver] Kevin Romero - Lab 3</title>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body onload="main()">
+	<div class="wrapper">
+		<div id="navbar">
+			<span>Lab 3 - Driver</span>
+
+			<a class="menu-item" href="features.html">Features</a>
+
+			<a href="#" class="trigger" id="objects-trigger" onclick="$('#list').toggle();">Lists</a>
+			<a href="#" class="trigger" id="options-trigger" onclick="$('#options').toggle();">Options</a>
+		</div>
+
+		<div id="content" class="options-visible">
+			<canvas id="webgl" height="800" width="800">
+				Please use a browser that supports "canvas".
+			</canvas>
+		</div>
+
+		<div id="options">
+			<h3>Options</h3>
+			<div class="opt">
+				<h4>File</h4>
+				<div id="file">
+					<button id="fSave">Save file</button>
+					<button id="fLoad" disabled>Extract data</button>
+					<input type="file" id="fOpen">
+				</div>
+
+				<h4>Rotation</h4>
+				<div id="rotation">
+					<div>
+						<button id="bRotateU">Rotate Up</button>
+					</div>
+					<div>
+						<button id="bRotateL">Rotate Left</button>
+						<button id="bRotateR">Rotate Right</button>
+					</div>
+					<div>
+						<button id="bRotateD">Rotate Down</button>
+					</div>
+					<div>
+						<button id="bRotateC">Center</button>
+					</div>
+				</div>
+
+				<h4>Toggles and adjustments</h4>
+				<div id="toggles">
+					<h6>Perspective projection</h6>
+					<div>
+						<button id="bPerspective">Toggle Perspective</button>
+						<div id="circle-pers" class="circle"></div>
+					</div>
+					<form>
+						<input type="range" min="1" max="179" value="100" id="p-fovy">
+						<label for="p-fovy">fovy: <span id="p-fovy-val">100</span></label>
+					</form>
+					<form>
+						<input type="range" min="0.0" max="2.0" value="1.0" step="0.1" id="p-aspect">
+						<label for="p-aspect">aspect: <span id="p-aspect-val">1.0</span></label>
+					</form>
+
+					<form>
+						<input type="range" min="2" max="1000" value="1000" id="p-far">
+						<label for="p-far">far: <span id="p-far-val">1000</span></label>
+					</form>
+					<form>
+						<input type="range" min="1" max="999" value="1" id="p-near">
+						<label for="p-near">near: <span id="p-near-val">1</span></label>
+					</form>
+
+					<h6>Drawing</h6>
+					<div>
+						<button id="bNormals">Toggle Normals</button>
+						<div id="circle-n" class="circle"></div>
+					</div>
+					<div>
+						<button id="bSkeleton">Toggle Skeleton</button>
+						<div id="circle-sk" class="circle"></div>
+					</div>
+					<div>
+						<button id="bPoints">Toggle Points</button>
+						<div id="circle-p" class="circle"></div>
+					</div>
+					<div>
+						<button id="bSurface">Toggle Surface</button>
+						<div id="circle-s" class="circle active"></div>
+					</div>
+
+					<h6>Lightning</h6>
+					<div>
+						<button id="bAmbient">Toggle Ambient Lightning</button>
+						<div id="circle-am" class="circle active"></div>
+					</div>
+					<div>
+						<button id="bDiffuse">Toggle Diffuse Lightning</button>
+						<div id="circle-di" class="circle active"></div>
+					</div>
+					<div>
+						<button id="bSpecular">Toggle Specular Lightning</button>
+						<div id="circle-sp" class="circle"></div>
+					</div>
+					<div>
+						<button id="bSmooth">Toggle Smooth Shading</button>
+						<div id="circle-sm" class="circle"></div>
+					</div>
+
+					<h6>Coloring</h6>
+					<form class="color">
+						<input type="color" name="color_picker" id="ambientColor" value="#000033">
+						<label for="ambientColor">Ambient color</label>
+					</form>
+					<form class="color">
+						<input type="color" name="color_picker" id="diffuseColor" value="#ff0000">
+						<label for="diffuseColor">Diffuse color</label>
+					</form>
+					<form class="color">
+						<input type="color" name="color_picker" id="specularColor" value="#00ff00">
+						<label for="specularColor">Specular color</label>
+					</form>
+					<form>
+						<input type="range" min="1" max="20" value="20" id="ns">
+						<label for="ns">Ns: <span id="ns-val">20</span></label>
+					</form>
+
+					<form class="color">
+						<input type="color" name="color_picker" id="normalsColor" value="#ffc8c8">
+						<label for="normalsColor">Normals color</label>
+					</form>
+					<form class="color">
+						<input type="color" name="color_picker" id="skeletonColor" value="#0000ff">
+						<label for="skeletonColor">Skeleton color</label>
+					</form>
+					<form class="color">
+						<input type="color" name="color_picker" id="pointsColor" value="#0000ff">
+						<label for="pointsColor">Points color</label>
+					</form>
+				</div>
+
+				<h4>Misc</h4>
+				<div id="misc">
+					<button id="bClear">Clear</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="list">
+			<h3>Objects</h3>
+			<ul class="objects"></ul>
+			<h3>Light Sources <span><button id="bAddLight">Add</button></span></h3>
+			<ul class="lights"></ul>
+		</div>
+
+	</div>
+
+	<script src="./lib/jquery-3.2.1.min.js"></script>
+	<script src="../lib/webgl-utils.js"></script>
+	<script src="../lib/webgl-debug.js"></script>
+	<script src="../lib/cuon-utils.js"></script>
+	<script src="../lib/cuon-matrix.js"></script>
+	<script src="./lib/mod_ioSOR.js"></script>
+	<script src="./js/options.js"></script>
+	<script src="./js/setup.js"></script>
+	<script src="./js/utils.js"></script>
+	<script src="./js/objects.js"></script>
+	<script src="./js/main.js"></script>
+</body>
+</html>
