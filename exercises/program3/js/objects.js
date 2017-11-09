@@ -215,7 +215,6 @@ var Obj = function() {
 		this.setPolygons();
 
 		this.generateRaw();
-		console.log(this);
 	};
 
 	this.generateRaw = function() {
@@ -268,20 +267,11 @@ var Obj = function() {
 		}
 
 		this.verticesNormal();
-
-		// for (let i = 0; i < this.polygons.length; i++) {
-		// 	for (let j = 0; j < this.polygons[i].elements.length; j++) {
-		// 		let index = searchVertexIndex(this.polygons[i].elements[j]);
-
-		// 		this.vertices[index].n[0] += this.polygons[i].n[0];
-		// 		this.vertices[index].n[1] += this.polygons[i].n[1];
-		// 		this.vertices[index].n[2] += this.polygons[i].n[2];
-		// 	}
-		// }
 	};
 
 	this.doScale = function(s) {
 		this.scale += s;
+		this.scale = Math.max(this.scale, 0);
 		this.update();
 	};
 

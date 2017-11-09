@@ -8,6 +8,7 @@ mouse_point = {
 	z: 0.0
 },
 moving = false,
+active_button = -1,
 move_start = {
 	x: 0.0,
 	y: 0.0,
@@ -175,6 +176,8 @@ function main() {
 
 		move_start.x = ((event.clientX - rect.left) - canvas.width / 2) / (canvas.width / 2) * s;
 		move_start.y = (canvas.height / 2 - (event.clientY - rect.top)) / (canvas.height / 2) * s;
+
+		active_button = event.button;
 	};
 
 	// Mouse release event
@@ -182,6 +185,7 @@ function main() {
 		event.preventDefault();
 		
 		moving = false;
+		active_button = -1;
 
 		if (picked_object > -1 && moving) {
 		} else {
@@ -471,7 +475,7 @@ function main() {
 function transform(picked_object, event, moved) {
 	if (event) {
 		// Translating or rotating
-		switch (event.button) {
+		switch (active_button) {
 			// Left button
 			case 0:
 				// console.log("Translate (X,Y) object " + picked_object + " with values (" + moved.x + ", " + moved.y + ").");
@@ -486,17 +490,18 @@ function transform(picked_object, event, moved) {
 
 			// Right button
 			case 2:
-				console.log("Rotate object " + picked_object + " with values (" + moved.x + ", " + moved.y + ").");
+				let hor = (moved.x / moved.y) > 10;
+				let vert = (moved.y / moved.x) > 10;
+
+				if (hor) {
+					objects[picked_object].doRotate({x: moved.x, y: 0.0, z: 0.0});
+				} else if (vert) {
+					objects[picked_object].doRotate({x: 0.0, y: 0.0, z: moved.y});
+				}
 			break;
 		}
 	} else {
-		// Scaling
-		if (moved == -1) {
-			console.log("Scale down object " + picked_object + ".");
-		} else {
-			console.log("Scale up object " + picked_object + ".");
-		}
-		
+		objects[picked_object].doScale(moved * (0.05));
 	}
 	draw();
 }
