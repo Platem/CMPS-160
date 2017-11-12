@@ -172,7 +172,10 @@ function main() {
 		event.preventDefault();
 		let rect = event.target.getBoundingClientRect();
 		let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
-		moving = true;
+
+		if (picked_object > -1) {
+			moving = true;
+		}
 
 		move_start.x = ((event.clientX - rect.left) - canvas.width / 2) / (canvas.width / 2) * s;
 		move_start.y = (canvas.height / 2 - (event.clientY - rect.top)) / (canvas.height / 2) * s;
@@ -183,14 +186,11 @@ function main() {
 	// Mouse release event
 	canvas.onmouseup = function(event) {
 		event.preventDefault();
-		
+
+		click(event);
+
 		moving = false;
 		active_button = -1;
-
-		if (picked_object > -1 && moving) {
-		} else {
-			click(event);
-		}
 	};
 
 	// Mouse move event
@@ -490,8 +490,8 @@ function transform(picked_object, event, moved) {
 
 			// Right button
 			case 2:
-				let hor = (moved.x / moved.y) > 10;
-				let vert = (moved.y / moved.x) > 10;
+				let hor = Math.abs((moved.x / moved.y)) > 10;
+				let vert = Math.abs((moved.y / moved.x)) > 10;
 
 				if (hor) {
 					objects[picked_object].doRotate({x: moved.x, y: 0.0, z: 0.0});
@@ -527,6 +527,7 @@ function click(event) {
 	let x2 = x_mouse - rect.left,
 	y2 = rect.bottom - y_mouse;
 
+	// Draw unique colors
 	draw(true);
 
 	// Which button was pressed?
@@ -547,8 +548,8 @@ function click(event) {
 					coords.e = newNode(coords, false);
 				}
 			}
-
 			break;
+
 		case 2:
 			let isObject = checkForObject(x2, y2);
 			if (active_object == -1 && isObject.is) {
@@ -566,11 +567,12 @@ function click(event) {
 				if (picked_object > -1) {
 					objects[picked_object].picked = false;
 					picked_object = -1;
+				} else {
+					coords.e = newNode(coords, true);
 				}
-
-				coords.e = newNode(coords, true);
 			}
 			break;
+
 		default:
 			break;
 	}
@@ -822,6 +824,7 @@ function readSOR() {
 			// Add object
 			object.ended = true;
 			object.verticesNormal();
+			object.generateRaw();
 			objects.push(object);
 			updateList();
 		}
