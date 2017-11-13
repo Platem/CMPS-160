@@ -11,13 +11,6 @@ $(function() {
 		}, 500);
 	});
 
-	$('.nav-icon').each(function() {
-		let t = $(this).attr('data-toggle');
-		$(this).toggleClass('opened');
-		$('#' + t).toggleClass('collapsed');
-	});
-
-
 	$(window).on('resize', function(e) {
 		clearTimeout(resizeTimer);
 		resizeTimer = setTimeout(function() {
@@ -25,9 +18,7 @@ $(function() {
 		}, 250);
 	});
 
-	setTimeout(function() {
-		updateCanvas(true);
-	}, 500);
+	updateCanvas(true);
 });
 
 function updateCanvas(animate) {

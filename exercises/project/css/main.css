@@ -109,27 +109,35 @@
 
 #left-panel {
   position: relative;
+  border-right: 3px solid #2E3840;
 }
 #left-panel div.button {
   height: 40px;
   width: 40px;
   position: absolute;
   right: -40px;
-  top: 7px;
+  top: 10px;
   border-radius: 0px 3px 3px 0px;
+  border-right: 3px solid #2E3840;
+  border-top: 3px solid #2E3840;
+  border-bottom: 3px solid #2E3840;
   background: #589FBF;
 }
 
 #right-panel {
   position: relative;
+  border-left: 3px solid #2E3840;
 }
 #right-panel div.button {
   height: 40px;
   width: 40px;
   position: absolute;
   left: -40px;
-  top: 7px;
+  top: 10px;
   border-radius: 3px 0px 0px 3px;
+  border-left: 3px solid #2E3840;
+  border-top: 3px solid #2E3840;
+  border-bottom: 3px solid #2E3840;
   background: #589FBF;
 }
 
@@ -139,14 +147,14 @@
   content: '';
   display: block;
   height: 5px;
-  margin: 6px 4px;
-  transition: all .5s ease-in-out;
+  margin: 5px 4px;
+  transition: all .05s ease-in-out;
 }
 .nav-icon.opened:before {
-  transform: translateY(11px) rotate(135deg);
+  transform: translateY(10px) rotate(135deg);
 }
 .nav-icon.opened:after {
-  transform: translateY(-11px) rotate(-135deg);
+  transform: translateY(-10px) rotate(-135deg);
 }
 .nav-icon.opened div {
   transform: scale(0);
