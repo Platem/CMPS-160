@@ -19,17 +19,28 @@ $(function() {
 	});
 
 	updateCanvas(true);
+
+	/* Setup */
+	if (!setup()) {
+		console.log('There was an error in the setup. Exiting now.');
+		return;
+	}
 });
 
 function updateCanvas(animate) {
 	let webgl = $('#webgl');
-	let canvas = $('#canvas');
+	let content = $('#content');
+	let opened = 0;
+	if (!$('#left-panel').hasClass('collapsed')) opened++;
+	if (!$('#right-panel').hasClass('collapsed')) opened++;
 
 	let w = webgl.width();
 	let h = webgl.height();
 
-	let W = canvas.width() - 20;
-	let H = canvas.height() - 20;
+	let W = (content.width() / (3 + opened)) * 3 - 20;
+	let H = content.height() - 20;
+
+	console.log(W, H, opened);
 
 	if (W > H) {
 		if (animate) {
