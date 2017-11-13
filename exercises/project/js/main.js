@@ -5,14 +5,15 @@ $(function() {
 		$(this).toggleClass('opened');
 		$('#' + t).toggleClass('collapsed');
 
-		if (t == 'left-panel') {
-			$('#page').toggleClass('left-opened');
-		} else if (t == 'right-panel') {
-			$('#page').toggleClass('right-opened');
-		}
-
 		updateCanvas();
 	});
+
+	$('.nav-icon').each(function() {
+		let t = $(this).attr('data-toggle');
+		$(this).toggleClass('opened');
+		$('#' + t).toggleClass('collapsed');
+	});
+
 	$(window).on('resize', function () {
 		updateCanvas();
 	});

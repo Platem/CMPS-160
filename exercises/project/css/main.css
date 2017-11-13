@@ -73,7 +73,10 @@
   height: 100px;
   width: 100px;
   margin: auto;
-  outline: 1px solid black;
+  border: 3px solid #2E3840;
+  border-radius: 6px;
+  background: white;
+  transition: all 0.5s;
 }
 
 .panel {
@@ -113,7 +116,7 @@
   width: 40px;
   position: absolute;
   right: -40px;
-  top: 10px;
+  top: 7px;
   border-radius: 0px 3px 3px 0px;
   background: #589FBF;
 }
@@ -126,7 +129,7 @@
   width: 40px;
   position: absolute;
   left: -40px;
-  top: 10px;
+  top: 7px;
   border-radius: 3px 0px 0px 3px;
   background: #589FBF;
 }
