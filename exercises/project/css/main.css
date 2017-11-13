@@ -1,0 +1,151 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#page {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: #CEEBF2;
+}
+
+#navbar {
+  height: 50px;
+  width: 100%;
+  background: #2E3840;
+  display: flex;
+  align-items: stretch;
+}
+#navbar .nav {
+  border-radius: 3px;
+  line-height: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+#navbar #left-nav {
+  flex: 1;
+}
+#navbar #center-nav {
+  flex: 4;
+  text-align: center;
+}
+#navbar #right-nav {
+  flex: 1;
+}
+#navbar .toggler {
+  background: #589FBF;
+  border: none;
+  border-radius: 3px;
+  height: 100%;
+  width: 50%;
+  margin-left: 25%;
+}
+#navbar .toggler:hover {
+  background: #4694b7;
+}
+#navbar .brand {
+  width: 100%;
+  height: 100%;
+  color: #82C5D9;
+}
+
+#content {
+  height: calc(100vh - 50px);
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+#canvas {
+  flex: 3;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+#canvas #webgl {
+  height: 100px;
+  width: 100px;
+  margin: auto;
+  outline: 1px solid black;
+}
+
+.panel {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  background: #589FBF;
+  color: white;
+  transition: all 0.5s;
+}
+.panel .list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  padding: 10px;
+  transition: all 1s;
+}
+.panel .list .list-item {
+  min-height: 100px;
+  margin-bottom: 10px;
+  border-radius: 3px;
+  background: #4481A6;
+}
+.panel.collapsed {
+  flex: 0;
+}
+.panel.collapsed .list {
+  padding: 0;
+}
+
+#left-panel {
+  position: relative;
+}
+#left-panel div.button {
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  right: -40px;
+  top: 10px;
+  border-radius: 0px 3px 3px 0px;
+  background: #589FBF;
+}
+
+#right-panel {
+  position: relative;
+}
+#right-panel div.button {
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  left: -40px;
+  top: 10px;
+  border-radius: 3px 0px 0px 3px;
+  background: #589FBF;
+}
+
+.nav-icon:after, .nav-icon:before, .nav-icon div {
+  background-color: white;
+  border-radius: 3px;
+  content: '';
+  display: block;
+  height: 5px;
+  margin: 6px 4px;
+  transition: all .5s ease-in-out;
+}
+.nav-icon.opened:before {
+  transform: translateY(11px) rotate(135deg);
+}
+.nav-icon.opened:after {
+  transform: translateY(-11px) rotate(-135deg);
+}
+.nav-icon.opened div {
+  transform: scale(0);
+}
