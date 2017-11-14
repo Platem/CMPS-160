@@ -10,10 +10,16 @@
 	margin: 0;
 	padding: 0;
 }
+
 *, *:before, *:after {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
 }
 
 #page {
@@ -21,6 +27,7 @@
 	flex-wrap: wrap;
 	background: #CEEBF2;
 	font-family: Pompiere;
+	overflow: hidden;
 }
 
 #navbar {
@@ -118,10 +125,11 @@
 	}
 
 	.panel-content {
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
-		overflow: hidden;
+		overflow: auto;
 
 		.header {
 			height: 40px;
@@ -140,8 +148,6 @@
 		}
 
 		.list {
-			display: flex;
-			flex-direction: column;
 			list-style-type: none;
 			padding: 10px;
 

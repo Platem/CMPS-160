@@ -18,17 +18,11 @@ $(function() {
 		let $toggled = $('#' + $(this).attr('data-toggle'));
 		let side = $toggled.hasClass('left-list') ? 'left' : 'right';
 
-		$('.' + side + '-list').each(function() {
-			if ($(this).css('display') != 'none' && $(this).attr('id') != $toggled.attr('id')) {
-				$(this).slideToggle(200);
-			}
-		});
-
-		$toggled.slideToggle(200);
+		$toggled.slideToggle(500);
 	});
 
 	$('.list').each(function(){
-		$(this).toggle();
+		$(this).slideToggle(500);
 	});
 
 	/* Setup */
