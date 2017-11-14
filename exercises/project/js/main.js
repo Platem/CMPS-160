@@ -4,9 +4,8 @@ $(function() {
 		let t = $(this).attr('data-toggle');
 		$(this).toggleClass('opened');
 		$('#' + t).toggleClass('collapsed');
-		setTimeout(function() {
-			updateCanvas(true);
-		}, 0);
+		
+		updateCanvas(true);
 	});
 
 	let resizetimer;
@@ -22,11 +21,20 @@ $(function() {
 		let $toggled = $('#' + $(this).attr('data-toggle'));
 		let side = $toggled.hasClass('left-list') ? 'left' : 'right';
 
-		$toggled.slideToggle(500);
+		$toggled.slideToggle();
+	});
+
+
+	$('.panel').each(function() {
+		$(this).toggleClass('collapsed');
+	});
+
+	$('.nav-icon').each(function() {
+		$(this).toggleClass('opened');
 	});
 
 	$('.list').each(function(){
-		$(this).slideToggle(500);
+		$(this).slideToggle();
 	});
 
 	/* Setup */
