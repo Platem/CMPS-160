@@ -34,7 +34,7 @@ $(function() {
 	});
 
 	$('.list').each(function(){
-		$(this).slideToggle();
+		$(this).toggle();
 	});
 
 	/* Setup */
