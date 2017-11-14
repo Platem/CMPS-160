@@ -1,5 +1,3 @@
-let resizeTimer;
-
 $(function() {
 	/* Toggle Panels */
 	$('.nav-icon').on('click', function(e) {
@@ -8,23 +6,37 @@ $(function() {
 		$('#' + t).toggleClass('collapsed');
 		setTimeout(function() {
 			updateCanvas(true);
-		}, 500);
+		}, 0);
 	});
 
 	$(window).on('resize', function(e) {
-		clearTimeout(resizeTimer);
-		resizeTimer = setTimeout(function() {
-			updateCanvas(true);
-		}, 250);
+		updateCanvas(true);
 	});
 
-	updateCanvas(true);
+	/* Toggle lists on panels */
+	$('.header').on('click', function() {
+		let $toggled = $('#' + $(this).attr('data-toggle'));
+		let side = $toggled.hasClass('left-list') ? 'left' : 'right';
+
+		$('.' + side + '-list').each(function() {
+			if ($(this).css('display') != 'none' && $(this).attr('id') != $toggled.attr('id')) {
+				$(this).slideToggle(200);
+			}
+		});
+
+		$toggled.slideToggle(200);
+	});
+
+	$('.list').each(function(){
+		$(this).toggle();
+	});
 
 	/* Setup */
 	if (!setup()) {
 		console.log('There was an error in the setup. Exiting now.');
 		return;
 	}
+	updateCanvas(true);
 });
 
 function updateCanvas(animate) {
@@ -39,8 +51,6 @@ function updateCanvas(animate) {
 
 	let W = (content.width() / (3 + opened)) * 3 - 20;
 	let H = content.height() - 20;
-
-	console.log(W, H, opened);
 
 	if (W > H) {
 		if (animate) {
