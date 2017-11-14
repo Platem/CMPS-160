@@ -9,8 +9,12 @@ $(function() {
 		}, 0);
 	});
 
+	let resizetimer;
 	$(window).on('resize', function(e) {
-		updateCanvas(true);
+		clearInterval(resizetimer);
+		resizetimer = setTimeout(function() {
+			updateCanvas(true);
+		}, 50);
 	});
 
 	/* Toggle lists on panels */
