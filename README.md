@@ -7,3 +7,4 @@
 * [Program 2](/exercises/program2/features.html)
 * [Program 3](/exercises/program3/features.html)
 * [Program 4](/exercises/program4/features.html)
+* [Final Project](/exercises/project/driver.html)
