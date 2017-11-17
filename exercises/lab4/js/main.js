@@ -2,7 +2,7 @@ var lights = [],
 	objects = [],
 	active_object = -1,
 	picked_object = -1,
-	zooming = false,
+	outing = false,
 	mouse = {
 		active: false,
 		button: -1,
@@ -239,7 +239,7 @@ function main() {
 			let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
 
 			let x2 = event.clientX - rect.left,
-					y2 = rect.bottom - event.clientY;
+				y2 = rect.bottom - event.clientY;
 
 			draw(true);
 			let isLight = checkForLight(x2, y2);
@@ -271,12 +271,21 @@ function main() {
 	canvas.onwheel = function(event) {
 		event.preventDefault();
 		if (picked_object > -1) {
+			// Scale object
 			transform(event);
-		} else if (zooming) {
+		} else if (outing) {
+			// Move camera
 
 		} else {
-
+			// Zoom
+			let val = draw_options.perspective.fovy + event.deltaY / 5;
+			if (val < 1) val = 1;
+			if (val > 179) val = 179;
+			draw_options.perspective.fovy = Math.floor(val);
+			document.getElementById('p-fovy-val').innerHTML = draw_options.perspective.fovy;
+			document.getElementById('p-fovy').value = draw_options.perspective.fovy;
 		}
+		draw();
 	};
 
 	// Disable context menu
@@ -529,7 +538,6 @@ function transform(event) {
 		switch (mouse.button) {
 			// Left button
 			case 0:
-				// console.log("Translate (X,Y) object " + picked_object + " with values (" + moved.x + ", " + moved.y + ").");
 				objects[picked_object].doTranslate({
 					x: moved.x,
 					y: moved.y,
@@ -539,7 +547,6 @@ function transform(event) {
 
 				// Middle button
 			case 1:
-				// console.log("Translate (Z) object " + picked_object + " with values (" + moved.x + ", " + moved.y + ").");
 				objects[picked_object].doTranslate({
 					x: 0.0,
 					y: 0.0,
@@ -578,14 +585,22 @@ function click(event) {
 	if (active_object != -1) {
 		switch (mouse.button) {
 			case 0:
-				newNode({x: mouse.up.x, y: mouse.up.y, z: 0.0}, false);
+				newNode({
+					x: mouse.up.x,
+					y: mouse.up.y,
+					z: 0.0
+				}, false);
 				break;
 
 			case 1:
 				break;
 
 			case 2:
-				newNode({x: mouse.up.x, y: mouse.up.y, z: 0.0}, true);
+				newNode({
+					x: mouse.up.x,
+					y: mouse.up.y,
+					z: 0.0
+				}, true);
 				break;
 
 			default:
@@ -595,45 +610,55 @@ function click(event) {
 		if (mouse.active) {
 
 		} else {
-			switch(mouse.button) {
-			case 0:
-				if (mouse.up.light > -1) {
-					// Toggle light
-				} else if (mouse.up.object > -1) {
-					// Pick object
-					if (picked_object > -1) {
-						objects[picked_object].picked = false;
-						picked_object = -1;
+			switch (mouse.button) {
+				case 0:
+					if (mouse.up.light > -1) {
+						// Toggle light
+					} else if (mouse.up.object > -1) {
+						// Pick object
+						if (picked_object > -1) {
+							objects[picked_object].picked = false;
+							picked_object = -1;
+						}
+						objects[mouse.up.object].picked = true;
+						picked_object = mouse.up.object;
+					} else {
+						// Unpick object or start new
+						if (picked_object > -1) {
+							objects[picked_object].picked = false;
+							picked_object = -1;
+						} else {
+							newNode({
+								x: mouse.up.x,
+								y: mouse.up.y,
+								z: 0.0
+							}, true);
+						}
 					}
-					objects[mouse.up.object].picked = true;
-					picked_object = mouse.up.object;
-				} else {
+					break;
+
+				case 1:
+					// Toggle in/out mode
+					outing ? outing = false : outing = true;
+					alert('outing is ' + outing);
+					break;
+
+				case 2:
 					// Unpick object or start new
 					if (picked_object > -1) {
 						objects[picked_object].picked = false;
 						picked_object = -1;
 					} else {
-						newNode({x: mouse.up.x, y: mouse.up.y, z: 0.0}, true);
+						newNode({
+							x: mouse.up.x,
+							y: mouse.up.y,
+							z: 0.0
+						}, true);
 					}
-				}
-				break;
+					break;
 
-			case 1:
-				// Toggle special mode
-				break;
-
-			case 2:
-				// Unpick object or start new
-				if (picked_object > -1) {
-					objects[picked_object].picked = false;
-					picked_object = -1;
-				} else {
-					newNode({x: mouse.up.x, y: mouse.up.y, z: 0.0}, true);
-				}
-				break;
-
-			default:
-				break;
+				default:
+					break;
 			}
 		}
 	}
@@ -673,7 +698,7 @@ function newNode(coords, ends) {
 	if (!first) {
 		let pA = objects[active_object].line.nodes[objects[active_object].line.nodes.length - 1].point;
 
-		if (Math.abs(pA.x - coords.x) < 1 || Math.abs(pA.y - coords.y) < 1 /*|| Math.abs(pA.z - coords.z) < 1*/) return;
+		if (Math.abs(pA.x - coords.x) < 1 || Math.abs(pA.y - coords.y) < 1 /*|| Math.abs(pA.z - coords.z) < 1*/ ) return;
 	}
 	// Push to object
 	objects[active_object].line.nodes.push(new Node(coords));
@@ -818,7 +843,11 @@ function draw(withID) {
 			if (objects[i].visible)
 				objects[i].drawObject(withID);
 		} else {
-			objects[i].drawLine({x: mouse.step.x, y:mouse.step.y, z: 0.0});
+			objects[i].drawLine({
+				x: mouse.step.x,
+				y: mouse.step.y,
+				z: 0.0
+			});
 		}
 	}
 }
