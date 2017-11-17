@@ -275,7 +275,8 @@ function main() {
 			transform(event);
 		} else if (outing) {
 			// Move camera
-
+			let val = draw_options.viewer.position[2] + event.deltaY / 5;
+			draw_options.viewer.position[2] = val;
 		} else {
 			// Zoom
 			let val = draw_options.perspective.fovy + event.deltaY / 5;
