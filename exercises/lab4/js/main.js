@@ -2,7 +2,7 @@ var lights = [],
 	objects = [],
 	active_object = -1,
 	picked_object = -1,
-	outing = true,
+	outing = false,
 	mouse = {
 		active: false,
 		button: -1,
@@ -132,6 +132,16 @@ function main() {
 
 	document.addEventListener("keydown", function(e) {
 		switch (e.keyCode) {
+			case 79: // Toggle inout
+				e.preventDefault();
+				e.stopPropagation();
+				outing ? outing = false : outing = true;
+				if (outing) {
+					$('#webgl').css('cursor', 'crosshair');
+				} else {
+					$('#webgl').css('cursor', 'auto');
+				}
+				break;
 			case 37:
 				e.preventDefault();
 				rotateView('left');
@@ -222,6 +232,7 @@ function main() {
 
 			if (diff_x > 10 || diff_y > 0) {
 				mouse.active = true;
+				$('#webgl').css('cursor', 'move');
 			}
 		}
 
@@ -253,6 +264,7 @@ function main() {
 
 			click(event);
 
+			$('#webgl').css('cursor', 'auto');
 			mouse.active = false;
 			mouse.button = -1;
 			mouse.down.x = null;
@@ -624,11 +636,13 @@ function click(event) {
 						}
 						objects[mouse.up.object].picked = true;
 						picked_object = mouse.up.object;
+						$('#webgl').css('cursor', 'grab');
 					} else {
 						// Unpick object or start new
 						if (picked_object > -1) {
 							objects[picked_object].picked = false;
 							picked_object = -1;
+							$('#webgl').css('cursor', 'auto');
 						} else {
 							newNode({
 								x: mouse.up.x,
@@ -642,7 +656,11 @@ function click(event) {
 				case 1:
 					// Toggle in/out mode
 					outing ? outing = false : outing = true;
-					alert('outing is ' + outing);
+					if (outing) {
+						$('#webgl').css('cursor', 'crosshair');
+					} else {
+						$('#webgl').css('cursor', 'auto');
+					}
 					break;
 
 				case 2:
