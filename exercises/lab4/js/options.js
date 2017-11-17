@@ -24,6 +24,15 @@ var draw_options = {
 		up: [0.0, 500.0, 0.0]
 	},
 
+	orthographic: {
+		left: -500,
+		right: 500,
+		bottom: -500,
+		top: 500,
+		near: -500,
+		far: 500
+	},
+
 	perspective: {
 		enabled: false,
 		fovy: 100,

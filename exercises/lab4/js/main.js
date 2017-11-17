@@ -2,7 +2,7 @@ var lights = [],
 	objects = [],
 	active_object = -1,
 	picked_object = -1,
-	outing = false,
+	outing = true,
 	mouse = {
 		active: false,
 		button: -1,
@@ -275,8 +275,9 @@ function main() {
 			transform(event);
 		} else if (outing) {
 			// Move camera
-			let val = draw_options.viewer.position[2] + event.deltaY / 5;
-			draw_options.viewer.position[2] = val;
+			draw_options.viewer.position[2] += event.deltaY / 10;
+			draw_options.orthographic.near += event.deltaY / 10;
+			draw_options.orthographic.far += event.deltaY / 10;
 		} else {
 			// Zoom
 			let val = draw_options.perspective.fovy + event.deltaY / 5;
@@ -794,7 +795,7 @@ function moveView(side) {
 
 // Draw
 function draw(withID) {
-	// Get rotation matrix and ortho
+	// Get rotation/translation matrix and ortho/persp
 	let mat = new Matrix4(),
 		matPersp = new Matrix4(),
 		matOrtho = new Matrix4(),
@@ -809,7 +810,10 @@ function draw(withID) {
 			draw_options.viewer.center[0], draw_options.viewer.center[1], draw_options.viewer.center[2],
 			draw_options.viewer.up[0], draw_options.viewer.up[1], draw_options.viewer.up[2]);
 	} else {
-		matOrtho.setOrtho(draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1], draw_options.scale_range[0], draw_options.scale_range[1]);
+		console.log(draw_options.orthographic);
+		matOrtho.setOrtho(draw_options.orthographic.left, draw_options.orthographic.right, 
+											draw_options.orthographic.bottom, draw_options.orthographic.top, 
+											draw_options.orthographic.near, draw_options.orthographic.far);
 		matRotateX.setRotate(draw_options.draw_rotation.x, 1, 0, 0);
 		matRotateY.setRotate(draw_options.draw_rotation.y, 0, 1, 0);
 		matTranslate.setTranslate(draw_options.draw_translate.x, draw_options.draw_translate.y, draw_options.draw_translate.z);
