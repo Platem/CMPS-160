@@ -1,0 +1,22 @@
+#features {
+	margin: auto;
+	width: 600px;
+	text-align: left;
+
+	h1, h2 {
+		text-align: center;
+		width: 100%;
+	}
+
+	img {
+		width: 600px;
+
+		&.half {
+			width: 300px;
+
+			& + img.half {
+				float: left;
+			}
+		}
+	}
+}
