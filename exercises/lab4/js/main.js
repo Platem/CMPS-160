@@ -677,6 +677,12 @@ function move(event) {
 			} else {
 				if (mouse.down.light == -1 && mouse.down.object == -1) {
 					// Panning here
+					let deltax = mouse.step.x - mouse.last_step.x;
+					let deltay = mouse.step.y - mouse.last_step.y;
+					let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
+					draw_options.draw_translate.x += deltax / s;
+					draw_options.draw_translate.y += deltay / s;
+					draw();
 				}
 			}
 		}
@@ -810,7 +816,6 @@ function draw(withID) {
 			draw_options.viewer.center[0], draw_options.viewer.center[1], draw_options.viewer.center[2],
 			draw_options.viewer.up[0], draw_options.viewer.up[1], draw_options.viewer.up[2]);
 	} else {
-		console.log(draw_options.orthographic);
 		matOrtho.setOrtho(draw_options.orthographic.left, draw_options.orthographic.right, 
 											draw_options.orthographic.bottom, draw_options.orthographic.top, 
 											draw_options.orthographic.near, draw_options.orthographic.far);
