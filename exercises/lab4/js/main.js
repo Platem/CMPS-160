@@ -2,6 +2,7 @@ var lights = [],
 	objects = [],
 	active_object = -1,
 	picked_object = -1,
+	slideInterval = null,
 	outing = false,
 	mouse = {
 		active: false,
@@ -134,12 +135,17 @@ function main() {
 		switch (e.keyCode) {
 			case 79: // Toggle inout
 				e.preventDefault();
-				e.stopPropagation();
 				outing ? outing = false : outing = true;
 				if (outing) {
 					$('#webgl').css('cursor', 'crosshair');
 				} else {
 					$('#webgl').css('cursor', 'auto');
+				}
+				break;
+			case 27:
+				e.preventDefault();
+				if (slideInterval) {
+					stopSlideShow();
 				}
 				break;
 			case 37:
@@ -300,6 +306,27 @@ function main() {
 			document.getElementById('p-fovy').value = draw_options.perspective.fovy;
 		}
 		draw();
+	};
+
+	canvas.ondblclick = function(event){
+		if (picked_object > -1) {
+			objects[picked_object].picked = false;
+			picked_object = -1;
+		};
+		let rect = event.target.getBoundingClientRect();
+		let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
+
+		let x2 = event.clientX - rect.left,
+			y2 = rect.bottom - event.clientY;
+
+		draw(true);
+		let isObject = checkForObject(x2, y2);
+		draw();
+
+		if (isObject.is) {
+			let center = objects[isObject.index].center;
+			startSlideShow(center, true);
+		}
 	};
 
 	// Disable context menu
@@ -666,8 +693,10 @@ function click(event) {
 				case 2:
 					// Unpick object or start new
 					if (picked_object > -1) {
-						objects[picked_object].picked = false;
-						picked_object = -1;
+						// objects[picked_object].picked = false;
+						// picked_object = -1;
+						let center = objects[picked_object].center;
+						startSlideShow(center, false);
 					} else {
 						newNode({
 							x: mouse.up.x,
@@ -878,6 +907,68 @@ function draw(withID) {
 			});
 		}
 	}
+}
+
+function startSlideShow(center, shouldLookAround) {
+	// Save viewer
+	draw_options.save_viewer = {
+		position: [draw_options.viewer.position[0],
+							 draw_options.viewer.position[1],
+							 draw_options.viewer.position[2]],
+		center: 	[draw_options.viewer.center[0],
+							 draw_options.viewer.center[1],
+							 draw_options.viewer.center[2]]
+	};
+	let offset = [0.0, 0.0, 0.0];
+
+	if (shouldLookAround) {
+		// Looking around
+		offset[0] = draw_options.viewer.position[0] - center.x;
+		offset[1] = draw_options.viewer.position[1] - center.y;
+		offset[2] = draw_options.viewer.position[2] - center.z;
+	} else {
+		// Examining
+		offset[0] = draw_options.viewer.center[0] - center.x;
+		offset[1] = draw_options.viewer.center[1] - center.y;
+		offset[2] = draw_options.viewer.center[2] - center.z;
+	}
+
+	// Translate viewer (lookfrom) and center (lookat) by offset
+	draw_options.viewer.position[0] -= offset[0];
+	draw_options.viewer.position[1] -= offset[1];
+	draw_options.viewer.position[2] -= offset[2];
+	draw_options.viewer.center[0] -= offset[0];
+	draw_options.viewer.center[1] -= offset[1];
+	draw_options.viewer.center[2] -= offset[2];
+
+	slideInterval = setInterval(function() {
+		console.log("interval");
+		if (shouldLookAround) {
+			let p = rotatePointAboutPoint(draw_options.viewer.center, draw_options.viewer.position, 0, 2);
+			draw_options.viewer.center[0] = p[0];
+			draw_options.viewer.center[1] = p[1];
+			draw_options.viewer.center[2] = p[2];
+		} else {
+			let p = rotatePointAboutPoint(draw_options.viewer.position, draw_options.viewer.center, 0, 2);
+			draw_options.viewer.position[0] = p[0];
+			draw_options.viewer.position[1] = p[1];
+			draw_options.viewer.position[2] = p[2];
+		}
+		draw();
+	}, 10);
+}
+
+function stopSlideShow() {
+	clearInterval(slideInterval);
+	slideInterval = null;
+	draw_options.viewer.position[0] = draw_options.save_viewer.position[0];
+	draw_options.viewer.position[1] = draw_options.save_viewer.position[1];
+	draw_options.viewer.position[2] = draw_options.save_viewer.position[2];
+	draw_options.viewer.center[0] = draw_options.save_viewer.center[0];
+	draw_options.viewer.center[1] = draw_options.save_viewer.center[1];
+	draw_options.viewer.center[2] = draw_options.save_viewer.center[2];
+	draw_options.save_viewer = null;
+	draw();
 }
 
 // Read objects from file
