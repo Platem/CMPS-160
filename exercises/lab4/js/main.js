@@ -314,6 +314,7 @@ function main() {
 			objects[picked_object].picked = false;
 			picked_object = -1;
 		};
+
 		let rect = event.target.getBoundingClientRect();
 		let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
 
@@ -657,6 +658,9 @@ function click(event) {
 				case 0:
 					if (mouse.up.light > -1) {
 						// Toggle light
+						lights[mouse.up.light].enabled = lights[mouse.up.light].enabled ? false : true;
+						updateLightList();
+						draw();
 					} else if (mouse.up.object > -1) {
 						// Pick object
 						if (picked_object > -1) {
@@ -949,17 +953,27 @@ function startSlideShow(center, shouldLookAround) {
 	draw_options.viewer.center[1] -= offset[1];
 	draw_options.viewer.center[2] -= offset[2];
 
+	draw_options.draw_translate.x -= center.x / ((Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2);
+	draw_options.draw_translate.y -= center.y / ((Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2);
+
+	if (picked_object > -1) {
+		objects[picked_object].picked = false;
+		picked_object = -1;
+	}
+
 	slideInterval = setInterval(function() {
 		if (shouldLookAround) {
 			let p = rotatePointAboutPoint(draw_options.viewer.center, draw_options.viewer.position, 0, 2);
 			draw_options.viewer.center[0] = p[0];
 			draw_options.viewer.center[1] = p[1];
 			draw_options.viewer.center[2] = p[2];
+			draw_options.draw_rotation.y += 2;
 		} else {
 			let p = rotatePointAboutPoint(draw_options.viewer.position, draw_options.viewer.center, 0, 2);
 			draw_options.viewer.position[0] = p[0];
 			draw_options.viewer.position[1] = p[1];
 			draw_options.viewer.position[2] = p[2];
+			draw_options.draw_rotation.y += 2;
 		}
 		draw();
 	}, 10);
@@ -974,6 +988,10 @@ function stopSlideShow() {
 	draw_options.viewer.center[0] = draw_options.save_viewer.center[0];
 	draw_options.viewer.center[1] = draw_options.save_viewer.center[1];
 	draw_options.viewer.center[2] = draw_options.save_viewer.center[2];
+	draw_options.draw_translate.x = 0.0;
+	draw_options.draw_translate.y = 0.0;
+	draw_options.draw_translate.z = 0.0;
+	draw_options.draw_rotation.y = 0;
 	draw_options.save_viewer = null;
 	draw();
 }
