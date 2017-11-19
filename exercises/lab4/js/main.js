@@ -203,9 +203,8 @@ function main() {
 		if (mouse.button == -1) {
 			let rect = event.target.getBoundingClientRect();
 			let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
-
-			let x2 = event.clientX - rect.left,
-				y2 = rect.bottom - event.clientY;
+			let x2 = event.clientX - rect.left + draw_options.draw_translate.x,
+					y2 = rect.bottom - event.clientY + draw_options.draw_translate.y;
 
 			draw(true);
 			let isLight = checkForLight(x2, y2);
@@ -230,7 +229,9 @@ function main() {
 		mouse.last_step.y = mouse.step.y;
 
 		mouse.step.x = ((event.clientX - rect.left) - canvas.width / 2) / (canvas.width / 2) * s;
+		mouse.step.x -= draw_options.draw_translate.x * s;
 		mouse.step.y = (canvas.height / 2 - (event.clientY - rect.top)) / (canvas.height / 2) * s;
+		mouse.step.y -= draw_options.draw_translate.y * s;
 
 		if (!mouse.active && mouse.button != -1) {
 			let diff_x = Math.abs(mouse.step.x - mouse.down.x);
@@ -255,8 +256,8 @@ function main() {
 			let rect = event.target.getBoundingClientRect();
 			let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
 
-			let x2 = event.clientX - rect.left,
-				y2 = rect.bottom - event.clientY;
+			let x2 = event.clientX - rect.left + draw_options.draw_translate.x,
+					y2 = rect.bottom - event.clientY + draw_options.draw_translate.y;
 
 			draw(true);
 			let isLight = checkForLight(x2, y2);
@@ -523,6 +524,7 @@ function main() {
 		e.preventDefault();
 		let $li = $(e.target).parent();
 		let index = $li.index();
+		if (picked_object == index) picked_object = -1;
 		objects.splice(index, 1);
 		updateList();
 		draw();
@@ -627,8 +629,8 @@ function click(event) {
 		switch (mouse.button) {
 			case 0:
 				newNode({
-					x: mouse.up.x,
-					y: mouse.up.y,
+					x: mouse.up.x - draw_options.draw_translate.x * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
+					y: mouse.up.y - draw_options.draw_translate.y * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
 					z: 0.0
 				}, false);
 				break;
@@ -638,8 +640,8 @@ function click(event) {
 
 			case 2:
 				newNode({
-					x: mouse.up.x,
-					y: mouse.up.y,
+					x: mouse.up.x - draw_options.draw_translate.x * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
+					y: mouse.up.y - draw_options.draw_translate.y * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
 					z: 0.0
 				}, true);
 				break;
@@ -672,8 +674,8 @@ function click(event) {
 							$('#webgl').css('cursor', 'auto');
 						} else {
 							newNode({
-								x: mouse.up.x,
-								y: mouse.up.y,
+								x: mouse.up.x - draw_options.draw_translate.x * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
+								y: mouse.up.y - draw_options.draw_translate.y * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
 								z: 0.0
 							}, true);
 						}
@@ -699,8 +701,8 @@ function click(event) {
 						startSlideShow(center, false);
 					} else {
 						newNode({
-							x: mouse.up.x,
-							y: mouse.up.y,
+							x: mouse.up.x - draw_options.draw_translate.x * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
+							y: mouse.up.y - draw_options.draw_translate.y * (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2,
 							z: 0.0
 						}, true);
 					}
@@ -727,8 +729,14 @@ function move(event) {
 					let deltax = mouse.step.x - mouse.last_step.x;
 					let deltay = mouse.step.y - mouse.last_step.y;
 					let s = (Math.abs(draw_options.scale_range[0]) + Math.abs(draw_options.scale_range[1])) / 2;
+
 					draw_options.draw_translate.x += deltax / s;
 					draw_options.draw_translate.y += deltay / s;
+
+					draw_options.viewer.position[0] -= deltax;
+					draw_options.viewer.position[1] -= deltay;
+					draw_options.viewer.center[0] -= deltax;
+					draw_options.viewer.center[1] -= deltay;
 					draw();
 				}
 			}
@@ -942,7 +950,6 @@ function startSlideShow(center, shouldLookAround) {
 	draw_options.viewer.center[2] -= offset[2];
 
 	slideInterval = setInterval(function() {
-		console.log("interval");
 		if (shouldLookAround) {
 			let p = rotatePointAboutPoint(draw_options.viewer.center, draw_options.viewer.position, 0, 2);
 			draw_options.viewer.center[0] = p[0];

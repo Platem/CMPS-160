@@ -273,6 +273,13 @@ var Obj = function() {
 				this.polygons[i].calcN();
 		}
 
+		let craw = this.raw.center,
+				cdraw = this.center,
+				c = craw.scale(this.scale).rotate(this.rotation).translate(this.translation);
+		cdraw.x = c.x;
+		cdraw.y = c.y;
+		cdraw.z = c.z;
+
 		this.verticesNormal();
 	};
 
