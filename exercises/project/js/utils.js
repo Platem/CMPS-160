@@ -1,3 +1,64 @@
+function preparePositionBuffer() {
+	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+	gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(a_Position);
+}
+
+function loadArrayToPositionBuffer(array) {
+	preparePositionBuffer();
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.DYNAMIC_DRAW);
+}
+
+function prepareColorBuffer() {
+	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+	gl.vertexAttribPointer(a_Color, 3, gl.UNSIGNED_BYTE, true, 0, 0);
+	gl.enableVertexAttribArray(a_Color);
+}
+
+function loadArrayToColorBuffer(array) {
+	prepareColorBuffer();
+	gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(array), gl.DYNAMIC_DRAW);
+}
+
+function prepareNormalBuffer() {
+	gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+	gl.vertexAttribPointer(a_Normal, 3, gl.FLOAT, true, 0, 0);
+	gl.enableVertexAttribArray(a_Normal);
+}
+
+function loadArrayToNormalBuffer(array) {
+	prepareNormalBuffer();
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.DYNAMIC_DRAW);
+}
+
+function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, draw_mode) {
+	loadArrayToPositionBuffer(positionArray);
+	loadArrayToColorBuffer(colorArray);
+	loadArrayToNormalBuffer(normalArray);
+	switch(draw_mode) {
+		case 'points':
+			gl.drawArrays(gl.POINTS, 0, positionArray.length / 3);
+			break;
+		case 'lines':
+			gl.drawArrays(gl.LINES, 0, positionArray.length / 3);
+			break;
+		case 'line_strip':
+			gl.drawArrays(gl.LINE_STRIP, 0, positionArray.length / 3);
+			break;
+		case 'line_loop':
+			gl.drawArrays(gl.LINE_LOOP, 0, positionArray.length / 3);
+			break;
+		case 'triangles':
+			gl.drawArrays(gl.TRIANGLES, 0, positionArray.length / 3);
+			break;
+		case 'triangle_loop':
+			gl.drawArrays(gl.TRIANGLE_LOOP, 0, positionArray.length / 3);
+			break;
+		default:
+			gl.drawArrays(gl.POINTS, 0, positionArray.length / 3);
+	}
+}
+
 var hexIndex = 0;
 
 function hexID() {
@@ -141,33 +202,49 @@ function circleCenter(pA, pB) {
 	return new Coord(pA.x + r[0], pA.y + r[1], pA.z + r[2], 1.0, 0.0, 0.0);
 }
 
-function rotatePointAboutPoint(pA, pB, angleX, angleY) {
+function rotatePointAboutPoint(pA, pB, angleX, angleY, angleZ) {
 	let ret = [pA[0], pA[1], pA[2]];
-	let aX = Math.PI * angleX / 180;
-	let aY = Math.PI * angleY / 180;
 
 	// console.log(ret);
+	// console.log(pB);
 
 	// First translate pA as to put pB in the origin
 	ret[0] = ret[0] - pB[0];
 	ret[1] = ret[1] - pB[1];
 	ret[2] = ret[2] - pB[2];
 
-	// console.log(ret);
+	if (angleX) {
+		let a = ret[0];
+		let b = ret[1];
+		let c = ret[2];
+		// Rotate around X axis
+		let aX = Math.PI * angleX / 180;
+		ret[0] = a;
+		ret[1] = b * Math.cos(aX) - c * Math.sin(aX); 
+		ret[2] = b * Math.sin(aX) + c * Math.cos(aX);
+	}
 
-	// Rotate around X axis
-	ret[0] = ret[0];
-	ret[1] = ret[1] * Math.cos(aX) - ret[2] * Math.sin(aX); 
-	ret[2] = ret[1] * Math.sin(aX) + ret[2] * Math.cos(aX);
+	if (angleY) {
+		let a = ret[0];
+		let b = ret[1];
+		let c = ret[2];
+		// Rotate around Y axis
+		let aY = Math.PI * angleY / 180;
+		ret[0] = a * Math.cos(aY) + c * Math.sin(aY); 
+		ret[1] = b;
+		ret[2] = - a * Math.sin(aY) + c * Math.cos(aY);
+	}
 
-	// console.log(ret);
-
-	// Rotate around Y axis
-	ret[0] = ret[0] * Math.cos(aY) + ret[2] * Math.sin(aY); 
-	ret[1] = ret[1];
-	ret[2] = - ret[0] * Math.sin(aY) + ret[2] * Math.cos(aY);
-
-	// console.log(ret);
+	if (angleZ) {
+		let a = ret[0];
+		let b = ret[1];
+		let c = ret[2];
+		// Rotate around Z axis
+		let aZ = Math.PI * angleZ / 180;
+		ret[0] = a * Math.cos(aZ) - b * Math.sin(aZ);
+		ret[1] = a * Math.sin(aZ) + b * Math.cos(aZ);
+		ret[2] = c;
+	}
 
 	// Then translate back
 	ret[0] = ret[0] + pB[0];
@@ -177,4 +254,23 @@ function rotatePointAboutPoint(pA, pB, angleX, angleY) {
 	// console.log(ret);
 	// console.log('---');
 	return ret;
+}
+/**
+ * Resize a canvas to match the size its displayed.
+ * @param {HTMLCanvasElement} canvas The canvas to resize.
+ * @param {number} [multiplier] amount to multiply by.
+ *    Pass in window.devicePixelRatio for native pixels.
+ * @return {boolean} true if the canvas was resized.
+ * @memberOf module:webgl-utils
+ */
+function resizeCanvasToDisplaySize(canvas, multiplier) {
+	multiplier = multiplier || 1;
+	var width  = canvas.clientWidth  * multiplier | 0;
+	var height = canvas.clientHeight * multiplier | 0;
+	if (canvas.width !== width ||  canvas.height !== height) {
+		canvas.width  = width;
+		canvas.height = height;
+		return true;
+	}
+	return false;
 }

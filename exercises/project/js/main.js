@@ -1,3 +1,5 @@
+var Game;
+
 $(function() {
 	/* Toggle Panels */
 	$('.nav-icon').on('click', function(e) {
@@ -37,12 +39,16 @@ $(function() {
 		$(this).toggle();
 	});
 
+	/* Init game */
+	Game = new TicTacToe();
+
 	/* Setup */
-	if (!setup()) {
-		console.log('There was an error in the setup. Exiting now.');
-		return;
-	}
 	updateCanvas(true);
+	setupScene();
+	setTimeout(function() {
+		drawScene();
+	}, 500);
+	
 });
 
 function updateCanvas(animate) {
