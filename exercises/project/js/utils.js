@@ -35,6 +35,7 @@ function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, draw_mode
 	loadArrayToPositionBuffer(positionArray);
 	loadArrayToColorBuffer(colorArray);
 	loadArrayToNormalBuffer(normalArray);
+	
 	switch(draw_mode) {
 		case 'points':
 			gl.drawArrays(gl.POINTS, 0, positionArray.length / 3);

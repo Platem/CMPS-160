@@ -21,7 +21,19 @@ var TicTacToe = function() {
 
 	this.drawGame = function() {
 
-		this.circleObj[0].drawObj();
+		// this.crossObj[0].addTransform('rotate', [0, 1, 0]);
+		// this.crossObj[0].applyTransform();
+		// this.crossObj[0].drawObj();
+
+
+		// this.circleObj[0].addTransform('rotate', [0, 1, 0]);
+		// this.circleObj[0].applyTransform();
+		// this.circleObj[0].drawObj();
+
+
+		// this.tableObj.addTransform('rotate', [0, 1, 0]);
+		// this.tableObj.applyTransform();
+		// this.tableObj.drawObj();
 
 	}
 
@@ -33,7 +45,7 @@ var TicTacToe = function() {
 	this.playing = false;
 	this.turn = -1;	// 0 for cross, 1 for circle
 
-	this.tableObj = 	new Table();
+	this.tableObj = 	new Table( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
 	this.crossObj =  [new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 

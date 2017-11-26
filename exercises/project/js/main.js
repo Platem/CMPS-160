@@ -39,6 +39,14 @@ $(function() {
 		$(this).toggle();
 	});
 
+	/* Toggle rotation */
+	$(document).keypress(function(e) {
+		if (event.which == 32) {
+			e.preventDefault();
+			move = move ? false : true;
+		}
+	});
+
 	/* Init game */
 	Game = new TicTacToe();
 
@@ -46,7 +54,7 @@ $(function() {
 	updateCanvas(true);
 	setupScene();
 	setTimeout(function() {
-		drawScene();
+		requestAnimationFrame(drawScene);
 	}, 500);
 	
 });

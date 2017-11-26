@@ -14,6 +14,12 @@ var canvas,
 var VSHADER_SOURCE = document.getElementById('vertex-shader').text,
 		FSHADER_SOURCE = document.getElementById('fragment-shader').text;
 
+const COLOR_RED = [255, 0, 0];
+const COLOR_GREEN = [0, 255, 0];
+const COLOR_BLUE = [0, 0, 255];
+const COLOR_BLACK = [0, 0, 0];
+const COLOR_BROWN = [222, 184, 135];
+
 // Setup WebGL function
 function setupGL() {
 	// Retrieve <canvas> element
@@ -34,7 +40,6 @@ function setupGL() {
 		console.log('Failed to intialize shaders.');
 		return false;
 	}
-
 
 	/* a_ Position */
 	a_Position = gl.getAttribLocation(gl.program, 'a_Position');
@@ -90,7 +95,7 @@ function setupGL() {
 	gl.clearColor(1.0, 1.0, 1.0, 1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.enable(gl.DEPTH_TEST);
-	gl.enable(gl.CULL_FACE);
+	// gl.enable(gl.CULL_FACE);
 
 	// Everything OK
 	return true;

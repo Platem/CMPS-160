@@ -90,8 +90,8 @@
 
 				const vec3 KA = vec3(0.0, 0.0, 0.2);
 				const vec3 KD = vec3(1.0, 0.0, 0.0);
-				const vec3 KS = vec3(0.0, 0.0, 0.0);
-				const float NS = 0.0;
+				const vec3 KS = vec3(0.4, 0.4, 0.4);
+				const float NS = 10.0;
 
 				const vec3 light = vec3(1.0, 1.0, 1.0);
 				const vec3 lightColor = vec3(1.0, 1.0, 1.0);
@@ -99,18 +99,21 @@
 				const vec3 eyeDirection = normalize(vec3(0.0, 0.0, 1.0));
 				vec3 reflectionDirection;
 				float specular;
+				float doLight = 1.0;
 
 				void main() {
 					gl_FragColor = v_Color;
 					gl_FragColor.a = 1.0;
 
-					// gl_FragColor.rgb += min(dot(normalize(v_Normal.xyz), normalize(light)), 0.0) * KD * lightColor;
+					if (doLight == 1.0) {
+						gl_FragColor.rgb += min(dot(normalize(v_Normal.xyz), normalize(light)), 0.0) * KD * lightColor;
 
-					// reflectionDirection = normalize(reflect(normalize(-light), normalize(v_Normal.xyz)));
-					// specular = pow(min(dot(reflectionDirection, eyeDirection), 0.0), NS);
-					// gl_FragColor.rgb += KS * specular * lightColor;
+						reflectionDirection = normalize(reflect(normalize(-light), normalize(v_Normal.xyz)));
+						specular = pow(min(dot(reflectionDirection, eyeDirection), 0.0), NS);
+						gl_FragColor.rgb += KS * specular * lightColor;
 
-					// gl_FragColor.rgb += KA;
+						gl_FragColor.rgb += KA;
+					}
 				}
 			</script>
 
