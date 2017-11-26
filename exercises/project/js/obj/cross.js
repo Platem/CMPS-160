@@ -155,24 +155,24 @@ var Cross = function(_center, _normal) {
 		let c = [];
 		let n = [];
 
-		// Center
-		loadArraysAndDraw(gl, this.center, COLOR_RED, this.normal, 'points');
+		// // Center
+		// loadArraysAndDraw(gl, this.center, COLOR_RED, this.normal, 'points');
 
-		// Skeleton
-		for (let vertex of this.skeleton) {
-			v.push(vertex.center[0]);
-			v.push(vertex.center[1]);
-			v.push(vertex.center[2]);
+		// // Skeleton
+		// for (let vertex of this.skeleton) {
+		// 	v.push(vertex.center[0]);
+		// 	v.push(vertex.center[1]);
+		// 	v.push(vertex.center[2]);
 
-			c.push(COLOR_BLUE[0]);
-			c.push(COLOR_BLUE[1]);
-			c.push(COLOR_BLUE[2]);
+		// 	c.push(COLOR_BLUE[0]);
+		// 	c.push(COLOR_BLUE[1]);
+		// 	c.push(COLOR_BLUE[2]);
 
-			n.push(1.0);
-			n.push(1.0);
-			n.push(1.0);
-		}
-		loadArraysAndDraw(gl, v, c, n, 'lines');
+		// 	n.push(1.0);
+		// 	n.push(1.0);
+		// 	n.push(1.0);
+		// }
+		// loadArraysAndDraw(gl, v, c, n, 'lines');
 
 		v = [];
 		c = [];

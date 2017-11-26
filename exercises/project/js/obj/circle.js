@@ -67,6 +67,7 @@ var Circle = function(_center, _normal) {
 
 	this.generateVertices = function() {
 		let triangles = [];
+		let sum = [0.0, 0.0, 0.0];
 		this.vertices = [];
 
 		triangles.push([this.skeleton[0].circle[this.skeleton[0].circle.length - 1], this.skeleton[0].circle[0], this.skeleton[this.skeleton.length - 1].circle[this.skeleton[this.skeleton.length - 1].circle.length - 1]]);
@@ -139,6 +140,11 @@ var Circle = function(_center, _normal) {
 			this.vertices[i] = [pat[0], pat[1], pat[2]];
 			this.vertices[i].normal = [pbt[0] - pat[0], pbt[1] - pat[1], pbt[2] - pat[2]];
 		}
+
+		let c = this.center;
+		let n = [this.center[0] + this.normal[0], this.center[1] + this.normal[1], this.center[2] + this.normal[2]];
+		this.normal = rotatePointAboutPoint(n, c, this.transform.rotate[0], this.transform.rotate[1], this.transform.rotate[2]);
+		this.center = [c[0] + this.transform.translate[0], c[1] + this.transform.translate[1], c[2] + this.transform.translate[2]];
 	}
 
 	this.drawObj = function() {
@@ -147,24 +153,24 @@ var Circle = function(_center, _normal) {
 		let n = [];
 
 		// Center
-		loadArraysAndDraw(gl, this.center, COLOR_RED, this.normal, 'points');
+		// loadArraysAndDraw(gl, this.center, COLOR_RED, this.normal, 'points');
 
-		// Skeleton
-		for (let vertex of this.skeleton) {
-			v.push(vertex.center[0]);
-			v.push(vertex.center[1]);
-			v.push(vertex.center[2]);
+		// // Skeleton
+		// for (let vertex of this.skeleton) {
+		// 	v.push(vertex.center[0]);
+		// 	v.push(vertex.center[1]);
+		// 	v.push(vertex.center[2]);
 
-			c.push(COLOR_BLUE[0]);
-			c.push(COLOR_BLUE[1]);
-			c.push(COLOR_BLUE[2]);
+		// 	c.push(COLOR_BLUE[0]);
+		// 	c.push(COLOR_BLUE[1]);
+		// 	c.push(COLOR_BLUE[2]);
 
-			n.push(1.0);
-			n.push(1.0);
-			n.push(1.0);
-		}
+		// 	n.push(1.0);
+		// 	n.push(1.0);
+		// 	n.push(1.0);
+		// }
 
-		loadArraysAndDraw(gl, v, c, n, 'line_loop');
+		// loadArraysAndDraw(gl, v, c, n, 'line_loop');
 
 		v = [];
 		c = [];

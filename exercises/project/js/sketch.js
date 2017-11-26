@@ -10,7 +10,7 @@ var setupScene = function() {
 		return;
 	}
 	mat.setIdentity();
-	matRX.setRotate(0, 1, 0, 0);
+	matRX.setRotate(-60, 0, 1, 0);
 }
 
 var drawScene = function() {

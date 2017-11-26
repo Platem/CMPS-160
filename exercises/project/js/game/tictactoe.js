@@ -20,21 +20,9 @@ var TicTacToe = function() {
 	};
 
 	this.drawGame = function() {
+		this.crossObj[0].drawObj();
 
-		// this.crossObj[0].addTransform('rotate', [0, 1, 0]);
-		// this.crossObj[0].applyTransform();
-		// this.crossObj[0].drawObj();
-
-
-		// this.circleObj[0].addTransform('rotate', [0, 1, 0]);
-		// this.circleObj[0].applyTransform();
-		// this.circleObj[0].drawObj();
-
-
-		// this.tableObj.addTransform('rotate', [0, 1, 0]);
-		// this.tableObj.applyTransform();
-		// this.tableObj.drawObj();
-
+		this.tableObj.drawObj();
 	}
 
 	/* Game setup */
@@ -46,13 +34,40 @@ var TicTacToe = function() {
 	this.turn = -1;	// 0 for cross, 1 for circle
 
 	this.tableObj = 	new Table( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
+	this.tableObj.addTransform('rotate', [-40, 0, 0])
+	this.tableObj.applyTransform();
+
 	this.crossObj =  [new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0])];
+
 	this.circleObj = [new Circle([0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Circle([0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Circle([0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
 										new Circle([0.0, 0.0, 0.0], [0.0, 0.0, 1.0])];
+
+	this.crossObj[0].addTransform('scale', -0.85);
+	this.crossObj[0].addTransform('rotate', [-40, 0, 0])
+
+	this.crossObj[0].addTransform('translate',[-165, -90, 165]);
+
+	this.crossObj[0].applyTransform();
 }
+
+/*
+	Object positions:
+		Top left: 			addTransform('translate',[-165, 165, -50]);
+		Top center: 		addTransform('translate',[0, 165, -50]);
+		Top right: 			addTransform('translate',[165, 165, -50]);
+	
+		Center left: 		addTransform('translate',[-165, 40, 60]);
+		Center center: 	addTransform('translate',[0, 40, 60]);
+		Center right: 	addTransform('translate',[165, 40, 60]);
+	
+		Bottom left: 		addTransform('translate',[-165, -90, 160]);
+		Bottom center: 	addTransform('translate',[0, -90, 160]);
+		Bottom right: 	addTransform('translate',[165, -90, 160]);
+
+*/	
