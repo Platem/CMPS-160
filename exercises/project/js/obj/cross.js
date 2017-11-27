@@ -1,7 +1,9 @@
-var Cross = function(_center, _normal) {
+var Cross = function(_center, _normal, _isGuide) {
 	this.reset = function() {
 		this.center = this.original.center;
 		this.normal = this.original.normal;
+		this.isWinner = false;
+		this.zone = null;
 
 		this.generateVertices();
 	}
@@ -150,6 +152,41 @@ var Cross = function(_center, _normal) {
 		}
 	}
 
+	/*
+	Object positions:
+		i, j
+	---------
+		0, 0: 	addTransform('translate',[-165, 165, -50]);
+		0, 1: 	addTransform('translate',[0, 165, -50]);
+		0, 2: 	addTransform('translate',[165, 165, -50]);
+	
+		1, 0: 	addTransform('translate',[-165, 40, 60]);
+		1, 1: 	addTransform('translate',[0, 40, 60]);
+		1, 2: 	addTransform('translate',[165, 40, 60]);
+	
+		2, 0: 	addTransform('translate',[-165, -90, 165]);
+		2, 1: 	addTransform('translate',[0, -90, 165]);
+		2, 2: 	addTransform('translate',[165, -90, 165]);
+	*/	
+	this.setZone = function(_zone) {
+		this.transform.translate = [0.0, 0.0, 0.0];
+		if (_zone)
+			this.zone = _zone;
+
+		let x = 0, y = 0, z = 0;
+
+		if 			(_zone[0] == 0) { y = 165; z = -50;}
+		else if (_zone[0] == 1) { y = 40;	z = 60;	}
+		else if (_zone[0] == 2) { y = -90;	z = 165;}
+
+		if 			(_zone[1] == 0) 	 x = -165;
+		else if (_zone[1] == 1)	 x = 0;
+		else if (_zone[1] == 2)	 x = 165;
+
+		this.addTransform('translate',[x, y, z]);
+		this.applyTransform();
+	}
+
 	this.drawObj = function() {
 		let v = [];
 		let c = [];
@@ -183,16 +220,30 @@ var Cross = function(_center, _normal) {
 			v.push(vertex[1]);
 			v.push(vertex[2]);
 
-			c.push(COLOR_RED[0]);
-			c.push(COLOR_RED[1]);
-			c.push(COLOR_RED[2]);
+			if (this.isGuide) {
+				c.push(COLOR_GRAY[0]);
+				c.push(COLOR_GRAY[1]);
+				c.push(COLOR_GRAY[2]);
+			} else if (this.isWinner) {
+				c.push(COLOR_GREEN[0]);
+				c.push(COLOR_GREEN[1]);
+				c.push(COLOR_GREEN[2]);
+			} else {
+				c.push(COLOR_RED[0]);
+				c.push(COLOR_RED[1]);
+				c.push(COLOR_RED[2]);
+			}
 
 			n.push(vertex.normal[0]);
 			n.push(vertex.normal[1]);
 			n.push(vertex.normal[2]);
 		}
 
-		loadArraysAndDraw(gl, v, c, n, 'triangles');
+		if (this.isGuide) {
+			loadArraysAndDraw(gl, v, c, n, 'triangles', true);
+		} else {
+			loadArraysAndDraw(gl, v, c, n, 'triangles');
+		}
 
 		// Circles
 		// for (let vertex of this.skeleton) {
@@ -231,6 +282,9 @@ var Cross = function(_center, _normal) {
 
 	this.center = this.original.center;
 	this.normal = this.original.normal;
+	this.isGuide = _isGuide;
+	this.isWinner = false;
+	this.zone = null;
 
 	this.transform = {
 		translate: [0.0, 0.0, 0.0],

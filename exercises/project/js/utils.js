@@ -31,7 +31,14 @@ function loadArrayToNormalBuffer(array) {
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.DYNAMIC_DRAW);
 }
 
-function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, draw_mode) {
+function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, draw_mode, nolights) {
+	var u_light = gl.getUniformLocation(gl.program, 'doLight');
+	if (nolights) {
+		gl.uniform1f(u_light, 0.0);
+	} else {
+		gl.uniform1f(u_light, 1.0);
+	}
+
 	loadArrayToPositionBuffer(positionArray);
 	loadArrayToColorBuffer(colorArray);
 	loadArrayToNormalBuffer(normalArray);

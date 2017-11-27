@@ -99,7 +99,7 @@
 				const vec3 eyeDirection = normalize(vec3(0.0, 0.0, 1.0));
 				vec3 reflectionDirection;
 				float specular;
-				float doLight = 1.0;
+				uniform float doLight;
 
 				void main() {
 					gl_FragColor = v_Color;

@@ -39,11 +39,41 @@ $(function() {
 		$(this).toggle();
 	});
 
-	/* Toggle rotation */
 	$(document).keypress(function(e) {
-		if (event.which == 32) {
-			e.preventDefault();
-			move = move ? false : true;
+		// console.log(e.which);
+		switch (e.which) {
+			case 32:
+				e.preventDefault();
+				move = move ? false : true;
+				break;
+			case 114:
+				e.preventDefault();
+				Game.reset();
+				break;
+		}
+	});
+
+	$('#webgl').mousemove(function(e) {
+		e.preventDefault();
+		mouse[0] = event.clientX;
+		mouse[1] = event.clientY;
+		Game.mousePosition = mouse;
+	});
+
+	$('#webgl').click(function(e) {
+		e.preventDefault();
+		Game.doTurn();
+
+		if (Game.playing == false) {
+			let winner = Game.winner;
+			console.log(Game);
+			if (winner == 0) {
+				alert('Cross wins!');
+			} else if (winner == 1) {
+				alert('Circle wins!');
+			} else {
+				alert("Is draw!");
+			}
 		}
 	});
 

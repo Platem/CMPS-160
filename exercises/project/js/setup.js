@@ -19,6 +19,7 @@ const COLOR_GREEN = [0, 255, 0];
 const COLOR_BLUE = [0, 0, 255];
 const COLOR_BLACK = [0, 0, 0];
 const COLOR_BROWN = [222, 184, 135];
+const COLOR_GRAY = [180, 180, 180];
 
 // Setup WebGL function
 function setupGL() {
