@@ -66,7 +66,7 @@ $(function() {
 
 		if (Game.playing == false) {
 			let winner = Game.winner;
-			console.log(Game);
+
 			if (winner == 0) {
 				alert('Cross wins!');
 			} else if (winner == 1) {

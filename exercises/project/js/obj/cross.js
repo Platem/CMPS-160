@@ -170,8 +170,9 @@ var Cross = function(_center, _normal, _isGuide) {
 	*/	
 	this.setZone = function(_zone) {
 		this.transform.translate = [0.0, 0.0, 0.0];
-		if (_zone)
+		if (_zone) {
 			this.zone = _zone;
+		}
 
 		let x = 0, y = 0, z = 0;
 

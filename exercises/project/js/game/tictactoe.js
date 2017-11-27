@@ -53,16 +53,18 @@ var TicTacToe = function() {
 	}
 
 	this.doTurn = function() {
-		if (this.zoneHover) {
+		if (this.playing && this.zoneHover && this.board[this.zoneHover[0]][this.zoneHover[1]] == -1) {
 			// Update board
 			this.board[this.zoneHover[0]][this.zoneHover[1]] = this.turn;
 
 			// Update objects
 			if (this.turn == 0) {
 				this.crossObj[this.nextCross].setZone(this.zoneHover);
+				this.crossObj[this.nextCross].zone = this.zoneHover;
 				this.nextCross++;
 			} else if (this.turn == 1) {
 				this.circleObj[this.nextCircle].setZone(this.zoneHover);
+				this.circleObj[this.nextCircle].zone = this.zoneHover;
 				this.nextCircle++;
 			}
 
@@ -83,6 +85,7 @@ var TicTacToe = function() {
 					winner: this.board[0][0],
 					winnerPositions: [[0, 0], [0, 1], [0, 2]]
 				});
+				return;
 			}
 
 			// col0
@@ -91,6 +94,7 @@ var TicTacToe = function() {
 					winner: this.board[0][0],
 					winnerPositions: [[0, 0], [1, 0], [2, 0]]
 				});
+				return;
 			}
 
 			// dia0
@@ -99,6 +103,7 @@ var TicTacToe = function() {
 					winner: this.board[0][0],
 					winnerPositions: [[0, 0], [1, 1], [2, 2]]
 				});
+				return;
 			}
 		}
 
@@ -109,6 +114,7 @@ var TicTacToe = function() {
 					winner: this.board[1][0],
 					winnerPositions: [[1, 0], [1, 1], [1, 2]]
 				});
+				return;
 			}
 		}
 
@@ -119,14 +125,16 @@ var TicTacToe = function() {
 					winner: this.board[2][0],
 					winnerPositions: [[2, 0], [2, 1], [2, 2]]
 				});
+				return;
 			}
 
-			// dia2
+			// dia1
 			if (this.board[2][0] == this.board[1][1] && this.board[1][1] == this.board[0][2]) {
 				this.endGame({
 					winner: this.board[2][0],
 					winnerPositions: [[2, 0], [1, 1], [0, 2]]
 				});
+				return;
 			}
 		}
 
@@ -137,6 +145,7 @@ var TicTacToe = function() {
 					winner: this.board[0][1],
 					winnerPositions: [[0, 1], [1, 1], [2, 1]]
 				});
+				return;
 			}
 		}
 
@@ -147,6 +156,7 @@ var TicTacToe = function() {
 					winner: this.board[0][2],
 					winnerPositions: [[0, 2], [1, 2], [2, 2]]
 				});
+				return;
 			}
 		}
 
@@ -160,25 +170,23 @@ var TicTacToe = function() {
 	}
 
 	this.endGame = function(opts) {
-		this.playing = 0;
+		this.playing = false;
 		this.winner = opts.winner;
 		this.winnerPositions = opts.winnerPositions;
 
 		if (this.winner == 0) {
-			console.log("heeee");
 			let w0 = this.winnerPositions[0];
 			let w1 = this.winnerPositions[1];
 			let w2 = this.winnerPositions[2];
 
-			for (let cross of this.crossObj) {
-				let z = cross.zone;
+			for (let i = 0; i < this.nextCross; i++) {
+				let z = this.crossObj[i].zone;
 
 				if (z) {
 					if ((z[0] == w0[0] && z[1] == w0[1]) || 
 							(z[0] == w1[0] && z[1] == w1[1]) || 
 							(z[0] == w2[0] && z[1] == w2[1])) {
-						console.log(z, "isWinner");
-						cross.isWinner = true;
+						this.crossObj[i].isWinner = true;
 					}
 				}
 			}
@@ -187,15 +195,14 @@ var TicTacToe = function() {
 			let w1 = this.winnerPositions[1];
 			let w2 = this.winnerPositions[2];
 
-			for (let circle of this.circleObj) {
-				let z = circle.zone;
+			for (let i = 0; i < this.nextCircle; i++) {
+				let z = this.circleObj[i].zone;
 
 				if (z) {
 					if ((z[0] == w0[0] && z[1] == w0[1]) || 
 							(z[0] == w1[0] && z[1] == w1[1]) || 
 							(z[0] == w2[0] && z[1] == w2[1])) {
-						console.log(z, "isWinner");
-						circle.isWinner = true;
+						this.circleObj[i].isWinner = true;
 					}
 				}
 			}
