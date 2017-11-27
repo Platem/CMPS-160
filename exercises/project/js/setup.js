@@ -21,6 +21,9 @@ const COLOR_BLACK = [0, 0, 0];
 const COLOR_BROWN = [222, 184, 135];
 const COLOR_GRAY = [180, 180, 180];
 
+var USE_FFD = true;
+var SHOW_FFD = true;
+
 // Setup WebGL function
 function setupGL() {
 	// Retrieve <canvas> element

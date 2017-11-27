@@ -499,6 +499,7 @@ var Table = function(_center, _normal) {
 			table_2_2.push([91, -240, 51]);
 			table_2_2.normal = [0.0, 0.0, 1.0];
 		this.tableZones.push(table_2_2);
+
 	}
 
 	this.addTransform = function(type, opts) {

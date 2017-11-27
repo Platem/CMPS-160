@@ -26,6 +26,14 @@ var TicTacToe = function() {
 	this.drawGame = function(mouse) {
 		this.tableObj.drawObj();
 
+		for (let i = 0; i < this.nextCross; i++) {
+			this.crossObj[i].drawObj();
+		}
+
+		for (let i = 0; i < this.nextCircle; i++) {
+			this.circleObj[i].drawObj();
+		}
+
 		if (this.turn != -1 && this.playing) {
 			let zone = this.tableObj.checkForTableZone(this.mousePosition);
 			this.zoneHover = zone;
@@ -42,13 +50,6 @@ var TicTacToe = function() {
 			}
 		}
 
-		for (let i = 0; i < this.nextCross; i++) {
-			this.crossObj[i].drawObj();
-		}
-
-		for (let i = 0; i < this.nextCircle; i++) {
-			this.circleObj[i].drawObj();
-		}
 
 	}
 

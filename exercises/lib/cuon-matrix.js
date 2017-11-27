@@ -160,6 +160,7 @@ Matrix4.prototype.setInverseOf = function(other) {
 
   s = other.elements;
   d = this.elements;
+
   inv = new Float32Array(16);
 
   inv[0]  =   s[5]*s[10]*s[15] - s[5] *s[11]*s[14] - s[9] *s[6]*s[15]

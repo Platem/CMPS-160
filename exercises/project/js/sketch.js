@@ -28,7 +28,6 @@ var drawScene = function() {
 	mat.setIdentity();
 	if (move) {
 		matRX.rotate(1, 0, 1, 0);
-
 		eye = rotatePointAboutPoint(eye, lookat, false, 1, false);
 	}
 
