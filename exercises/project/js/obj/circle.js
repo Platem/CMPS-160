@@ -300,6 +300,7 @@ var Circle = function(_center, _normal, _isGuide) {
 		let v = [];
 		let c = [];
 		let n = [];
+		let t = [];
 
 		// // Center
 		// loadArraysAndDraw(gl, [0, 0, 0], COLOR_RED, [1, 1, 1], 'points', true);
@@ -324,6 +325,7 @@ var Circle = function(_center, _normal, _isGuide) {
 		v = [];
 		c = [];
 		n = [];
+		t = [];
 		// Triangles
 		if (USE_FFD) {
 			for (let i = 0; i < this.verticesProportion.length; i++) {
@@ -357,6 +359,9 @@ var Circle = function(_center, _normal, _isGuide) {
 				n.push(xn - x);
 				n.push(yn - y);
 				n.push(zn - z);
+
+				t.push((x + 500) / 1000);
+				t.push((y + 500) / 1000);
 			}
 		} else {
 			for (let i = 0; i < this.vertices.length; i++) {
@@ -382,13 +387,18 @@ var Circle = function(_center, _normal, _isGuide) {
 				n.push(vertex.normal[0]);
 				n.push(vertex.normal[1]);
 				n.push(vertex.normal[2]);
+
+				t.push((vertex[0] + 500) / 1000);
+				t.push((vertex[1] + 500) / 1000);
 			}
 		}	
 
 		if (this.isGuide) {
-			loadArraysAndDraw(gl, v, c, n, 'triangles', true);
-		} else {
-			loadArraysAndDraw(gl, v, c, n, 'triangles');
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', true, false);
+		} else if (this.isWinner) {
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_metal_green');
+		}	else {
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_metal_blue');
 		}
 
 		// Circles
@@ -421,6 +431,7 @@ var Circle = function(_center, _normal, _isGuide) {
 		v = [];
 		c = [];
 		n = [];
+		t = [];
 		if (SHOW_FFD) {
 			v.push(this.ffd.p[0]);
 			v.push(this.ffd.p[1]);
@@ -443,6 +454,11 @@ var Circle = function(_center, _normal, _isGuide) {
 			n.push(1.0);
 			n.push(1.0);
 
+			t.push(0.5);
+			t.push(0.5);
+			t.push(0.5);
+			t.push(0.5);
+
 			v.push(this.ffd.p[0]);
 			v.push(this.ffd.p[1]);
 			v.push(this.ffd.p[2]);
@@ -463,6 +479,11 @@ var Circle = function(_center, _normal, _isGuide) {
 			n.push(1.0);
 			n.push(1.0);
 			n.push(1.0);
+
+			t.push(0.5);
+			t.push(0.5);
+			t.push(0.5);
+			t.push(0.5);
 
 			v.push(this.ffd.p[0]);
 			v.push(this.ffd.p[1]);
@@ -485,7 +506,12 @@ var Circle = function(_center, _normal, _isGuide) {
 			n.push(1.0);
 			n.push(1.0);
 
-			loadArraysAndDraw(gl, v, c, n, 'lines');
+			t.push(0.5);
+			t.push(0.5);
+			t.push(0.5);
+			t.push(0.5);
+
+			loadArraysAndDraw(gl, v, c, n, t, 'lines');
 		}
 	}
 

@@ -67,15 +67,18 @@
 				attribute vec4 a_Position;
 				attribute vec4 a_Color;
 				attribute vec4 a_Normal;
+				attribute vec2 a_TexCoord;
 
 				varying vec4 v_Position;
 				varying vec4 v_Color;
 				varying vec4 v_Normal;
+				varying vec2 v_TexCoord;
 
 				void main() {
 					v_Position = a_Position;
 					v_Color = a_Color;
 					v_Normal = a_Normal;
+					v_TexCoord = a_TexCoord;
 					gl_PointSize = 5.0;
 					gl_Position = u_MvpMatrix * a_Position;
 				}
@@ -87,6 +90,7 @@
 				varying vec4 v_Position;
 				varying vec4 v_Color;
 				varying vec4 v_Normal;
+				varying vec2 v_TexCoord;
 
 				const vec3 KA = vec3(0.0, 0.0, 0.2);
 				const vec3 KD = vec3(1.0, 0.0, 0.0);
@@ -100,13 +104,33 @@
 				vec3 reflectionDirection;
 				float specular;
 				uniform float doLight;
+				uniform float texture; /* 0 = no texture | 1 = env | 2 = obj_metal_blue | 3 = obj_metal_red | 4 = obj_metal_green | 5 = obj_wood*/
+				uniform sampler2D u_envTexture;
+				uniform sampler2D u_objTexture_metal_blue;
+				uniform sampler2D u_objTexture_metal_red;
+				uniform sampler2D u_objTexture_metal_green;
+				// uniform sampler2D u_objTexture_wood;
 
 				void main() {
 					gl_FragColor = v_Color;
 					gl_FragColor.a = 1.0;
+							
+					if (texture > 0.0) {
+						if (texture == 1.0) {
+							gl_FragColor = texture2D(u_envTexture, v_TexCoord);
+						} else if (texture == 2.0) {
+							gl_FragColor = texture2D(u_objTexture_metal_blue, v_TexCoord);
+						} else if (texture == 3.0) {
+							gl_FragColor = texture2D(u_objTexture_metal_red, v_TexCoord);
+						} else if (texture == 4.0) {
+							gl_FragColor = texture2D(u_objTexture_metal_green, v_TexCoord);
+						}
+					}
 
 					if (doLight == 1.0) {
-						gl_FragColor.rgb += min(dot(normalize(v_Normal.xyz), normalize(light)), 0.0) * KD * lightColor;
+						if (texture == 0.0) {	
+							gl_FragColor.rgb += min(dot(normalize(v_Normal.xyz), normalize(light)), 0.0) * KD * lightColor;
+						}
 
 						reflectionDirection = normalize(reflect(normalize(-light), normalize(v_Normal.xyz)));
 						specular = pow(min(dot(reflectionDirection, eyeDirection), 0.0), NS);
@@ -125,6 +149,7 @@
 			<script src="js/lib/mod_ioSOR.js"></script>
 			<script src="js/setup.js"></script>
 			<script src="js/utils.js"></script>
+			<script src="js/obj/env.js"></script>
 			<script src="js/obj/table.js"></script>
 			<script src="js/obj/cross.js"></script>
 			<script src="js/obj/circle.js"></script>

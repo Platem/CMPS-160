@@ -610,6 +610,7 @@ var Table = function(_center, _normal) {
 		let v = [];
 		let c = [];
 		let n = [];
+		let t = [];
 
 		for (let i = 0; i < this.box.length; i++) {
 			v.push(this.box[i][0]);
@@ -623,6 +624,9 @@ var Table = function(_center, _normal) {
 			n.push(this.boxNormals[i][0]);
 			n.push(this.boxNormals[i][1]);
 			n.push(this.boxNormals[i][2]);
+
+			t.push((this.box[i][0] + 500) / 1000);
+			t.push((this.box[i][1] + 500) / 1000);
 		}
 
 		for (let i = 0; i < this.ribbons.length; i++) {
@@ -637,9 +641,12 @@ var Table = function(_center, _normal) {
 			n.push(this.ribbonsNormals[i][0]);
 			n.push(this.ribbonsNormals[i][1]);
 			n.push(this.ribbonsNormals[i][2]);
+
+			t.push((this.ribbons[i][0] + 500) / 1000);
+			t.push((this.ribbons[i][1] + 500) / 1000);
 		}
 
-		loadArraysAndDraw(gl, v, c, n, 'triangles');
+		loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
 	}
 
 	this.drawZones = function(withID) {
@@ -655,19 +662,18 @@ var Table = function(_center, _normal) {
 		let v = [];
 		let c = [];
 		let n = [];
+		let t = [];
 
 		for (let i = 0; i < this.tableZones.length; i++) {
 			for (let j = 0; j < this.tableZones[i].length; j++) {
+				v.push(this.tableZones[i][j][0]);
+				v.push(this.tableZones[i][j][1]);
+
 				if (withID) {
-					v.push(this.tableZones[i][j][0]);
-					v.push(this.tableZones[i][j][1]);
 					v.push(this.tableZones[i][j][2] - 1);
 				} else {
-					v.push(this.tableZones[i][j][0]);
-					v.push(this.tableZones[i][j][1]);
 					v.push(this.tableZones[i][j][2]);
 				}
-				
 
 				if (withID) {
 					switch (i) {
@@ -731,13 +737,16 @@ var Table = function(_center, _normal) {
 				n.push(1.0);
 				n.push(1.0);
 				n.push(1.0);
+				
+				t.push((this.tableZones[i][j][0] + 500) / 1000);
+				t.push((this.tableZones[i][j][1] + 500) / 1000);
 			}
 		}
 
 		if (withID)
-			loadArraysAndDraw(gl, v, c, n, 'triangles', true);
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', true, false);
 		else
-			loadArraysAndDraw(gl, v, c, n, 'triangles');
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
 	}
 
 	this.checkForTableZone = function(mouse, log) {

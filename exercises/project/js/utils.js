@@ -31,8 +31,41 @@ function loadArrayToNormalBuffer(array) {
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.DYNAMIC_DRAW);
 }
 
-function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, draw_mode, nolights) {
-	var u_light = gl.getUniformLocation(gl.program, 'doLight');
+function prepareTextureBuffer() {
+	gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+	gl.vertexAttribPointer(a_TexCoord, 2, gl.FLOAT, true, 0, 0);
+	gl.enableVertexAttribArray(a_TexCoord);
+}
+
+function loadArrayToTextureBuffer(array, texture) {
+	let val = 0.0;
+	switch (texture) {
+		case 'env':
+			val = 1.0;
+			break;
+		case 'obj_metal_blue':
+			val = 2.0;
+			break;
+		case 'obj_metal_red':
+			val = 3.0;
+			break;
+		case 'obj_metal_green':
+			val = 4.0;
+			break;
+		// case 'obj_wood':
+		// 	val = 5.0;
+		// 	break;
+		default:
+			break;
+	}
+	let u_texture = gl.getUniformLocation(gl.program, 'texture');
+	gl.uniform1f(u_texture, val);
+	prepareTextureBuffer();
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.DYNAMIC_DRAW);
+}
+
+function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, textureArray, draw_mode, nolights, texture) {
+	let u_light = gl.getUniformLocation(gl.program, 'doLight');
 	if (nolights) {
 		gl.uniform1f(u_light, 0.0);
 	} else {
@@ -42,6 +75,7 @@ function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, draw_mode
 	loadArrayToPositionBuffer(positionArray);
 	loadArrayToColorBuffer(colorArray);
 	loadArrayToNormalBuffer(normalArray);
+	loadArrayToTextureBuffer(textureArray, texture);
 	
 	switch(draw_mode) {
 		case 'points':
@@ -281,4 +315,8 @@ function resizeCanvasToDisplaySize(canvas, multiplier) {
 		return true;
 	}
 	return false;
+}
+
+function isPowerOf2(value) {
+  return (value & (value - 1)) == 0;
 }

@@ -24,6 +24,7 @@ var TicTacToe = function() {
 	};
 
 	this.drawGame = function(mouse) {
+		this.envObj.drawObj();
 		this.tableObj.drawObj();
 
 		for (let i = 0; i < this.nextCross; i++) {
@@ -225,6 +226,8 @@ var TicTacToe = function() {
 	this.winnerPositions = null;
 
 	/* Create objs */
+	this.envObj = new Env();
+
 	this.tableObj = 	new Table( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
 
 	this.crossObj =  [new Cross( [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), 
