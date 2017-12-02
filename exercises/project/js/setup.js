@@ -19,6 +19,7 @@ var canvas,
 		u_objTexture_metal_red,
 		u_objTexture_metal_green,
 		u_objTexture_wood,
+		u_objTexture_wood_2,
 
 		img_env,
 		img_metal_blue,
@@ -36,16 +37,17 @@ const COLOR_BLACK = [0, 0, 0];
 const COLOR_BROWN = [222, 184, 135];
 const COLOR_GRAY = [180, 180, 180];
 
-const ENV_TEX = ['obj-metal-blue.png','env-field.png', 'env-grass.jpg', 'env-mountains.jpg', 'env.museum.jpg'];
+const ENV_TEX = [/*'env-field.png', */'env-grass.jpg', 'env-mountains.jpg', 'env-museum.jpg'];
 const OBJ_TEX = {
 	metal_blue: 'obj-metal-blue.png',
 	metal_red: 'obj-metal-red.png',
 	metal_green: 'obj-metal-green.png',
-	wood: ''
+	wood: 'obj-wood.jpg',
+	wood_2: 'obj-wood-2.jpg'
 };
 
 var USE_FFD = true;
-var SHOW_FFD = true;
+var SHOW_FFD = false;
 
 // Setup WebGL function
 function setupGL() {
@@ -141,10 +143,12 @@ function setupGL() {
 	gl.uniform1i(u_objTexture_metal_red, 2);
 	u_objTexture_metal_green = gl.getUniformLocation(gl.program, 'u_objTexture_metal_green');
 	gl.uniform1i(u_objTexture_metal_green, 3);
-	// u_objTexture_wood = gl.getUniformLocation(gl.program, 'u_objTexture_wood');
-	// gl.uniform1i(u_objTexture_wood, 4);
+	u_objTexture_wood = gl.getUniformLocation(gl.program, 'u_objTexture_wood');
+	gl.uniform1i(u_objTexture_wood, 4);
+	u_objTexture_wood_2 = gl.getUniformLocation(gl.program, 'u_objTexture_wood_2');
+	gl.uniform1i(u_objTexture_wood_2, 5);
 
-	for (let i = 1; i < 5; i++) loadTexture(i, true);
+	for (let i = 1; i < 7; i++) loadTexture(i, true);
 
 	loadImages();
 
@@ -184,11 +188,17 @@ function loadImages() {
 		loadTexture(4);
 	};
 
-	// img_wood = new Image();
-	// img_wood.src = 'img/' + OBJ_TEX.wood;
-	// img_wood.onload = function() {
-	// 	loadTexture(5);
-	// };
+	img_wood = new Image();
+	img_wood.src = 'img/' + OBJ_TEX.wood;
+	img_wood.onload = function() {
+		loadTexture(5);
+	};
+
+	img_wood_2 = new Image();
+	img_wood_2.src = 'img/' + OBJ_TEX.wood_2;
+	img_wood_2.onload = function() {
+		loadTexture(6);
+	};
 }
 
 function loadTexture(text, withBlueColor) {
@@ -217,9 +227,12 @@ function loadTexture(text, withBlueColor) {
 			case 4:
 				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img_metal_green);
 				break;
-			// case 5:
-			// 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img_wood);
-			// 	break;
+			case 5:
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img_wood);
+				break;
+			case 6:
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img_wood_2);
+				break;
 		}
 	}
 

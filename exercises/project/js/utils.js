@@ -52,9 +52,12 @@ function loadArrayToTextureBuffer(array, texture) {
 		case 'obj_metal_green':
 			val = 4.0;
 			break;
-		// case 'obj_wood':
-		// 	val = 5.0;
-		// 	break;
+		case 'obj_wood':
+			val = 5.0;
+			break;
+		case 'obj_wood_2':
+			val = 6.0;
+			break;
 		default:
 			break;
 	}

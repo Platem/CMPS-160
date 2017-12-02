@@ -628,7 +628,12 @@ var Table = function(_center, _normal) {
 			t.push((this.box[i][0] + 500) / 1000);
 			t.push((this.box[i][1] + 500) / 1000);
 		}
+		loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
 
+		v = [];
+		c = [];
+		n = [];
+		t = [];
 		for (let i = 0; i < this.ribbons.length; i++) {
 			v.push(this.ribbons[i][0]);
 			v.push(this.ribbons[i][1]);
@@ -646,7 +651,7 @@ var Table = function(_center, _normal) {
 			t.push((this.ribbons[i][1] + 500) / 1000);
 		}
 
-		loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
+		loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood_2');
 	}
 
 	this.drawZones = function(withID) {

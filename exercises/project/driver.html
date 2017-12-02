@@ -109,7 +109,8 @@
 				uniform sampler2D u_objTexture_metal_blue;
 				uniform sampler2D u_objTexture_metal_red;
 				uniform sampler2D u_objTexture_metal_green;
-				// uniform sampler2D u_objTexture_wood;
+				uniform sampler2D u_objTexture_wood;
+				uniform sampler2D u_objTexture_wood_2;
 
 				void main() {
 					gl_FragColor = v_Color;
@@ -124,6 +125,10 @@
 							gl_FragColor = texture2D(u_objTexture_metal_red, v_TexCoord);
 						} else if (texture == 4.0) {
 							gl_FragColor = texture2D(u_objTexture_metal_green, v_TexCoord);
+						} else if (texture == 5.0) {
+							gl_FragColor = texture2D(u_objTexture_wood, v_TexCoord);
+						} else if (texture == 6.0) {
+							gl_FragColor = texture2D(u_objTexture_wood_2, v_TexCoord);
 						}
 					}
 

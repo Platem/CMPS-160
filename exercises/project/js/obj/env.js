@@ -1,6 +1,30 @@
 var Env = function() {
 	this.drawObj = function() {
+		let v = [];
+		let c = [];
+		let n = [];
+		let t = [];
 
+		for (let i = 0; i < this.triangles.length; i+=3) {
+			v.push(this.triangles[i]);
+			v.push(this.triangles[i + 1]);
+			v.push(this.triangles[i + 2]);
+
+			c.push(1.0);
+			c.push(1.0);
+			c.push(1.0);
+
+			n.push(1.0);
+			n.push(1.0);
+			n.push(1.0);
+		}
+
+		for (let i = 0; i < this.texCoords.length; i+=2) {
+			t.push(this.texCoords[i]);
+			t.push(this.texCoords[i + 1]);
+		}
+
+		loadArraysAndDraw(gl, v, c, n, t, 'triangles', 'true', 'env');
 	};
 	
 	this.triangles = [
@@ -54,6 +78,53 @@ var Env = function() {
 	];
 
 	this.texCoords = [
+		// Back
+		1/4, 1/3,
+		1/4, 2/3,
+		2/4, 2/3,
 
+		2/4, 2/3,
+		2/4, 1/3,
+		1/4, 1/3,
+
+		// Front
+		3/4, 1/3,
+		3/4, 2/3,
+		4/4, 2/3,
+		4/4, 2/3,
+		4/4, 1/3,
+		3/4, 1/3,
+
+		// Left
+		0, 1/3,
+		0, 2/3,
+		1/4, 2/3,
+		1/4, 2/3,
+		1/4, 1/3,
+		0, 1/3,
+
+		// Right
+		2/4, 1/3,
+		2/4, 2/3,
+		3/4, 2/3,
+		3/4, 2/3,
+		3/4, 1/3,
+		2/4, 1/3,
+
+		// Up
+		1/4, 0,
+		1/4, 1/3,
+		2/4, 1/3,
+		2/4, 1/3,
+		2/4, 0,
+		1/4, 0,
+
+		// Down
+		1/4, 2/3,
+		1/4, 3/3,
+		2/4, 3/3,
+		2/4, 3/3,
+		2/4, 2/3,
+		1/4, 2/3
 	];
 }

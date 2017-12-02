@@ -32,7 +32,7 @@ var drawScene = function() {
 	}
 
 	if (persp) {
-		mat.setPerspective(100, 1.0, 1, 1000);
+		mat.setPerspective(100, 1.0, 1, 1500);
 		mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
 	} else {
 		mat.setOrtho(	- 500.0, 500.0,
