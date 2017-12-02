@@ -48,7 +48,7 @@ $(function() {
 				break;
 			case 114:
 				e.preventDefault();
-				Game.reset();
+				Game = new TicTacToe();
 				break;
 		}
 	});
@@ -78,12 +78,12 @@ $(function() {
 	});
 
 	/* Init game */
-	Game = new TicTacToe();
 
 	/* Setup */
 	updateCanvas(true);
 	setupScene();
 	setTimeout(function() {
+		Game = new TicTacToe();
 		requestAnimationFrame(drawScene);
 	}, 500);
 	

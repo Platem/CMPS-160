@@ -1,10 +1,8 @@
 var mouse = [0.0, 0.0];
 
-var persp = true,
-		move = false;
+var move = false;
 
-var mat = new Matrix4()
-		matRX = new Matrix4();
+var mat = new Matrix4();
 
 let eye = [0, 0, 500];
 let lookat = [0, 0, 0];
@@ -16,34 +14,30 @@ var setupScene = function() {
 		return;
 	}
 	mat.setIdentity();
-	matRX.setRotate(-60, 0, 1, 0);
+	mat.setPerspective(100, 1.0, 1, 1500);
+	mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
 }
 
-var drawScene = function() {
+let then = 0;
+let speed = 60;
+
+var drawScene = function(now) {
 	resizeCanvasToDisplaySize(gl.canvas);
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	// Set matrix
-	mat.setIdentity();
-	if (move) {
-		matRX.rotate(1, 0, 1, 0);
-		eye = rotatePointAboutPoint(eye, lookat, false, 1, false);
-	}
-
-	if (persp) {
-		mat.setPerspective(100, 1.0, 1, 1500);
-		mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
-	} else {
-		mat.setOrtho(	- 500.0, 500.0,
-									- 500.0, 500.0,
-									- 500.0, 500.0);
-		mat.multiply(matRX);
-	}
+	now *= .001;
+	let deltaTime = now - then;
+	then = now;
 
 	gl.uniformMatrix4fv(u_MvpMatrix, false, mat.elements);
 
-	//
+	if (move) {
+		eye = rotatePointAboutPoint(eye, lookat, false, speed * deltaTime, false);
+		mat.setPerspective(100, 1.0, 1, 1500);
+		mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
+	}
+
 	Game.drawGame(mouse);
 
 	// Call it again

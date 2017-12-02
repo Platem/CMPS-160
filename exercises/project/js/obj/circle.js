@@ -15,7 +15,7 @@ var Circle = function(_center, _normal, _isGuide) {
 	this.generateSkeleton = function() {
 		let circles = [],
 				radius = 250;
-				points = 80,
+				points = 40,
 				a = 360 / points;
 
 		// Generate skeleton

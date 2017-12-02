@@ -1,28 +1,5 @@
 var TicTacToe = function() {
 	/* Game Functions */
-	this.reset = function() {
-		this.board = [[-1, -1, -1],
-									[-1, -1, -1],
-									[-1, -1, -1]];
-
-		this.playing = false;
-		this.turn = 0;	// 0 for cross, 1 for circle
-		this.nextCross = 0;
-		this.nextCircle = 0;
-		this.winner = null;
-
-		this.tableObj.reset();
-
-		for (let cross of this.crossObj) {
-			cross.reset();
-		}
-
-		for (let circle of this.circleObj) {
-			circle.reset();
-		}
-
-	};
-
 	this.drawGame = function(mouse) {
 		this.envObj.drawObj();
 		this.tableObj.drawObj();

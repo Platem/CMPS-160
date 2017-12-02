@@ -14,7 +14,7 @@ var Cross = function(_center, _normal, _isGuide) {
 	this.generateSkeleton = function() {
 		let circles = [],
 				radius = 350;
-				points = 120,
+				points = 40,
 				a = 45;
 
 		let p = [0, radius, 0];
