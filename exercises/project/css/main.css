@@ -124,10 +124,10 @@
   height: 40px;
   margin: 10px;
   margin-bottom: 0;
-  background: #4481A6;
+  background: #356582;
   text-align: center;
   line-height: 40px;
-  font-size: 24px;
+  font-size: 30px;
   border-radius: 3px;
 }
 .panel .panel-content .header:hover {
@@ -139,10 +139,14 @@
   padding: 10px;
 }
 .panel .panel-content .list .list-item {
-  min-height: 100px;
   margin-bottom: 10px;
   border-radius: 3px;
   background: #4481A6;
+  padding: 10px;
+  font-size: 22px;
+  text-align: center;
+  text-decoration: underline;
+  text-decoration-color: #4481A6;
 }
 .panel.collapsed {
   flex: 0;

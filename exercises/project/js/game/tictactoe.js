@@ -27,8 +27,6 @@ var TicTacToe = function() {
 				}
 			}
 		}
-
-
 	}
 
 	this.doTurn = function() {
@@ -201,6 +199,7 @@ var TicTacToe = function() {
 	this.zoneHover = null;
 	this.winner = null;
 	this.winnerPositions = null;
+	this.animationQueue = [];
 
 	/* Create objs */
 	this.envObj = new Env();

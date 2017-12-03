@@ -22,24 +22,39 @@
 						<div class="button nav-icon" data-toggle="left-panel"><div></div></div>
 
 						<div class="panel-content">
-							<span class="header" data-toggle="list-1">Header 1</span>
-							<ul class="list left-list" id="list-1">
-								<li class="list-item">1</li>
-								<li class="list-item">2</li>
-								<li class="list-item">3</li>
-								<li class="list-item">4</li>
-								<li class="list-item">5</li>
-								<li class="list-item">6</li>
+							<span class="header" data-toggle="list-about">About</span>
+							<ul class="list left-list" id="list-about">
+								<li class="list-item">This is TicTacToe. The classic game. <br>It's made in WebGL and it's the result of a whole Computer Graphics course in UCSC.</li>
 							</ul>
 
-							<span class="header" data-toggle="list-2">Header 2</span>
-							<ul class="list left-list" id="list-2">
-								<li class="list-item">1</li>
-								<li class="list-item">2</li>
-								<li class="list-item">3</li>
-								<li class="list-item">4</li>
-								<li class="list-item">5</li>
-								<li class="list-item">6</li>
+							<span class="header" data-toggle="list-objects">How do you create the objects</span>
+							<ul class="list left-list" id="list-objects">
+								<li class="list-item">As said before, it's based in WebGL. Basically the javascript code tells the GPU where to draw series of polygons and thats what you see here.</li>
+								<li class="list-item">So to build the objects and draw them, first we set its vertices. The vertices will be used to create the polygons.</li>
+								<li class="list-item">Now you may think it's crazy to build objects setting all its vertices. Of course it is. <br> We only do that with the board, since is a pretty simple shape (only 8 points for the main shape and another 8 for each ribbon, 40 points in total).</li>
+								<li class="list-item">Ok, so now you get how the table works, but what about the crosses and the donuts? Do I set every point by hand?... Pls no! We are using a programming language for a reason. <br> Through javascript we can create loops that set the points for us.</li>
+								<li class="list-item">For the cross it's really easy. We set 4 points, the ones in the ends of the paths of an X. Then for both diagonals a line is set, connecting two points. Between these two points a cylinder is generated, similarly as how we did in the <a href="/exercises/program4/features.html">main class assignment</a>. Nice, right?</li>
+								<li class="list-item">And what about the donuts? Well, the generation is a bit more tricky, but follows the same cylinder-based principle. <br> First, we set a center for the object, and generate a circle of evenly separated points around it. <br> Then, for each point in the circle, another circle is generated, following the direction of the radius. <br> Finally, cylinders are generated between each pair of consecutive outer-circles.</li>
+							</ul>
+
+							<span class="header" data-toggle="list-colors">How do you create the colors</span>
+							<ul class="list left-list" id="list-colors">
+								<li class="list-item">Well everything is pretty much handled by WebGL itself. However, my work here is to provide WebGL the images to take the textures from (aka texturemaps) and tell it which pixels from the image to take.</li>
+								<li class="list-item">In order to create this texture effect what I do to the objects is map their (x, y) coordinates to (x', y') coordinates of the texturemap.</li>
+								<li class="list-item">For the board the texturemaps used are two wood images. <br> For the objects it's a patter that simulates a metallic surface.</li>
+							</ul>
+
+							<span class="header" data-toggle="list-scene">What about the grass-clody scene</span>
+							<ul class="list left-list" id="list-scene">
+								<li class="list-item">Thats a really cool trick. Basically is another texturemap. <br> What? Texturemap? But doesn't it mean... that there's an object...? <br> Sure! What we see in the scene is a cube! The hole scene is inside a cube that has its faces maped to a texture image of a cloudy field. Awesome.</li>
+							</ul>
+
+							<span class="header" data-toggle="list-else">What else</span>
+							<ul class="list left-list" id="list-else">
+								<li class="list-item">Well there are some other things going on:</li>
+								<li class="list-item">For illumination, we assume a directional light coming from the sky (aka Sun). We can see specular reflects in the objects. This illumination is calculated by the GPU giving to it a vertex and the surface normal it has.</li>
+								<li class="list-item">To position the objects a technique called Free From Deformation is used. Basically instead of moving the whole objects (and all its points) we set a cube around the object and move this cube. What we draw is the relative coordinates of the points in the object con respect to the original auxiliar cube. This way instead of moving thousands of points an object has we only move 8 points.</li>
+								<li class="list-item">To detect which cell of the board is being selected we use another trick called 'picking'. What we do is draw every cell with a unique color, read the color of the pixel the mouse is hovering and redraw with original color. <br> This happens so fast we cannot notice it in the game, but our gpu can and lets us make a game like this.</li>
 							</ul>
 						</div>
 					</div>
@@ -52,8 +67,8 @@
 						<div class="button nav-icon" data-toggle="right-panel"><div></div></div>
 
 						<div class="panel-content">
-							<span class="header" data-toggle="list-3">Header 3</span>
-							<ul class="list right-list" id="list-3">
+							<span class="header" data-toggle="list-settings">Settings</span>
+							<ul class="list right-list" id="list-settings">
 								<li class="list-item"></li>
 							</ul>
 						</div>
@@ -95,12 +110,12 @@
 				const vec3 KA = vec3(0.0, 0.0, 0.2);
 				const vec3 KD = vec3(1.0, 0.0, 0.0);
 				const vec3 KS = vec3(0.4, 0.4, 0.4);
-				const float NS = 10.0;
+				const float NS = 5.0;
 
 				const vec3 light = vec3(1.0, 1.0, 1.0);
 				const vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
-				const vec3 eyeDirection = normalize(vec3(0.0, 0.0, 1.0));
+				uniform vec3 eyeDirection;
 				vec3 reflectionDirection;
 				float specular;
 				uniform float doLight;
@@ -137,8 +152,8 @@
 							gl_FragColor.rgb += min(dot(normalize(v_Normal.xyz), normalize(light)), 0.0) * KD * lightColor;
 						}
 
-						reflectionDirection = normalize(reflect(normalize(-light), normalize(v_Normal.xyz)));
-						specular = pow(min(dot(reflectionDirection, eyeDirection), 0.0), NS);
+						reflectionDirection = normalize(reflect(normalize(light), normalize(v_Normal.xyz)));
+						specular = pow(min(dot(reflectionDirection, normalize(eyeDirection)), 0.0), NS);
 						gl_FragColor.rgb += KS * specular * lightColor;
 
 						gl_FragColor.rgb += KA;

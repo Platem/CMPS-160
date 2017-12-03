@@ -135,10 +135,10 @@
 			height: 40px;
 			margin: 10px;
 			margin-bottom: 0;
-			background: #4481A6;
+			background: darken(#4481A6, 10%);
 			text-align: center;
 			line-height: 40px;
-			font-size: 24px;
+			font-size: 30px;
 			border-radius: 3px;
 
 			&:hover {
@@ -152,10 +152,14 @@
 			padding: 10px;
 
 			.list-item {
-				min-height: 100px;
 				margin-bottom: 10px;
 				border-radius: 3px;
 				background: #4481A6;
+				padding: 10px;
+				font-size: 22px;
+				text-align: center;
+				text-decoration: underline;
+				text-decoration-color: #4481A6;
 			}
 		}
 	}

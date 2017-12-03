@@ -8,14 +8,18 @@ let eye = [0, 0, 500];
 let lookat = [0, 0, 0];
 let up = [0, 1, 0];
 
+let u_eye;
+
 var setupScene = function() {
 	if (!setupGL()) {
 		console.log('There was an error in the WebGL setup. Exiting now.');
 		return;
 	}
+	u_eye = gl.getUniformLocation(gl.program, 'eyeDirection');
 	mat.setIdentity();
 	mat.setPerspective(100, 1.0, 1, 1500);
 	mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
+	gl.uniform3fv(u_eye, new Float32Array(eye));
 }
 
 let then = 0;
@@ -36,6 +40,7 @@ var drawScene = function(now) {
 		eye = rotatePointAboutPoint(eye, lookat, false, speed * deltaTime, false);
 		mat.setPerspective(100, 1.0, 1, 1500);
 		mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
+		gl.uniform3fv(u_eye, new Float32Array(eye));
 	}
 
 	Game.drawGame(mouse);

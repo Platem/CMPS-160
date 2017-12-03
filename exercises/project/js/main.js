@@ -26,7 +26,6 @@ $(function() {
 		$toggled.slideToggle();
 	});
 
-
 	$('.panel').each(function() {
 		$(this).toggleClass('collapsed');
 	});
@@ -35,9 +34,15 @@ $(function() {
 		$(this).toggleClass('opened');
 	});
 
-	$('.list').each(function(){
-		$(this).toggle();
+	$('.header').each(function(){
+		let $toggled = $('#' + $(this).attr('data-toggle'));
+		let side = $toggled.hasClass('left-list') ? 'left' : 'right';
+
+		if (side == 'left')
+			$toggled.toggle();
 	});
+
+
 
 	$(document).keypress(function(e) {
 		// console.log(e.which);
