@@ -141,33 +141,49 @@ function circleCenter(pA, pB) {
 	return new Coord(pA.x + r[0], pA.y + r[1], pA.z + r[2], 1.0, 0.0, 0.0);
 }
 
-function rotatePointAboutPoint(pA, pB, angleX, angleY) {
+function rotatePointAboutPoint(pA, pB, angleX, angleY, angleZ) {
 	let ret = [pA[0], pA[1], pA[2]];
-	let aX = Math.PI * angleX / 180;
-	let aY = Math.PI * angleY / 180;
 
 	// console.log(ret);
+	// console.log(pB);
 
 	// First translate pA as to put pB in the origin
 	ret[0] = ret[0] - pB[0];
 	ret[1] = ret[1] - pB[1];
 	ret[2] = ret[2] - pB[2];
 
-	// console.log(ret);
+	if (angleX) {
+		let a = ret[0];
+		let b = ret[1];
+		let c = ret[2];
+		// Rotate around X axis
+		let aX = Math.PI * angleX / 180;
+		ret[0] = a;
+		ret[1] = b * Math.cos(aX) - c * Math.sin(aX); 
+		ret[2] = b * Math.sin(aX) + c * Math.cos(aX);
+	}
 
-	// Rotate around X axis
-	ret[0] = ret[0];
-	ret[1] = ret[1] * Math.cos(aX) - ret[2] * Math.sin(aX); 
-	ret[2] = ret[1] * Math.sin(aX) + ret[2] * Math.cos(aX);
+	if (angleY) {
+		let a = ret[0];
+		let b = ret[1];
+		let c = ret[2];
+		// Rotate around Y axis
+		let aY = Math.PI * angleY / 180;
+		ret[0] = a * Math.cos(aY) + c * Math.sin(aY); 
+		ret[1] = b;
+		ret[2] = - a * Math.sin(aY) + c * Math.cos(aY);
+	}
 
-	// console.log(ret);
-
-	// Rotate around Y axis
-	ret[0] = ret[0] * Math.cos(aY) + ret[2] * Math.sin(aY); 
-	ret[1] = ret[1];
-	ret[2] = - ret[0] * Math.sin(aY) + ret[2] * Math.cos(aY);
-
-	// console.log(ret);
+	if (angleZ) {
+		let a = ret[0];
+		let b = ret[1];
+		let c = ret[2];
+		// Rotate around Z axis
+		let aZ = Math.PI * angleZ / 180;
+		ret[0] = a * Math.cos(aZ) - b * Math.sin(aZ);
+		ret[1] = a * Math.sin(aZ) + b * Math.cos(aZ);
+		ret[2] = c;
+	}
 
 	// Then translate back
 	ret[0] = ret[0] + pB[0];
