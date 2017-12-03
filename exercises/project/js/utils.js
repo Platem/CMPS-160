@@ -69,7 +69,7 @@ function loadArrayToTextureBuffer(array, texture) {
 
 function loadArraysAndDraw(gl, positionArray, colorArray, normalArray, textureArray, draw_mode, nolights, texture) {
 	let u_light = gl.getUniformLocation(gl.program, 'doLight');
-	if (nolights) {
+	if (nolights || !USE_LIGHT) {
 		gl.uniform1f(u_light, 0.0);
 	} else {
 		gl.uniform1f(u_light, 1.0);

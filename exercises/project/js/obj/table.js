@@ -628,7 +628,11 @@ var Table = function(_center, _normal) {
 			t.push((this.box[i][0] + 500) / 1000);
 			t.push((this.box[i][1] + 500) / 1000);
 		}
-		loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
+
+		if (USE_TEX)
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
+		else
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, false);
 
 		v = [];
 		c = [];
@@ -651,7 +655,10 @@ var Table = function(_center, _normal) {
 			t.push((this.ribbons[i][1] + 500) / 1000);
 		}
 
-		loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood_2');
+		if (USE_TEX)
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood_2');
+		else
+			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, false);
 	}
 
 	this.drawZones = function(withID) {
@@ -751,7 +758,10 @@ var Table = function(_center, _normal) {
 		if (withID)
 			loadArraysAndDraw(gl, v, c, n, t, 'triangles', true, false);
 		else
-			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
+			if (USE_TEX)
+				loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_wood');
+			else
+				loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, false);
 	}
 
 	this.checkForTableZone = function(mouse, log) {

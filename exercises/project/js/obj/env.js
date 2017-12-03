@@ -1,15 +1,9 @@
 var Env = function() {
 	this.drawObj = function() {
-		let v = [];
 		let c = [];
 		let n = [];
-		let t = [];
 
 		for (let i = 0; i < this.triangles.length; i+=3) {
-			v.push(this.triangles[i]);
-			v.push(this.triangles[i + 1]);
-			v.push(this.triangles[i + 2]);
-
 			c.push(1.0);
 			c.push(1.0);
 			c.push(1.0);
@@ -19,12 +13,10 @@ var Env = function() {
 			n.push(1.0);
 		}
 
-		for (let i = 0; i < this.texCoords.length; i+=2) {
-			t.push(this.texCoords[i]);
-			t.push(this.texCoords[i + 1]);
-		}
-
-		loadArraysAndDraw(gl, v, c, n, t, 'triangles', 'true', 'env');
+		if (USE_TEX)
+			loadArraysAndDraw(gl, this.triangles, c, n, this.texCoords, 'triangles', true, 'env');
+		else
+			loadArraysAndDraw(gl, this.triangles, c, n, this.texCoords, 'triangles', true, false);
 	};
 	
 	this.triangles = [

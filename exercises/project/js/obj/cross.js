@@ -405,9 +405,15 @@ var Cross = function(_center, _normal, _isGuide) {
 		if (this.isGuide) {
 			loadArraysAndDraw(gl, v, c, n, t, 'triangles', true, false);
 		} else if (this.isWinner) {
-			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_metal_green');
+			if (USE_TEX)
+				loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_metal_green');
+			else
+				loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, false);
 		}	else {
-			loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_metal_red');
+			if (USE_TEX)
+				loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, 'obj_metal_red');
+			else
+				loadArraysAndDraw(gl, v, c, n, t, 'triangles', false, false);
 		}
 
 		// Circles
@@ -448,12 +454,12 @@ var Cross = function(_center, _normal, _isGuide) {
 			v.push(this.ffd.p[1] + this.ffd.s[1]);
 			v.push(this.ffd.p[2] + this.ffd.s[2]);
 
-			c.push(COLOR_BLACK[0]);
-			c.push(COLOR_BLACK[1]);
-			c.push(COLOR_BLACK[2]);
-			c.push(COLOR_BLACK[0]);
-			c.push(COLOR_BLACK[1]);
-			c.push(COLOR_BLACK[2]);
+			c.push(COLOR_MAGENTA[0]);
+			c.push(COLOR_MAGENTA[1]);
+			c.push(COLOR_MAGENTA[2]);
+			c.push(COLOR_MAGENTA[0]);
+			c.push(COLOR_MAGENTA[1]);
+			c.push(COLOR_MAGENTA[2]);
 
 			n.push(1.0);
 			n.push(1.0);
@@ -474,12 +480,12 @@ var Cross = function(_center, _normal, _isGuide) {
 			v.push(this.ffd.p[1] + this.ffd.t[1]);
 			v.push(this.ffd.p[2] + this.ffd.t[2]);
 
-			c.push(COLOR_BLACK[0]);
-			c.push(COLOR_BLACK[1]);
-			c.push(COLOR_BLACK[2]);
-			c.push(COLOR_BLACK[0]);
-			c.push(COLOR_BLACK[1]);
-			c.push(COLOR_BLACK[2]);
+			c.push(COLOR_MAGENTA[0]);
+			c.push(COLOR_MAGENTA[1]);
+			c.push(COLOR_MAGENTA[2]);
+			c.push(COLOR_MAGENTA[0]);
+			c.push(COLOR_MAGENTA[1]);
+			c.push(COLOR_MAGENTA[2]);
 
 			n.push(1.0);
 			n.push(1.0);
@@ -500,12 +506,12 @@ var Cross = function(_center, _normal, _isGuide) {
 			v.push(this.ffd.p[1] + this.ffd.u[1]);
 			v.push(this.ffd.p[2] + this.ffd.u[2]);
 
-			c.push(COLOR_BLACK[0]);
-			c.push(COLOR_BLACK[1]);
-			c.push(COLOR_BLACK[2]);
-			c.push(COLOR_BLACK[0]);
-			c.push(COLOR_BLACK[1]);
-			c.push(COLOR_BLACK[2]);
+			c.push(COLOR_MAGENTA[0]);
+			c.push(COLOR_MAGENTA[1]);
+			c.push(COLOR_MAGENTA[2]);
+			c.push(COLOR_MAGENTA[0]);
+			c.push(COLOR_MAGENTA[1]);
+			c.push(COLOR_MAGENTA[2]);
 
 			n.push(1.0);
 			n.push(1.0);

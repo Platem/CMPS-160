@@ -69,15 +69,16 @@
 						<div class="panel-content">
 							<span class="header" data-toggle="list-settings">Settings</span>
 							<ul class="list right-list" id="list-settings">
-								<li class="list-item"></li>
+								<li class="list-item action" id="setting-ffdtoggle">Toggle FFD</li>
+								<li class="list-item action" id="setting-textures">Toggle Textures</li>
+								<li class="list-item action" id="setting-light">Toggle Light</li>
 							</ul>
 
 							<span class="header" data-toggle="list-actions">Actions</span>
 							<ul class="list right-list" id="list-actions">
 								<li class="list-item action" id="action-restart">Restart</li>
 								<li class="list-item action" id="action-center">Center Camera</li>
-								<li class="list-item action"></li>
-								<li class="list-item action"></li>
+								<li class="list-item action" id="action-movement">Togle movement</li>
 							</ul>
 						</div>
 					</div>
@@ -115,12 +116,12 @@
 				varying vec4 v_Normal;
 				varying vec2 v_TexCoord;
 
-				const vec3 KA = vec3(0.0, 0.0, 0.2);
-				const vec3 KD = vec3(1.0, 0.0, 0.0);
-				const vec3 KS = vec3(0.4, 0.4, 0.4);
+				const vec3 KA = vec3(0.0, 0.0, 0.1);
+				const vec3 KD = vec3(0.5, 0.5, 0.5);
+				const vec3 KS = vec3(0.5, 0.5, 0.5);
 				const float NS = 5.0;
 
-				const vec3 light = vec3(1.0, 1.0, 1.0);
+				const vec3 light = vec3(0.0, 1.0, 1.0);
 				const vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
 				uniform vec3 eyeDirection;
@@ -165,6 +166,8 @@
 						gl_FragColor.rgb += KS * specular * lightColor;
 
 						gl_FragColor.rgb += KA;
+
+						gl_FragColor.rgb = min(gl_FragColor.rgb, 1.0);
 					}
 				}
 			</script>

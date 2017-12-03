@@ -36,6 +36,7 @@ const COLOR_BLUE = [0, 0, 255];
 const COLOR_BLACK = [0, 0, 0];
 const COLOR_BROWN = [222, 184, 135];
 const COLOR_GRAY = [180, 180, 180];
+const COLOR_MAGENTA = [255, 0, 255];
 
 const ENV_TEX = [/*'env-field.png', */'env-grass.jpg', 'env-mountains.jpg', 'env-museum.jpg'];
 const OBJ_TEX = {
@@ -47,7 +48,9 @@ const OBJ_TEX = {
 };
 
 var USE_FFD = true;
+var USE_TEX = true;
 var SHOW_FFD = false;
+var USE_LIGHT = true;
 
 // Setup WebGL function
 function setupGL() {

@@ -42,6 +42,21 @@ $(function() {
 			$toggled.toggle();
 	});
 
+	$('#setting-ffdtoggle').on('click', function(e) {
+		e.preventDefault();
+		SHOW_FFD ? SHOW_FFD = false : SHOW_FFD = true;
+	});
+
+	$('#setting-textures').on('click', function(e) {
+		e.preventDefault();
+		USE_TEX ? USE_TEX = false : USE_TEX = true;
+	});
+
+	$('#setting-light').on('click', function(e) {
+		e.preventDefault();
+		USE_LIGHT ? USE_LIGHT = false : USE_LIGHT = true;
+	});
+
 	$('#action-restart').on('click', function(e) {
 		e.preventDefault();
 		Game = new TicTacToe();
@@ -52,6 +67,10 @@ $(function() {
 		mat.setPerspective(100, 1.0, 1, 1500);
 		mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
 		gl.uniform3fv(u_eye, new Float32Array(eye));
+	});
+
+	$('#action-movement').on('click', function(e) {
+		e.preventDefault();
 	});
 
 	$(document).keypress(function(e) {
