@@ -148,6 +148,10 @@
   text-decoration: underline;
   text-decoration-color: #4481A6;
 }
+.panel .panel-content .list .list-item.action:hover {
+  cursor: pointer;
+  text-decoration-color: white;
+}
 .panel.collapsed {
   flex: 0;
   padding: 1px;

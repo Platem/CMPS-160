@@ -160,6 +160,11 @@
 				text-align: center;
 				text-decoration: underline;
 				text-decoration-color: #4481A6;
+
+				&.action:hover {
+					cursor: pointer;
+					text-decoration-color: white;
+				}
 			}
 		}
 	}

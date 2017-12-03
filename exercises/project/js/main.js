@@ -42,7 +42,17 @@ $(function() {
 			$toggled.toggle();
 	});
 
+	$('#action-restart').on('click', function(e) {
+		e.preventDefault();
+		Game = new TicTacToe();
+	});
 
+	$('#action-center').on('click', function(e) {
+		eye = [0, 0, 500];
+		mat.setPerspective(100, 1.0, 1, 1500);
+		mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
+		gl.uniform3fv(u_eye, new Float32Array(eye));
+	});
 
 	$(document).keypress(function(e) {
 		// console.log(e.which);
@@ -81,8 +91,6 @@ $(function() {
 			}
 		}
 	});
-
-	/* Init game */
 
 	/* Setup */
 	updateCanvas(true);
