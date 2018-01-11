@@ -71,19 +71,39 @@ $(function() {
 
 	$('#action-movement').on('click', function(e) {
 		e.preventDefault();
+		move = move ? false : true;
 	});
 
 	$(document).keypress(function(e) {
-		// console.log(e.which);
+		console.log(e.which);
 		switch (e.which) {
-			case 32:
+			case 99:  // C
+				e.preventDefault();
+				eye = [0, 0, 500];
+				mat.setPerspective(100, 1.0, 1, 1500);
+				mat.lookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0], up[1], up[2]);
+				gl.uniform3fv(u_eye, new Float32Array(eye));
+				break
+			case 102: // F
+				e.preventDefault();
+				SHOW_FFD ? SHOW_FFD = false : SHOW_FFD = true;
+				break
+			case 108: // L
+				e.preventDefault();
+				USE_LIGHT ? USE_LIGHT = false : USE_LIGHT = true;
+				break
+			case 109: // M
 				e.preventDefault();
 				move = move ? false : true;
 				break;
-			case 114:
+			case 114: // R
 				e.preventDefault();
 				Game = new TicTacToe();
 				break;
+			case 116: // T
+				e.preventDefault();
+				USE_TEX ? USE_TEX = false : USE_TEX = true;
+				break
 		}
 	});
 

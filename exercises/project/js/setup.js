@@ -48,9 +48,9 @@ const OBJ_TEX = {
 };
 
 var USE_FFD = true;
-var USE_TEX = true;
+var USE_TEX = false;
 var SHOW_FFD = false;
-var USE_LIGHT = true;
+var USE_LIGHT = false;
 
 // Setup WebGL function
 function setupGL() {

@@ -643,9 +643,9 @@ var Table = function(_center, _normal) {
 			v.push(this.ribbons[i][1]);
 			v.push(this.ribbons[i][2]);
 
-			c.push(COLOR_BLACK[0] + 100);
-			c.push(COLOR_BLACK[1] + 100);
-			c.push(COLOR_BLACK[2] + 100);
+			c.push(COLOR_BLACK[0] + 105);
+			c.push(COLOR_BLACK[1] + 105);
+			c.push(COLOR_BLACK[2] + 105);
 
 			n.push(this.ribbonsNormals[i][0]);
 			n.push(this.ribbonsNormals[i][1]);
